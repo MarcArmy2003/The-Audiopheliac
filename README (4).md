@@ -46,6 +46,5 @@ It’s a ritual. A pursuit. A collection of moments that sound better when you c
 
 ---
 
-> “Audiophiles don’t use their equipment to listen to your music.  
-> Audiophiles use your music to listen to their equipment.”  
-> — Alan Parsons
+“Audiophiles don’t use their equipment to listen to your music. Audiophiles use your music to listen to their equipment.”  
+— Alan Parsons
