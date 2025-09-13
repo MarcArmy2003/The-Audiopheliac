@@ -336,7 +336,80 @@
 **📍 Source & Price Paid**: Amazon, 24JAN25 / $24.97  
 **🎧 Sound Notes / Setup**: Big modern pop production — punchy beats and clean layered vocals. Vinyl mastering is clear with plenty of bass energy.  
 
-**⭐ Why I like it**: Fresh new artist energy — feels like a breakout debut with attitude.  
+**⭐ Why I like it**: Fresh new artist energy — feels like a breakout debut with attitude. Bit of a yeller though.  
 **🚀 Upgrade Goals / Wishlist Level**: None needed; happy to have the debut on vinyl.  
+
+---
+### 🎵 Vs. — Pearl Jam  
+
+**📀 Label / Catalog #**: Epic / Legacy / 88697843131 (LC 00199)  
+**🗓️ Year / Pressing Info**: 2011 Legacy reissue (original album 1993)  
+**🌍 Country / Stereo-Mono / Special Edition**: Europe / Stereo  
+
+**💿 Condition (Vinyl / Sleeve)**: NM / NM (clean copy, plays well)  
+**📍 Source & Price Paid**: Target, JUL24 / $24.99  
+**🎧 Sound Notes / Setup**: Punchy and dynamic — Eddie Vedder’s vocals soar, “Daughter” and “Elderly Woman” feel warm and intimate, while “Go” and “Animal” hit hard with tight bass.  
+
+**⭐ Why I like it**: One of Pearl Jam’s strongest albums — raw, urgent, and packed with emotional intensity.  
+**🚀 Upgrade Goals / Wishlist Level**: This Legacy reissue is excellent; only real upgrade would be a 1993 first U.S. pressing for collector value.  
+
+---
+### 🎵 Purple — Stone Temple Pilots  
+
+**📀 Label / Catalog #**: Atlantic / RCD1 82607, 603497837090  
+**🗓️ Year / Pressing Info**: 2023 Limited Reissue, Colored Vinyl  
+**🌍 Country / Stereo-Mono / Special Edition**: U.S. / Stereo / Clear Variant  
+
+**💿 Condition (Vinyl / Sleeve)**: M / NM  
+**📍 Source & Price Paid**: Target, JUL25 / $27.00  
+**🎧 Sound Notes / Setup**: Classic 90s grunge with heavy riffs and melodic hooks.  
+
+**⭐ Why I like it**: STP is my favorite grunge band of the 90s. I got *Core* for Christmas one year, not even knowing who they were — it became my coming-of-age soundtrack.  
+**🚀 Upgrade Goals / Wishlist Level**: Would only chase down an original 1994 pressing for nostalgia value.  
+
+---
+
+### 🎵 Sublime — Sublime  
+
+**📀 Label / Catalog #**: Gasoline Alley / Geffen / Skunk Records / B0034218-01  
+**🗓️ Year / Pressing Info**: 2024 Limited Reissue, Red + Yellow LPs, Gatefold  
+**🌍 Country / Stereo-Mono / Special Edition**: U.S. / Stereo / Colored Vinyl  
+
+**💿 Condition (Vinyl / Sleeve)**: M / NM  
+**📍 Source & Price Paid**: Target, JUN25 / $39.99  
+**🎧 Sound Notes / Setup**: Laid-back SoCal vibes, bass-forward with raw vocals.  
+
+**⭐ Why I like it**: It reminds me of riding around Derry, NH, as a teenager with nothing to do and nowhere to go.  
+**🚀 Upgrade Goals / Wishlist Level**: Happy with this pressing; only upgrade if an original ’96 appears at a good price.  
+
+---
+
+### 🎵 Pretty Hate Machine — Nine Inch Nails  
+
+**📀 Label / Catalog #**: The Bicycle Music Company / B0015767-01  
+**🗓️ Year / Pressing Info**: 2011 Reissue, Remastered, 180g LP  
+**🌍 Country / Stereo-Mono / Special Edition**: U.S. / Stereo / 180g  
+
+**💿 Condition (Vinyl / Sleeve)**: M / M  
+**📍 Source & Price Paid**: ??, 2025 / $??  
+**🎧 Sound Notes / Setup**: Cold, industrial, but still melodic — synths and rhythms punch hard.  
+
+**⭐ Why I like it**: A great album, but *The Downward Spiral* is Reznor’s masterpiece, IMO.  
+**🚀 Upgrade Goals / Wishlist Level**: Would love to add *Downward Spiral* to balance this in the collection.  
+
+---
+
+### 🎵 Facelift — Alice In Chains  
+
+**📀 Label / Catalog #**: Columbia / Sony / Legacy / 19439783861  
+**🗓️ Year / Pressing Info**: 2020s 2×LP Remaster/Reissue  
+**🌍 Country / Stereo-Mono / Special Edition**: U.S. / Stereo / Gatefold  
+
+**💿 Condition (Vinyl / Sleeve)**: M / NM  
+**📍 Source & Price Paid**: Target, JUN25 / $33  
+**🎧 Sound Notes / Setup**: Heavy and dark, guitars thick with distortion, Layne’s voice cutting through.  
+
+**⭐ Why I like it**: Not my favorite Alice in Chains album — that’s reserved for *Jar of Flies*. I was serving in the Army in Washington State (Tacoma) when I heard the news Layne had died in his Seattle apartment of an overdose. Sad, like too many artists.  
+**🚀 Upgrade Goals / Wishlist Level**: This pressing is strong; someday, a clean early ’90s copy would be ideal.  
 
 ---
