@@ -1,6 +1,6 @@
 # Master AV & Network Devices Inventory
 **The Audiopheliac – Complete AV, Gaming, and Network Inventory**  
-Compiled: Updated August 2025  
+Compiled: Updated September 2025  
 Owner Device ID: GDMARCHE  
 
 ---
@@ -12,48 +12,51 @@ Owner Device ID: GDMARCHE
   - Location: Family Room
   - Connected to: Schiit Mani 2 → Yamaha R-N800A → Polk ES60 speakers
   - Accessories: Pro-Ject Cork-It High-Quality Platter Mat
-- **Victrola AT7** (entry-level model)
+- **Technics SL-1200MK2**
   - Location: Home Office
-  - Connected via RCA to Sparknote amp (or Bose 3•2•1 system)
-  - Accessories: Audio-Technica felt platter mat (from AT-LP120XUSB)
+  - Connected via Schiit Mani 2 or ART DJPRE II (swappable)
+  - Notes: Legacy DJ-grade deck, compared against AT-LP120XUSB
 
 ### Phono Preamps
-- **Schiit Mani 2**
-  - Supports MM/MC/MI cartridges, adjustable gain
-- **ART DJPRE II**
-  - Selectable capacitance (100pF/200pF), low-cut filter, front gain trim
+- **Schiit Mani 2**  
+  - Supports MM/MC/MI cartridges, adjustable gain  
+- **ART DJPRE II**  
+  - Selectable capacitance (100pF/200pF), low-cut filter, front gain trim  
 
 ### Amps & Monitoring
-- **Yamaha R-N800A Network Receiver**
-  - Primary receiver for stereo and phono input
-  - Built-in DAC and MusicCast
-  - Reserved IP: `192.168.1.192` (Arcadyan module, MAC: 54:b7:bd:9f:ac:19)
-- **Spark 40 (Positive Grid)**
-  - 40W guitar amp, Bluetooth, USB recording, mobile app, ToneCloud
-- **Sparknote Practice Amp**
-  - Location: Home Office
-  - Provides gain control for low-output vinyl or guitar setups
-- **Audio-Technica ATH-M50x headphones**
-  - Used for studio monitoring and guitar practice
+- **Yamaha R-N800A Network Receiver**  
+  - Primary receiver for stereo and phono input  
+  - Built-in DAC and MusicCast  
+  - Reserved IP: `192.168.1.192` (Arcadyan module, MAC: 54:b7:bd:9f:ac:19)  
+- **Spark 40 (Positive Grid)**  
+  - 40W guitar amp, Bluetooth, USB recording, mobile app, ToneCloud  
+- **Sparknote Practice Amp**  
+  - Location: Home Office  
+  - Provides gain control for low-output vinyl or guitar setups  
+- **Audio-Technica ATH-M50x headphones**  
+  - Used for studio monitoring and guitar practice  
 
 ### Speakers
-- **Polk Signature Elite ES60** (tower speakers, white-washed)
-- **Bose Lifestyle 650**
-  - Location: Family Room
-  - Reserved IP: `192.168.1.102` (MAC: f4:e1:1e:df:c4:11)
-- **Bose 3•2•1 Series II**
-  - Location: Home Office
+- **Polk Signature Elite ES60** (tower speakers, white-washed)  
+- **Bose Lifestyle 650**  
+  - Location: Family Room  
+  - Reserved IP: `192.168.1.102` (MAC: f4:e1:1e:df:c4:11)  
+- **Bose 3•2•1 Series II**  
+  - Location: Home Office  
 
 ### Subwoofers
-- **SVS SB-1000 Pro**
-  - 12" sealed, DSP-tuned, RCA and Bluetooth options
+- **SVS SB-1000 Pro**  
+  - 12" sealed, DSP-tuned, RCA and Bluetooth options  
 
 ### Guitar Equipment
-- **Main Electric Guitar** (model TBD)
-- **New Bee 2.4G Wireless Guitar System**
-  - Transmitter/Receiver set for cable-free practice
-- **Positive Grid Spark 40 Amp**
-  - Also listed above, supports Smart Jam and ToneCloud integration
+- **Main Electric Guitar** (model TBD)  
+- **Seagull S Series SC-6W Acoustic Guitar**  
+- **Ibanez Performance PF5NT1201 Acoustic Guitar**  
+  - Serial: SQ00071493  
+- **New Bee 2.4G Wireless Guitar System**  
+  - Transmitter/Receiver set for cable-free practice  
+- **Positive Grid Spark 40 Amp**  
+  - Also listed above, supports Smart Jam and ToneCloud integration  
 
 ---
 
@@ -124,13 +127,23 @@ Owner Device ID: GDMARCHE
 ### Security & Home Automation
 - **Qolsys IQ Panel**
   - Reserved IP: `192.168.1.78` (MAC: 3c:31:78:9d:f2:08)
+
 - **Google Nest Cameras**
-  - Cam #1: `192.168.1.185` (MAC: 18:b4:30:e2:d7:78)
-  - Cam #2: `192.168.1.90` (MAC: b8:7b:d4:cf:ee:7b)
+  - Lanai Entrance / Pool Entry (part of ADT system) – IP/MAC TBD
+  - Indoor Hallway (faces down hallway) – IP/MAC TBD
+
 - **Google Nest Doorbell (Battery)**
+  - Location: Front Door
   - Reserved IP: `192.168.1.69` (MAC: fc:91:5d:94:a4:f2)
+
+- **Ring Spotlight Cam Pro**
+  - Location: Lanai, overlooking pool area
+  - Captures entire pool, does not cover lanai seating
+  - IP/MAC TBD
+
 - **Philips Hue Bridge**
   - Reserved IP: `192.168.1.165` (MAC: 00:17:88:a0:c8:e1)
+
 - **WiZ Light**
   - Reserved IP: `192.168.1.139` (MAC: a8:bb:50:ea:f0:22)
 
@@ -152,4 +165,4 @@ Owner Device ID: GDMARCHE
 
 ---
 
-_Last Updated: August 2025_
+_Last Updated: September 2025_
