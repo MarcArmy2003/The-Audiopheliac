@@ -1,8 +1,35 @@
-# 🎶 The Audiopheliac
+# 📖 The Audiopheliac
 
-**The Audiopheliac** *(n.):*  
-A portmanteau of *audiophile* + *heliac*, describing one who is devoted to the pursuit of high-fidelity sound and the ritual of vinyl, new and vintage stereo gear, and home AV experimentation.  
-Personal Hi-Fi, AV, and Vinyl Inventory Project.
+**The Audiopheliac (n.)**  
+*From* **audio** (Latin *audīre*, “to hear”) + **-philia** (Greek *φιλία*, “love of”) + **-iac** (Greek *-ιακός*, denoting obsession or compulsion).
+
+---
+
+### Definition
+
+1. **One whose devotion to sound exceeds enthusiasm and borders on obsession**  
+   A person consumed with the pursuit of high-fidelity audio, the ritual of vinyl playback, and the endless tinkering of vintage and modern stereo gear, home AV setups, and experimental listening spaces.
+
+2. **Personal project / identity**  
+   *The Audiopheliac* is a living archive and brand — encompassing hi-fi, AV, and vinyl inventory, cover art, playlists, and experiments in sound reproduction.
+
+---
+
+### 🔑 Distinction: Audiophile vs. Audiopheliac
+
+| **Feature**        | **Audiophile**                                                                 | **Audiopheliac**                                                                 |
+|---------------------|---------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
+| **Motivation**      | Love and appreciation for high-quality audio.                                   | Compulsion to tweak, test, and upgrade, often obsessively.                        |
+| **Focus**           | Uses gear to better enjoy the music.                                           | Uses music to justify the gear; the *system* becomes the art.                     |
+| **Satisfaction**    | Finds joy in balanced upgrades and great playback.                             | Rarely satisfied; always chasing the next improvement.                            |
+| **Relationship**    | Music is the end goal.                                                         | The gear is the end goal.                                                         |
+
+---
+
+### 📂 Project Note
+
+This definition underpins *The Audiopheliac* project — a personal hi-fi, AV, and vinyl inventory and branding effort.  
+It’s both a name and an ethos: *sound not only loved, but obsessively pursued*.
 
 ---
 
