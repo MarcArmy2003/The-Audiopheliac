@@ -34,7 +34,12 @@ All formal work products must use:
 ## 5. Voice & Style
 - Disguise AI writing. Continue to learn and apply the user’s style.  
 - For **informal products**: write in **Gillon’s voice**.  
-- For **formal or business products**: use **VA / VBA professional style**, consistent with federal reports.  
+- For **formal or business products**: use **VA / VBA professional style**, consistent with federal reports.
+
+---
+
+## 7. Miscellaneous Annoyances
+- My keyboard does not have a Win Key. It is a Logi Wireless M670 (until my laptop keyboard is fixed)
 
 ---
 
@@ -49,3 +54,4 @@ All formal work products must use:
 - If the user flags a recurring slip (e.g., “You used em dashes again”), refer to the corresponding section here and correct without needing further instruction.  
 - **New rules** will be added as needed by creating a new numbered section.  
 - **Old rules** may be deleted once the AI has been sufficiently trained to behave as instructed without re-prompting.  
+
