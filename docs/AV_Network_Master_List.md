@@ -18,8 +18,12 @@ Owner Device ID: GDMARCHE
   - Connected to: ART DJPRE II → (split)
     - Path A: Bose 3•2•1 System
     - Path B: SVS Bluetooth Transmitter → Yamaha R-N800A (Line 2 input)
-  - *Optimization Note:* Current split path + Bluetooth introduces lossy compression and added noise. Strong candidate for replacement with **WiiM Ultra** or phono stage with dual outs. Also needs better speakers than the Bose 3•2•1.
-
+    - Accessories: Pro-Ject Cork-It High-Quality Platter Mat 
+  -* Optimization Note:* The current split path + Bluetooth introduces lossy compression and added noise. It is a Strong candidate for replacement with **WiiM Ultra** or a phono stage with dual outs. It also needs better speakers than the Bose 3•2•1.
+ 
+- *- **Audio-Technica AT-LP120XUSB**
+  - Location: Cameron's Room
+ 
 ### Phono Preamps
 - **Schiit Mani II** (Family Room)
 - **ART DJPRE II** (Home Office)
@@ -31,27 +35,35 @@ Owner Device ID: GDMARCHE
   - *Connection Note:* Hardwired to SVS SB-1000 Pro sub. Line 2 input currently fed via SVS BT Receiver (linked to Office transmitter).
 - **Positive Grid Spark 40** (guitar amp)
 - **Audio-Technica ATH-M50x headphones**  
-  - *Optimization Note:* Only headphones logged; add others if in rotation.
+- **Beats Fit Pro**
+- **Logitech H390 Wired Headset**
 
 ### Speakers
 - **Polk Signature Elite ES60** (towers, Family Room)
 - **Bose Lifestyle 650** (Family Room, IP: `192.168.1.102`)
 - **Bose 3•2•1 Series II** (Home Office)
-- **Bose SoundTouch I & II** (Location TBD)
+- **Bose SoundTouch I & II** (portable)
   - *Optimization Note:* Log IPs when reserved.
 
 ### Subwoofers
 - **SVS SB-1000 Pro**
   - Hardwired to Yamaha R-N800A
-  - Packaged SVS BT Transmitter/Receiver pair is used separately for Office → Yamaha Line 2 link (not sub connection)
-
+- **Bose Bass Module 700** (Family Room)
+  - Bluetooth; part of Lifestyle 650
+  
 ### Instruments
 - **Seagull S Series SC-6W Acoustic Guitar**
 - **Ibanez Performance PF5NT1201 Acoustic Guitar** (Serial: SQ00071493)
 - **Casio Privia PX-870WE Digital Piano (White)**
   - Built-in speakers, USB/MIDI output
-- **Main Electric Guitar** (TBD)
+- **Main Electric Guitar** 
+  - 
 - **New Bee 2.4G Wireless Guitar System**
+
+### Accessories
+- **SVS SoundPath Wireless Audio Adapter**
+- **New Bee Blutooth Guitar transmitter/receiver**
+  
 
 ---
 
@@ -80,7 +92,33 @@ Owner Device ID: GDMARCHE
 - **QNAP 64:36:d5** (secondary NIC)
 - **QNAP QSW-1105-5T** (2.5GbE unmanaged switch)
 - **TP-Link Switches**: TL-SG105 / TL-SG108 / TL-SG116
-- **Utilities**: Seagate SeaTools, DiscWizard
+
+## SOFTWARE & UTILITIES
+- **Utilities**:
+  - Seagate SeaTools
+  - DiscWizard
+  - Duplicate Cleaner Pro 5
+- **Audio Software**
+  - Boom 3D Audio
+  - Melodyne/Cakewalk
+  - Waves MaxxAudio Pro
+  - MakeMKV
+  - Plex/Plex Media Server
+  - Spotify - Premium Family Plan
+  - Amazon Prime Music
+  - MusicCast
+  - To be continued...
+
+##**Routers and Modem**
+- Spectrum Wireless Router (Arcadyan)
+  - Two extender pods: bedroom and laundry room
+- Google Nest Mesh
+  - Two points: office and garage
+  - Primarily used for the work laptop and as needed
+  - Connected via the QNAP unmanaged switch using the same modem Internet feed as the Spectrum m0doem
+- Cisco Valet Plus
+  - Unused
+- Spectrum modem
 
 ### Core Devices
 - **PC – GDMARCHE** (primary workstation)
@@ -106,6 +144,11 @@ Owner Device ID: GDMARCHE
 - **Ring Spotlight Cam Pro** (Lanai)
 - **Philips Hue Bridge** (IP: `192.168.1.165`)
 - **WiZ Light** (IP: `192.168.1.139`)
+- **MyQ Liftmaster**
+  - Garage door opener, S/N GW0F00339FA7
+  - Unconfigured - unable to connect to the network
+- **Honeywell Home Proseries Thermostat**
+  - Unconfigured - unable to connect to the network
 
 ### Smart Speakers & Streaming
 - **Amazon Echo (Lanai)** (IP: `192.168.1.240`)
