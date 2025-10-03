@@ -21,7 +21,7 @@ Owner Device ID: GDMARCHE
     - Accessories: Pro-Ject Cork-It High-Quality Platter Mat 
   -* Optimization Note:* The current split path + Bluetooth introduces lossy compression and added noise. It is a Strong candidate for replacement with **WiiM Ultra** or a phono stage with dual outs. It also needs better speakers than the Bose 3•2•1.
  
-- *- **Audio-Technica AT-LP120XUSB**
+- * **Audio-Technica AT-LP120XUSB**
   - Location: Cameron's Room
  
 ### Phono Preamps
@@ -56,13 +56,11 @@ Owner Device ID: GDMARCHE
 - **Ibanez Performance PF5NT1201 Acoustic Guitar** (Serial: SQ00071493)
 - **Casio Privia PX-870WE Digital Piano (White)**
   - Built-in speakers, USB/MIDI output
-- **Main Electric Guitar** 
-  - 
-- **New Bee 2.4G Wireless Guitar System**
+- **Gibson Epiphone Les Paul Standard Pro - Sunburst** 
 
 ### Accessories
 - **SVS SoundPath Wireless Audio Adapter**
-- **New Bee Blutooth Guitar transmitter/receiver**
+- **New Bee 2.4G Wireless Guitar System**
   
 
 ---
