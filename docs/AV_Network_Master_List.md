@@ -30,7 +30,6 @@ Owner Device ID: GDMARCHE
   - Reserved IP: `192.168.1.192` (MAC: 54:b7:bd:9f:ac:19)
   - *Connection Note:* Hardwired to SVS SB-1000 Pro sub. Line 2 input currently fed via SVS BT Receiver (linked to Office transmitter).
 - **Positive Grid Spark 40** (guitar amp)
-- **Sparknote Practice Amp** (office)
 - **Audio-Technica ATH-M50x headphones**  
   - *Optimization Note:* Only headphones logged; add others if in rotation.
 
