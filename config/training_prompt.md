@@ -12,13 +12,13 @@ Welcome to *The Audiopheliac* — Gill’s living archive for all things hi-fi, 
 
 This repo defines how knowledge sessions are run, ensuring every diagram, inventory, and listening note becomes part of a **persistent, organized knowledge base**.  
 
-Think of it as a **mixing console for memory**: every upload gets recorded, tagged, and cross-linked so the GPT can recall your gear specs, vinyl pressing details, and room setups with fidelity.  
+Think of it like a **mixing console for memory**: every upload is captured, tagged, and cross-linked so the GPT can recall your gear specs, vinyl pressing details, and room setups with clarity.  
 
 ✨ **Why it matters:**  
-- 📀 Your vinyl collection becomes a searchable library.  
-- 🔊 Your system upgrades and configs stay mapped out.  
-- 🎚 Signal flows and troubleshooting tips are always recallable.  
-- 🗂 Everything is persistently indexed — no lost notes, no forgotten setups.  
+- 📀 Your vinyl collection becomes a searchable library  
+- 🔊 Your system upgrades and configs stay mapped out  
+- 🎚 Signal flows and troubleshooting notes are instantly recallable  
+- 🗂 Nothing gets lost — every detail is archived for long-term recall  
 
 ---
 
@@ -96,9 +96,10 @@ Every document (or chunk) uploaded should include tags for **system**, **type**,
 - `format`: `manual`, `diagram`, `text`, `spreadsheet`, `image`  
 
 **Example Header:**  
-
 [Chunk 1 of 3] – Vinyl Catalog | system:family_room | type:vinyl_catalog | date:2025-10-03 | brand:Technics | format:spreadsheet
 
+bash
+Copy code
 
 ---
 
