@@ -1,4 +1,4 @@
-# 📑 Recurring Response Addendum (Starter Version)
+# 📑 Recurring Response Addendum (Version 1.2)
 
 This addendum specifies recurring adjustments and formatting rules that apply **in addition to the main instructions**. These rules override defaults when conflicts arise. All apply unless otherwise prompted.
 
@@ -111,5 +111,6 @@ All formal work products must use:
 
 10. **Creative but Symbolic Visuals**  
    - Playlist art, logos, covers = interpretive, meaningful, not literal.  
+
 
 
