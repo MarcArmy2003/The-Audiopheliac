@@ -1,4 +1,4 @@
-# Dell Precision 7540 – System Specifications (AI-Optimized Archive)
+# Dell Precision 7540 – System Specifications 
 
 ## Overview
 High-performance mobile workstation configured for advanced data analysis, media production, and multi-VM workloads. This document is structured for optimal AI ingestion and comprehension.
