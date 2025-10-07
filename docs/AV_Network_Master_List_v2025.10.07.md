@@ -30,7 +30,7 @@ status: "Active"
 * **Audio-Technica AT-LP120XUSB (Bronze Edition)**
   * Location: Home Office  
   * Cartridge: Audio-Technica Gold/Red (Gold currently mounted)  
-  * Connected to: ART DJPRE II → Bose 3•2•1 System  
+  * Connected to: ART DJPRE II → Bose 3-2-1 System  
   * Accessories: Pro-Ject Cork-It High-Quality Platter Mat
 
 * **Victrola ATV-57 Integrated Turntable**
@@ -44,7 +44,6 @@ status: "Active"
 
 * **Schiit Mani II** (Family Room)  
 * **ART DJPRE II** (Home Office)  
- 
 
 ---
 
@@ -55,7 +54,7 @@ status: "Active"
   * MAC: `54:b7:bd:9f:ac:19`  
   * Pre-Out connected to SVS SoundPath Wireless Pro Transmitter  
   * Hardwired to SVS SB-1000 Pro sub  
-  * *Connection Note:* Acts as a wireless broadcast source to the Bose 3•2•1 System and Lanai zones via SVS SoundPath Pro Transmitter.
+  * *Connection Note:* Acts as a wireless broadcast source to the Bose 3-2-1 System and Lanai zones via SVS SoundPath Pro Transmitter.
 * **Positive Grid Spark 40** (Guitar Amp)  
 * **Audio-Technica ATH-M50x Headphones**  
 * **Beats Fit Pro**  
@@ -67,7 +66,7 @@ status: "Active"
 
 * **Polk Signature Elite ES60** (Towers – Family Room)  
 * **Bose Lifestyle 650 Console** – Reserved IP: `192.168.1.102`  
-* **Bose 3•2•1 Series II** (Home Office) – Connected via SVS SoundPath Wireless Pro Receiver  
+* **Bose 3-2-1 Series II** (Home Office) – Connected via SVS SoundPath Wireless Pro Receiver  
 * **Bose SoundLink Revolve+ II** (Portable Bluetooth)
 
 ---
@@ -84,7 +83,7 @@ status: "Active"
 * **Seagull S Series SC-6W Acoustic Guitar**  
 * **Ibanez Performance PF5NT1201 Acoustic Guitar** – Serial: `SQ00071493`  
 * **Casio Privia PX-870WE Digital Piano (White)** – Built-in Speakers, USB/MIDI Output  
-* **Gibson Epiphone Les Paul Standard Pro – Sunburst** Serial: `1205201591'
+* **Gibson Epiphone Les Paul Standard Pro – Sunburst** – Serial: `1205201591`
 
 ---
 
@@ -92,7 +91,7 @@ status: "Active"
 
 * **SVS SoundPath Wireless Audio Adapter (Pro)**  
   * **Transmitter SN:** SPWT12240016 — connected to Yamaha R-N800A Pre-Out  
-  * **Receiver SN:** SPWR12240016 — connected to Bose 3•2•1 TV Input (Home Office)  
+  * **Receiver SN:** SPWR12240016 — connected to Bose 3-2-1 TV Input (Home Office)  
   * *Optimization Note:* Enables whole-home analog audio streaming from any Yamaha source (Shield, PS5, PC, etc.) to remote zones.
 
 * **New Bee 2.4G Wireless Guitar System**  
@@ -149,7 +148,7 @@ status: "Active"
 
 ### Core Devices
 
-* **PC – GDMARCHE (Primary Workstation)** - IP: '192.168.1.75'
+* **PC – GDMARCHE (Primary Workstation)** – IP: `192.168.1.75`  
 * **Work Laptop – VA (373-LT-42683)** – IP: `192.168.1.153`
 
 ---
@@ -189,8 +188,8 @@ status: "Active"
 
 ## ⚡ OPTIMIZATION SUMMARY
 
-* **Whole-Home Audio:** Yamaha R-N800A broadcasts pre-out signal via SVS SoundPath Pro → Bose 3•2•1 → Lanai zone.  
-* **Office Vinyl Chain:** Now direct from AT-LP120XUSB → ART DJPRE II → Bose 3•2•1 for local playback.  
+* **Whole-Home Audio:** Yamaha R-N800A broadcasts pre-out signal via SVS SoundPath Pro → Bose 3-2-1 → Lanai zone.  
+* **Office Vinyl Chain:** Now direct from AT-LP120XUSB → ART DJPRE II → Bose 3-2-1 for local playback.  
 * **SoundTouch I & II:** Reserve IPs for tracking and control consistency.  
 * **Nest Cameras:** Reconcile static IPs vs Spectrum dynamic list.  
 * **NAS:** Stable 32 GB ECC config, expandable to 64 GB.  
@@ -208,29 +207,5 @@ flowchart LR
     B --> D[SVS SB-1000 Pro]
     B --> E[SVS SoundPath Pro Transmitter]
     E --> F[SVS SoundPath Pro Receiver]
-    F --> G[Bose 3•2•1 System (Home Office)]
+    F --> G[Bose 3-2-1 System]
     G --> H[Lanai / Chromecast / Bluetooth Zone]
-```
-
-### Guitar & Instrument Chain
-```mermaid
-flowchart LR
-    G[Electric Guitar] --> H[Positive Grid Spark 40]
-    I[Seagull Acoustic] --> J[Sparknote Practice Amp]
-    K[Ibanez Acoustic] --> J
-    L[Casio Privia PX-870WE] --> M[Built-in Speakers / USB-MIDI Out]
-```
-
----
-
-## 🧾 CHANGE LOG – OCTOBER 2025
-
-- Reassigned **SVS SoundPath Wireless Audio Adapter (Pro)** transmitter/receiver roles for whole-home streaming.  
-- Added **NVIDIA Shield Pro** to main source chain.  
-- Corrected **Victrola** entry to reflect model ATV-57 in Cameron’s Room.  
-- Verified **Google Nest Mesh WiFi** configuration for complete multi-zone integration.  
-- Updated diagrams and optimization notes to reflect new broadcast configuration.  
-- Confirmed all device IPs and interconnect paths for consistency across documentation.
-
----
-
