@@ -85,9 +85,9 @@ status: "Active"
 
 ### Instruments
 
-* **Seagull S Series SC-6W Acoustic Guitar (2002 La Patrie QC)** - Serial: '02286309'
+* **Seagull S Series SC-6W Acoustic Guitar (2002 La Patrie QC)** - Serial: `02286309`
 * **Ibanez Performance PF5NT1201 Acoustic Guitar** – Serial: `SQ00071493`  
-* **Casio Privia PX-870WE Digital Piano (White)** – Built-in Speakers, USB/MIDI Output  
+* **Casio Privia PX-870WE Digital Piano (White)** – Built-in Speakers, USB/MIDI Output; Serial: 
 * **Gibson Epiphone Les Paul Standard Pro – Sunburst** – Serial: `1205201591`  
 
 ---
