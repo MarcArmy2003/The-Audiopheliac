@@ -66,6 +66,7 @@ status: "Active"
 ---
 
 ## 🔗 Cross-Link Reference
-This document is referenced from the **Master AV & Network Devices Inventory** under the *Instruments* section and in the **Instructions → Documentation Map**.  
+This document is referenced from the [Master AV & Network Devices Inventory](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/docs/AV_Network_Master_List_v2025.10.07.md) under the *Instruments* section and in the *Instructions → Documentation Map*.
+
 Future integration: automatic pull via GitHub Action to sync instrument metadata with recording presets.
 
