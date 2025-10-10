@@ -33,8 +33,9 @@ status: "Active"
   * Connected to: **Schiit Mani II → Bose 3-2-1 System**  
   * Accessories: Pro-Ject Cork-It High-Quality Platter Mat
 
-* **Victrola ATV-57 Integrated Turntable**
-  * Location: Cameron’s Room  
+* **Victrola Brighton – Bluetooth Record Player – 3-Speed Turntable**
+  * Location: Cameron’s Room (getting the next generation into vinyl)
+  * Serial: `S240700587`
   * Integrated stereo speakers with Bluetooth input (receive only)  
   * *Optimization Note:* Standalone playback unit, independent from main system signal flow.
 
@@ -91,7 +92,7 @@ status: "Active"
 
 * **Seagull S Series SC-6W Acoustic Guitar (2002 La Patrie QC)** - Serial: `02286309`
 * **Ibanez Performance PF5NT1201 Acoustic Guitar** – Serial: `SQ00071493`  
-* **Casio Privia PX-870WE Digital Piano (White)** – Built-in Speakers, USB/MIDI Output; Serial: 
+* **Casio Privia PX-870WE Digital Piano (White)** – Built-in Speakers, USB/MIDI Output; Serial: `941BDC31K047200ADD`
 * **Gibson Epiphone Les Paul Standard Pro – Sunburst** – Serial: `1205201591`  
 
 ---
@@ -204,10 +205,10 @@ status: "Active"
   * CPU: Intel Xeon E-2286M @ 2.40GHz  
   * RAM: 112 GB DDR4 ECC  
   * GPU: NVIDIA Quadro RTX + Intel UHD P630  
-  * Storage: 1TB Samsung NVMe SSD + **Samsung 990 PRO 2TB NVMe (Incoming)**  
+  * Storage: 1TB Samsung NVMe SSD + **Samsung 990 PRO 2TB NVMe**  
   * BIOS Rev: 1.13.1  
   * Service Tag: `14XB9Y2`  
-  * *Optimization Note:* New SSD upgrade pending.  
+  * *Optimization Note:* SSD upgrade installation and Windows OS swap successful, 10/07/25.  
 
 ---
 
