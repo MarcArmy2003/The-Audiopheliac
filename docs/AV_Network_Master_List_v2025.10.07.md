@@ -28,7 +28,8 @@ status: "Active"
   * *Optimization Note:* Vintage DJ deck, pristine condition, extremely stable and musical. Main reference rig.
 
 * **Audio-Technica AT-LP120XUSB (Bronze Edition)**
-  * Location: Home Office  
+  * Location: Home Office
+  * Serial: `243402497`
   * Cartridge: Audio-Technica Gold/Red (Red currently mounted)  
   * Connected to: **Schiit Mani II → Bose 3-2-1 System**  
   * Accessories: Pro-Ject Cork-It High-Quality Platter Mat
