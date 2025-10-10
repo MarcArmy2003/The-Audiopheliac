@@ -1,8 +1,8 @@
 ---
 title: "Device Network & AV Topology"
-version: "2025.10.07"
+version: "2025.10.10"
 author: "Gillon Marche | The Audiopheliac"
-last_updated: "2025-10-07"
+last_updated: "2025-10-10"
 description: "Functional layout of The Audiopheliac's interconnected AV, gaming, and network ecosystem, including signal routing and topology maps."
 status: "Active"
 ---
@@ -16,10 +16,13 @@ status: "Active"
 ### Vinyl Signal Chain
 🎵 **Audio-Technica AT-LP120XUSB (Bronze Edition)**  
 ⬇️ (Phono Out)  
-🎚️ **ART DJPRE II** – phono preamp  
+🎚️ **Schiit Mani II** – phono preamp  
 ➡️ **Bose 3-2-1 Series II (AUX RCA In)**  
 
-*Previously split to Bluetooth; now direct RCA feed for improved fidelity.*
+🎛️ *Note:* Replaced ART DJPRE II for improved noise floor and RIAA accuracy.  
+*Tripp Lite USB 2.0 Type-A to Type-B (15-ft, U022-015)* connects either:  
+- 🔌 **AT-LP120XUSB** → **Dell Precision (GDMARCHE)** (for digitization/production)  
+- 🔌 **Spark 40 Amp** → **Dell Precision** (for tone editing or recording)  
 
 ### Wireless Audio Reception
 📡 **SVS SoundPath Pro Receiver**  
@@ -27,7 +30,7 @@ status: "Active"
 ⬇️ Receives broadcast audio from **Yamaha R-N800A Pre-Out** in the Family Room.
 
 ### Other Equipment
-- 🎸 **Positive Grid Spark 40** – standalone guitar amp  
+- 🎸 **Positive Grid Spark 40** – guitar amp (USB/BT interface with Dell)  
 - 💻 **Dell Precision (GDMARCHE)** – primary workstation  
 - 💼 **VA Work Laptop** – connects primarily via **Google Nest Mesh Wi-Fi**
 
@@ -60,8 +63,9 @@ status: "Active"
 ### Vinyl Chain (Family Room)
 🎵 **Technics SL-1200MK2**  
 ⬇️ (RCA Out)  
-🎚️ **Schiit Mani II** → **Yamaha R-N800A Line In**  
+🎚️ **Pro-Ject Phono Box S2 Ultra** → **Yamaha R-N800A Line In**  
 ➡️ **Polk ES60 Towers / SVS SB-1000 Pro Subwoofer**
+⬇️ Can be further extended to Bose SoundLink Revolve+ II (Portable Bluetooth) and Shield NVIDIA Shield Pro Bluetooth.
 
 ---
 
@@ -72,6 +76,16 @@ status: "Active"
 📡 **Amazon Echo (Lanai)** – optional streaming via Bluetooth or voice command  
 
 *Receives broadcast audio from Yamaha via Chromecast or Bluetooth depending on mode.*
+
+---
+
+## 🌴 Garage
+
+### Streaming Setup
+📡 **Chromecast (Wireless Cast)** → 📺 **Google Nest wifi node**  
+📡 **Bose SoundLink Revolve+ II** – optional streaming via Bluetooth
+
+*Bose 321 Series II will be repurposed as the garage-gym system with Victrola Brighton.*
 
 ---
 
@@ -93,6 +107,9 @@ status: "Active"
 ➡️ Connected via **Ethernet** to Spectrum Router  
 ❌ Not accessible through Google Nest Mesh directly (isolated subnet for performance).
 
-### Work Laptop
-💼 **VA Work Laptop**  
-➡️ Connected exclusively via **Google Nest Mesh Wi-Fi** for secure, isol
+---
+
+### Notes
+- **DJ PRE LE** remains *unassigned* (likely future garage-gym zone use).  
+- **Cable Audit:** All USB connections meet certified spec (USB 2.0 High-Speed).  
+- **Next step:** confirm Pro-Ject firmware version upon delivery and update `AV_Network_Master_List` when operational.
