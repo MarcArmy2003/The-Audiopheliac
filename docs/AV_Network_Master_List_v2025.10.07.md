@@ -47,7 +47,11 @@ status: "Active"
   * *Connection:* Technics SL-1200MK2 → Pro-Ject → Yamaha R-N800A  
 
 * **Schiit Mani II** (Home Office)  
-  * *Connection:* AT-LP120XUSB → Schiit → Bose 3-2-1  
+  * *Connection:* AT-LP120XUSB → Schiit → Bose 3-2-1
+ 
+* **DJ PRE LE** (Unassigned)
+  * Entry-level, decent-quality phonopreamp for a budget
+  * **Optimization Note:* It will likely be used in the garage-gym space once office speakers are upgraded.
 
 ---
 
@@ -108,7 +112,7 @@ status: "Active"
 * **Samsung NU6950 65" UHD Smart TV** – IP: `192.168.1.121`  
 * **Vizio Smart TV** (Bedroom) – IP: `192.168.1.154`  
 * **Sansui HD Monitors ×2**  
-* **Office HD Monitors ×2**  
+* **Office HD Monitors (Dell) ×2**  
 
 ---
 
@@ -173,24 +177,24 @@ status: "Active"
 ### Reserved IP Assignments
 (Imported from Reserved_IPs.txt)
 
-| Device | Reserved IP | Notes |
-|--------|--------------|-------|
-| Yamaha R-N800A | 192.168.1.192 | Primary receiver |
-| QNAP NAS | 192.168.1.230 | Static storage server |
-| Dell Precision 7540 | 192.168.1.75 | Workstation (GDMARCHE) |
-| PlayStation 5 | 192.168.1.103 | Gaming console |
-| Bose Lifestyle 650 | 192.168.1.102 | Main theater system |
-| Samsung TV | 192.168.1.121 | Family Room display |
-| Vizio TV | 192.168.1.154 | Bedroom |
-| Google Nest Router | 192.168.1.239 | Primary mesh point |
-| Nest Node (Garage) | 192.168.1.174 | Secondary node |
-| Nest Node (Ext.) | 192.168.1.90 | Extended coverage |
-| Amazon Echo (Lanai) | 192.168.1.240 | Smart speaker |
-| ADT Qolsys Panel | 192.168.1.78 | Security hub |
-| Philips Hue Bridge | 192.168.1.165 | Lighting control |
-| Shield Pro | 192.168.1.250 | Streaming hub |
-| MyQ Garage Door | Dynamic | Unconfigured |
-| Honeywell Thermostat | Dynamic | Unconfigured |
+| **Device**              | **Reserved IP**   | **Notes**                     |
+|--------------------------|------------------|--------------------------------|
+| Yamaha R-N800A           | `192.168.1.192`  | Primary receiver              |
+| QNAP NAS                 | `192.168.1.230`  | Static storage server         |
+| Dell Precision 7540      | `192.168.1.75`   | Workstation *(GDMARCHE)*      |
+| PlayStation 5            | `192.168.1.103`  | Gaming console                |
+| Bose Lifestyle 650       | `192.168.1.102`  | Main theater system           |
+| Samsung TV               | `192.168.1.121`  | Family Room display           |
+| Vizio TV                 | `192.168.1.154`  | Bedroom                       |
+| Google Nest Router       | `192.168.1.239`  | Primary mesh point            |
+| Nest Node (Garage)       | `192.168.1.174`  | Secondary node                |
+| Nest Node (Ext.)         | `192.168.1.90`   | Extended coverage             |
+| Amazon Echo (Lanai)      | `192.168.1.240`  | Smart speaker                 |
+| ADT Qolsys Panel         | `192.168.1.78`   | Security hub                  |
+| Philips Hue Bridge       | `192.168.1.165`  | Lighting control              |
+| NVIDIA Shield Pro        | `192.168.1.250`  | Streaming hub                 |
+| MyQ Garage Door          | *Dynamic*        | Unconfigured                  |
+| Honeywell Thermostat     | *Dynamic*        | Unconfigured                  |
 
 ---
 
