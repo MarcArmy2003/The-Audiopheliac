@@ -44,10 +44,11 @@ status: "Active"
 ### Phono Preamps
 
 * **Pro-Ject Phono Box S2 Ultra (Silver)** (Family Room)  
-  * *Status:* En route (expected Friday)  
+  * Serial: `25A001611`
   * *Connection:* Technics SL-1200MK2 → Pro-Ject → Yamaha R-N800A  
 
-* **Schiit Mani II** (Home Office)  
+* **Schiit Mani II** (Home Office)
+  * Serial: `CI182351284`
   * *Connection:* AT-LP120XUSB → Schiit → Bose 3-2-1
  
 * **DJ PRE LE** (Unassigned)
@@ -65,7 +66,7 @@ status: "Active"
   * Hardwired to SVS SB-1000 Pro sub  
   * *Connection Note:* Acts as wireless broadcast source to Bose 3-2-1 System and Lanai zones.
 
-* **Positive Grid Spark 40** (Guitar Amp)  
+* **Positive Grid Spark 40** (Guitar Amp) - Serial: `S040C624565`
 * **Audio-Technica ATH-M50x Headphones**  
 * **Beats Fit Pro**  
 * **Logitech H390 Wired Headset**  
