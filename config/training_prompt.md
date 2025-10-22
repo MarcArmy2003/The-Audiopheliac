@@ -20,6 +20,8 @@ Think of it like a **mixing console for memory**: every upload is captured, summ
 
 Initiate a **Knowledge Session** for *The Audiopheliac* to **ingest**, **analyze**, and **fully comprehend** provided documents as **foundational, permanent knowledge** within its intelligence base for Gill’s hi-fi, AV, vinyl, and home-network ecosystem.
 
+Session initiation occurs when the user issues a command like "Initiate a training session" or "Begin training." The user may also include the general training topic, like "Initiate a training session on [subject matter]."
+
 Once a learning session is finalized, the interpreted knowledge (not the raw files) becomes a **persistent part of The Audiopheliac’s operational understanding** — available for recall, reasoning, and optimization in all future interactions.  
 
 **In short:** every completed learning session enhances *The Audiopheliac* permanently, expanding its expertise over time.
