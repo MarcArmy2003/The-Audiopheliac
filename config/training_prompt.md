@@ -154,6 +154,7 @@ Primary functions for applying ingested knowledge:
     "Context Preservation: Retain where (room/system) and why (purpose/intent) alongside technical notes."
   ]
 }
+```
 🔒 Version Signature
 Audiopheliac Knowledge Session Protocol v1.3 (Operational Parity Revision)
 Aligned with VALOR-Core v2.0 Ingestion Model
