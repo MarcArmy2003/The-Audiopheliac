@@ -1,8 +1,8 @@
 ---
 title: "Master AV & Network Devices Inventory"
-version: "2025.10.08"
+version: "2025.10.22"
 author: "Gillon Marche | The Audiopheliac"
-last_updated: "2025-10-08"
+last_updated: "2025-10-22"
 repo_link: "https://github.com/MarcArmy2003/The-Audiopheliac"
 description: "Full documentation of The Audiopheliac’s AV, Gaming, and Network ecosystem with optimization notes and signal flow schematics."
 status: "Active"
@@ -28,15 +28,15 @@ status: "Active"
   * *Optimization Note:* Vintage DJ deck, pristine condition, extremely stable and musical. Main reference rig.
 
 * **Audio-Technica AT-LP120XUSB (Bronze Edition)**
-  * Location: Home Office
-  * Serial: `243402497`
+  * Location: Home Office  
+  * Serial: `243402497`  
   * Cartridge: Audio-Technica Gold/Red (Red currently mounted)  
   * Connected to: **Schiit Mani II → Bose 3-2-1 System**  
   * Accessories: Pro-Ject Cork-It High-Quality Platter Mat
 
 * **Victrola Brighton – Bluetooth Record Player – 3-Speed Turntable**
-  * Location: Cameron’s Room (getting the next generation into vinyl)
-  * Serial: `S240700587`
+  * Location: Cameron’s Room (getting the next generation into vinyl)  
+  * Serial: `S240700587`  
   * Integrated stereo speakers with Bluetooth input (receive only)  
   * *Optimization Note:* Standalone playback unit, independent from main system signal flow.
 
@@ -45,16 +45,16 @@ status: "Active"
 ### Phono Preamps
 
 * **Pro-Ject Phono Box S2 Ultra (Silver)** (Family Room)  
-  * Serial: `25A001611`
+  * Serial: `25A001611`  
   * *Connection:* Technics SL-1200MK2 → Pro-Ject → Yamaha R-N800A  
 
-* **Schiit Mani II** (Home Office)
-  * Serial: `CI182351284`
-  * *Connection:* AT-LP120XUSB → Schiit → Bose 3-2-1
+* **Schiit Mani II** (Home Office)  
+  * Serial: `CI182351284`  
+  * *Connection:* AT-LP120XUSB → Schiit → Bose 3-2-1  
  
-* **DJ PRE LE** (Unassigned)
-  * Entry-level, decent-quality phonopreamp for a budget
-  * **Optimization Note:* It will likely be used in the garage-gym space once office speakers are upgraded.
+* **DJ PRE LE** (Unassigned)  
+  * Entry-level, decent-quality phonopreamp for a budget  
+  * *Optimization Note:* It will likely be used in the garage-gym space once office speakers are upgraded.
 
 ---
 
@@ -72,6 +72,18 @@ status: "Active"
 * **Beats Fit Pro**  
 * **Logitech H390 Wired Headset**  
 
+* **Schiit SYS Passive Preamp + 2-Input Switch (Black)**  
+  * *Status:* Arriving Saturday  
+  * *Use:* Volume control and source switch for Yamaha HS7 pair  
+  * *Placement:* Desktop (Home Office signal hub)  
+  * *Note:* Pure passive design, ideal for transparent attenuation and quick A/B between sources.
+
+* **AIRHub (USB Audio Interface / DAC Hub)**  
+  * Serial: `21A31909244300030`  
+  * *Role:* USB DAC + Headphone hub for desktop monitoring  
+  * *Connection:* USB-C → Dell Precision / MacBook Pro (as required)  
+  * *Optimization Note:* Recommended as interface for nearfield HS7 chain; offloads DAC duties from system.
+
 ---
 
 ### Speakers
@@ -79,7 +91,14 @@ status: "Active"
 * **Polk Signature Elite ES60** (Towers – Family Room)  
 * **Bose Lifestyle 650 Console** – Reserved IP: `192.168.1.102`  
 * **Bose 3-2-1 Series II** (Home Office) – Connected via SVS SoundPath Wireless Pro Receiver  
-* **Bose SoundLink Revolve+ II** (Portable Bluetooth)
+* **Bose SoundLink Revolve+ II** (Portable Bluetooth)  
+* **Yamaha HS7 6.5" Powered Studio Monitors (Pair – Black)**  
+  * Location: Home Office  
+  * Serial Numbers: `UFWM02219`, `UFWM02220`  
+  * Power: 60W LF / 35W HF bi-amp (95W total per speaker)  
+  * Input: XLR/TRS balanced  
+  * *Connection:* Via **Schiit SYS Passive Preamp** → Dell Precision (monitoring chain)  
+  * *Optimization Note:* Studio-reference neutrality with exceptional imaging; placement isolation pads recommended.
 
 ---
 
@@ -92,9 +111,9 @@ status: "Active"
 
 ### Instruments
 
-* **Seagull S Series SC-6W Acoustic Guitar (2002 La Patrie QC)** - Serial: `02286309`
+* **Seagull S Series SC-6W Acoustic Guitar (2002 La Patrie QC)** - Serial: `02286309`  
 * **Ibanez Performance PF5NT1201 Acoustic Guitar** – Serial: `SQ00071493`  
-* **Casio Privia PX-870WE Digital Piano (White)** – Built-in Speakers, USB/MIDI Output; Serial: `941BDC31K047200ADD`
+* **Casio Privia PX-870WE Digital Piano (White)** – Built-in Speakers, USB/MIDI Output; Serial: `941BDC31K047200ADD`  
 * **Gibson Epiphone Les Paul Standard Pro – Sunburst** – Serial: `1205201591`  
 
 ---
@@ -122,7 +141,7 @@ status: "Active"
 ## 🎮 GAMING SYSTEMS
 
 * **Sony PlayStation 5 (CFI-1015A)** – IP: `192.168.1.103`  
-* **Xbox (variant TBD)**  
+* **Xbox One**  
 * **Nintendo Switch (Standard)**  
 * **Nintendo Switch Lite**  
 
@@ -212,6 +231,17 @@ status: "Active"
   * Service Tag: `14XB9Y2`  
   * *Optimization Note:* SSD upgrade installation and Windows OS swap successful, 10/07/25.  
 
+* **Apple MacBook Pro (13-inch, Mid 2012)**  
+  * Serial: `C17J10PDDTY3`  
+  * *Purpose:* Kids’ School / General Use Laptop  
+  * Upgrades:  
+    - **SSD:** Samsung 870 EVO 1 TB (MZ-77E1T0B/AM)  
+    - **Battery:** iFixit A1322 Replacement  
+    - **Memory:** Crucial 16 GB (2×8 GB DDR3 PC3-12800, 204-pin SODIMM)  
+  * *Status:* Recommissioned and optimized for school workflows.  
+  * *OS:* macOS Catalina (verified clean install)  
+  * *Note:* Post-upgrade thermal checks passed; reliable secondary system.  
+
 ---
 
 ## 🌐 SMART DEVICES & IOT
@@ -238,10 +268,11 @@ status: "Active"
 
 * **Whole-Home Audio:** Yamaha → SVS SoundPath → Bose 3-2-1 → Lanai zone.  
 * **Office Vinyl Chain:** AT-LP120XUSB → Schiit Mani II → Bose 3-2-1.  
+* **Office Studio Chain:** Dell Precision → AIRHub → Schiit SYS → Yamaha HS7 Monitors.  
 * **Google Mesh:** LAN backhaul added to switch for Google Home stability.  
 * **Cloudflare DNS:** Verified active on Nest Mesh.  
 * **Spectrum Router:** Maintains SSID “FBI Surveillance” with extenders active.  
-* **Dell Precision:** Upgraded storage pending Samsung 990 PRO installation.  
+* **Dell Precision:** Upgraded storage verified (Samsung 990 PRO).  
 
 ---
 
@@ -258,3 +289,4 @@ flowchart LR
     F --> G[Bose 3-2-1 System]
     G --> H[Lanai / Chromecast / Bluetooth Zone]
 ```
+
