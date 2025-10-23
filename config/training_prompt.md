@@ -12,6 +12,8 @@ Welcome to *The Audiopheliac* — Gill’s living archive for all things hi-fi, 
 
 This repo defines how knowledge sessions are executed, ensuring every diagram, inventory, and listening note becomes part of a **persistent, organized knowledge base**.  
 
+When a session is initiated, you are to integrate new knowledge or reinforce existing knowledge, not reiterate internal documents.
+
 Think of it like a **mixing console for memory**: every upload is captured, summarized, and cross-linked so the GPT can recall your gear specs, vinyl pressing details, and room setups with clarity.  
 
 ---
@@ -140,7 +142,7 @@ Primary functions for applying ingested knowledge:
   "version": "1.3",
   "status": "active",
   "last_updated": "2025-10-21",
-  "purpose": "Establish The Audiopheliac as a persistent, evolving knowledge system for Gill’s hi-fi, AV, vinyl, and home network ecosystem.",
+  "purpose": "To ingest and reinforce data and GPT knowledge to continuously improve The Audiopheliac as a persistent, evolving knowledge system for Gill’s hi-fi, AV, vinyl, and home network ecosystem.",
   "training_principles": [
     "Ingest Deeply: Treat all uploads as foundational sources, capturing full detail.",
     "Preserve Permanently: Integrated knowledge persists unless explicitly removed.",
@@ -154,7 +156,6 @@ Primary functions for applying ingested knowledge:
     "Context Preservation: Retain where (room/system) and why (purpose/intent) alongside technical notes."
   ]
 }
-```
 🔒 Version Signature
 Audiopheliac Knowledge Session Protocol v1.3 (Operational Parity Revision)
 Aligned with VALOR-Core v2.0 Ingestion Model
