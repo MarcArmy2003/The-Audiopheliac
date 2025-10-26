@@ -31,13 +31,13 @@ status: "Active"
   * Location: Home Office  
   * Serial: `243402497`  
   * Cartridge: Audio-Technica Gold/Red (Red currently mounted)  
-  * Connected to: **Schiit Mani II → Bose 3-2-1 System**  
+  * Connected to: **Schiit Mani II → Schiit SYS Passive Preamp → JBL LSR310S 10" Powered Studio Subwoofer & HS7s**  
   * Accessories: Pro-Ject Cork-It High-Quality Platter Mat
 
 * **Victrola Brighton – Bluetooth Record Player – 3-Speed Turntable**
   * Location: Cameron’s Room (getting the next generation into vinyl)  
   * Serial: `S240700587`  
-  * Integrated stereo speakers with Bluetooth input (receive only)  
+  * Integrated stereo speakers with Bluetooth
   * *Optimization Note:* Standalone playback unit, independent from main system signal flow.
 
 ---
@@ -50,11 +50,11 @@ status: "Active"
 
 * **Schiit Mani II** (Home Office)  
   * Serial: `CI182351284`  
-  * *Connection:* AT-LP120XUSB → Schiit → Bose 3-2-1  
+  * *Connection:* AT-LP120XUSB → Manbi II  → SYS Passive Preamp → JBL LSR310S 10" Powered Studio Subwoofer & HS7s 
  
 * **DJ PRE LE** (Unassigned)  
   * Entry-level, decent-quality phonopreamp for a budget  
-  * *Optimization Note:* It will likely be used in the garage-gym space once office speakers are upgraded.
+  * *Optimization Note:* May be used in the garage-gym space with Victrola.
 
 ---
 
@@ -65,7 +65,6 @@ status: "Active"
   * MAC: `54:b7:bd:9f:ac:19`  
   * Pre-Out → SVS SoundPath Wireless Pro Transmitter  
   * Hardwired to SVS SB-1000 Pro sub  
-  * *Connection Note:* Acts as wireless broadcast source to Bose 3-2-1 System and Lanai zones.
 
 * **Positive Grid Spark 40** (Guitar Amp) - Serial: `S040C624565`
 * **Audio-Technica ATH-M50x Headphones**  
@@ -73,8 +72,7 @@ status: "Active"
 * **Logitech H390 Wired Headset**  
 
 * **Schiit SYS Passive Preamp + 2-Input Switch (Black)**  
-  * *Status:* Arriving Saturday  
-  * *Use:* Volume control and source switch for Yamaha HS7 pair  
+  * *Use:* Volume control and source switch for JBL Subwoofer and Yamaha HS7 pair  
   * *Placement:* Desktop (Home Office signal hub)  
   * *Note:* Pure passive design, ideal for transparent attenuation and quick A/B between sources.
 
@@ -104,7 +102,8 @@ status: "Active"
 
 ### Subwoofers
 
-* **SVS SB-1000 Pro** (Family Room – Hardwired)  
+* **SVS SB-1000 Pro** (Family Room – Hardwired)
+* **JBL LSR310S 10" Powered Studio Subwoofer** (office - paired with HS7s via SYS Switch and AIR Hub)
 * **Bose Bass Module 700** (Bluetooth – Paired with Lifestyle 650)
 
 ---
@@ -135,7 +134,7 @@ status: "Active"
 * **Vizio Smart TV** (Bedroom) – IP: `192.168.1.154`  
 * **Sansui HD Monitors ×2**  
 * **Office HD Monitors (Dell) ×2**  
-
+* **USB-C Triple Display Docking Station - Model: JCD543**
 ---
 
 ## 🎮 GAMING SYSTEMS
@@ -175,9 +174,9 @@ status: "Active"
   * Status: Active – Bridge disabled  
 
 * **Google Nest Mesh WiFi System**  
-  * Main Point (Office) – IP: `192.168.1.239` / MAC: `1c:53:f9:26:e2:fd`  
+  * Main Point (family room) – IP: `192.168.1.239` / MAC: `1c:53:f9:26:e2:fd`  
   * Secondary Point (Garage) – IP: `192.168.1.174` / MAC: `b0:e4:d5:3a:78:fd`  
-  * Extension Point – IP: `192.168.1.90` / MAC: `b8:7b:d4:cf:ee:7b`  
+  * Extension Point – (office) IP: `192.168.1.90` / MAC: `b8:7b:d4:cf:ee:7b`  
   * *LAN Output → TP-Link 5Gb Switch*  
   * *DNS:* Cloudflare (1.1.1.1 / 1.0.0.1)  
 
@@ -222,14 +221,28 @@ status: "Active"
 
 ## 💻 WORKSTATION
 
-* **Dell Precision 7540 (GDMARCHE)**  
-  * CPU: Intel Xeon E-2286M @ 2.40GHz  
+* **Dell Precision 7540 (GDMARCHE)**
+  * Serial: `C17J10PDDTY3`  
+  * CPU: Intel Xeon E-2286M @ 2.40GHz
+  * *Purpose:* Personal and Veteran Analytics
   * RAM: 112 GB DDR4 ECC  
   * GPU: NVIDIA Quadro RTX + Intel UHD P630  
   * Storage: 1TB Samsung NVMe SSD + **Samsung 990 PRO 2TB NVMe**  
   * BIOS Rev: 1.13.1  
   * Service Tag: `14XB9Y2`  
-  * *Optimization Note:* SSD upgrade installation and Windows OS swap successful, 10/07/25.  
+  * *Optimization Note:*
+    * SSD upgrade installation and Windows OS swap successful, 10/07/25.
+    * Upgrade to full RAM capacity pending. 
+ 
+* **Dell Latitude 5340 (373-LT-4683)**
+  * Serial: `H67LKY3`  
+  * CPU: Intel vPRO i7
+  * *Purpose:* Official Department of Veterans Affairs business
+  * RAM:
+  * GPU:
+  * Storage:
+  * BIOS:
+  * VA Inventory Tag: `608 EE42683` 
 
 * **Apple MacBook Pro (13-inch, Mid 2012)**  
   * Serial: `C17J10PDDTY3`  
@@ -266,9 +279,9 @@ status: "Active"
 
 ## ⚡ OPTIMIZATION SUMMARY
 
-* **Whole-Home Audio:** Yamaha → SVS SoundPath → Bose 3-2-1 → Lanai zone.  
-* **Office Vinyl Chain:** AT-LP120XUSB → Schiit Mani II → Bose 3-2-1.  
-* **Office Studio Chain:** Dell Precision → AIRHub → Schiit SYS → Yamaha HS7 Monitors.  
+* **Whole-Home Audio:** Yamaha → SVS SoundPath → external inputs when SVS receiver is connected.  
+* **Office Vinyl Chain:** AT-LP120XUSB → Schiit Mani II → Schiit SYS Passive Preamp → JBL LSR310S 10" Powered Studio Subwoofer & HS7s 
+* **Office Studio Chain:** Dell Precision → AIRHub → Schiit SYS → JBL LSR310S 10" Powered Studio Subwoofer & Yamaha HS7 Monitors.  
 * **Google Mesh:** LAN backhaul added to switch for Google Home stability.  
 * **Cloudflare DNS:** Verified active on Nest Mesh.  
 * **Spectrum Router:** Maintains SSID “FBI Surveillance” with extenders active.  
