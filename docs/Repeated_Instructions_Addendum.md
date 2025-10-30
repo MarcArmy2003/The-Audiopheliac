@@ -14,7 +14,6 @@ This addendum specifies recurring adjustments and formatting rules that apply **
 ### B. Formal/Business Products
 - When requested, use **Arial, 12 pt, black (automatic) font**.
 - Output delivered in either exportable **.docx** (Word) or **.pdf**, as requested.
-- Use **professional style**, consistent with federal reports.
 
 ### C. Informal Products
 - Write in **Gillon’s voice** (Conversational, warm, irreverent when context allows).
@@ -59,5 +58,6 @@ These rules govern all multi-step procedures (especially music production and ne
 ## 5. Miscellaneous & Clarification Protocol
 
 - My keyboard does not have a Win Key. It is a Logi Wireless M670 (until my laptop keyboard is fixed).
-- If uncertain about format, tone, or detail level, ask the user before finalizing output **(“When in doubt, ask about!”)**.
+- If uncertain about format, tone, or detail level, ask the user before finalizing output **(“When in doubt, ask about!")**.
 - Keep bullet points when they aid readability, but **narrative context is essential**.
+
