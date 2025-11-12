@@ -27,6 +27,10 @@
 15. Kanye West – Late Registration
 16. Nas – Illmatic
 17. Foo Fighters - – The Colour and the Shape
+18. Johnny Cash – American IV: The Man Comes Around (2002)
+19. Chris Stapleton – From A Room: Volume 1
+20. Muddy Waters – Folk Singer (1964, Chess Records)
+21. Etta James – At Last! (1960, Argo)
 
 # 🧠 Conditional / Opportunistic Buys (Value-Dependent)
 **Streaming satisfaction adequate; only buy if special edition or dirt cheap.**
@@ -35,12 +39,26 @@
 3. Steely Dan – Aja	Only if clean and fairly priced. A technical showcase, not your go-to vibe.
 4. Outkast – Aquemini	Test listen before adding; potential modern analog keeper.
 5. Run the Jewels – RTJ4	Optional modern analog pick if you want something aggressive and crisp.
+6. Sturgill Simpson – Metamodern Sounds in Country Music (2014)
+7. Tyler Childers – Purgatory
+8. Willie Nelson – Red Headed Stranger
+9. Alison Krauss + Union Station – So Long So Wrong (1997)
+10. B.B. King – Live at the Regal
+11. Buddy Guy – Damn Right, I’ve Got the Blues
 
 
 # Gear Wish List:
-1. Replacement upgrade to LP120 stock cartridge.
+1. Replacement upgrade to LP120 stock cartridge (perhaps Ortofon 2M Bronze).
 2. Herbie's Audio Lab - Way Excellent II Turntable Mat
-3. 
+3. iFi iPower X (12V) — linear power supply upgrade for the Schiit Mani II.
+4. AudioQuest Carbon USB (for Scarlett Solo to PC chain).
+5. Ground loop isolator or star-ground configuration for your rack (reduce hum risk).
+6. Acoustic panels or bass traps behind HS7s in your office — critical for nearfield accuracy though current set up sounds good to my ears, with curtains and couch offering some dampening.
+7. Uptone Audio USB Regen (optional but subtle digital improvement for interface chain).
+8. Vinyl cleaning system (Kirmuss or Spin-Clean Pro). Currently using Groove Washer G2 with horse hair brush.
+9. Yamaha MusicCast supported wired/wireless speaker for secondary zones (lanai/poo, garage-gym) — optional family room pairing.
+10. NAS-to-Hi-Res Streaming Integration (enable DLNA or Roon bridge on your QNAP).
 
 # Key:
 *Crossed out text like "~~this~~" means the album or gear has been purchased.*
+
