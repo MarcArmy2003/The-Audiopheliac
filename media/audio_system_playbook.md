@@ -150,8 +150,7 @@ Solo HP Out for silent mode.
 
 ---
 
-## 🖼 System Signal Diagram
-![System Diagram](attachment://audio_system_diagram.png)
+![System Signal Diagram](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/media/studio_signal_diagram.jpg)
 
 ---
 
