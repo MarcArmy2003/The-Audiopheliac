@@ -32,6 +32,7 @@
 20. Muddy Waters – Folk Singer (1964, Chess Records)
 21. Etta James – At Last! (1960, Argo)
 22. Electric Light Orchestra - Discovery (1979)
+23. Guns N' Roses - Appetite For Destruction (1987)
 
 # 🧠 Conditional / Opportunistic Buys (Value-Dependent)
 **Streaming satisfaction adequate; only buy if special edition or dirt cheap.**
@@ -50,7 +51,7 @@
 
 # Gear Wish List:
 1. Replacement upgrade to LP120 stock cartridge (perhaps Ortofon 2M Bronze).
-2. Herbie's Audio Lab - Way Excellent II Turntable Mat
+2.  ~~Herbie's Audio Lab - Way Excellent II Turntable Mat~~
 3. iFi iPower X (12V) — linear power supply upgrade for the Schiit Mani II.
 4. AudioQuest Carbon USB (for Scarlett Solo to PC chain).
 5. Ground loop isolator or star-ground configuration for your rack (reduce hum risk).
@@ -62,5 +63,6 @@
 
 # Key:
 *Crossed out text like "~~this~~" means the album or gear has been purchased.*
+
 
 
