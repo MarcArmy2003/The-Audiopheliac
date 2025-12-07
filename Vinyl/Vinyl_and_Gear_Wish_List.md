@@ -31,6 +31,7 @@
 19. Chris Stapleton – From A Room: Volume 1
 20. Muddy Waters – Folk Singer (1964, Chess Records)
 21. Etta James – At Last! (1960, Argo)
+22. Electric Light Orchestra - Discovery (1979)
 
 # 🧠 Conditional / Opportunistic Buys (Value-Dependent)
 **Streaming satisfaction adequate; only buy if special edition or dirt cheap.**
@@ -61,4 +62,5 @@
 
 # Key:
 *Crossed out text like "~~this~~" means the album or gear has been purchased.*
+
 
