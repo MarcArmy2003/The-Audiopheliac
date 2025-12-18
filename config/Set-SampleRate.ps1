@@ -42,3 +42,11 @@ Start-Process -FilePath $svv -ArgumentList "setplaybackrate \"Focusrite USB\" $r
 
 Write-Host "✅ Focusrite set to $desc ($rate Hz)" -ForegroundColor Green
 Write-Host "You can verify in: Control Panel → Sound → Playback → Focusrite USB → Advanced."
+
+$current = (Get-ItemProperty -Path "HKCU:\Software\Microsoft\Multimedia\Sound Mapper").PlaybackFormat
+if ($current -like "*44100*") {
+    & "D:\The Audiopheliac\Scripts\Set-SampleRate.ps1" P
+} else {
+    & "D:\The Audiopheliac\Scripts\Set-SampleRate.ps1" L
+}
+
