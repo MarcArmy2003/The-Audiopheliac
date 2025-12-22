@@ -1,138 +1,64 @@
-# 📖 The Audiopheliac
+<p align="center">
+  <img src="https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/media/The_Audiopheliac_Primary_Logo_GPT.jpg" alt="The Audiopheliac Logo" width="300" />
+</p>
 
-**The Audiopheliac (n.)**  
-*From* **audio** (Latin *audīre*, “to hear”) + **-philia** (Greek *φιλία*, “love of”) + **-iac** (Greek *-ιακός*, denoting obsession or compulsion).
+# The Audiopheliac
 
----
-
-### Definition
-
-1. **One whose devotion to sound exceeds enthusiasm and borders on obsession**  
-   A person consumed with the pursuit of high-fidelity audio, the ritual of vinyl playback, and the endless tinkering of vintage and modern stereo gear, home AV setups, and experimental listening spaces.
-
-2. **Personal project / identity**  
-   *The Audiopheliac* is a living archive and brand — encompassing hi-fi, AV, and vinyl inventory, cover art, playlists, and experiments in sound reproduction.
+*“The Audiopheliac is both a home and a philosophy — where signal flow meets soul.”*
 
 ---
 
-### 🔑 Distinction: Audiophile vs. Audiopheliac
+## 🧱 Overview
 
-| **Feature**        | **Audiophile**                                                                 | **Audiopheliac**                                                                 |
-|---------------------|---------------------------------------------------------------------------------|----------------------------------------------------------------------------------|
-| **Motivation**      | Love and appreciation for high-quality audio.                                   | Compulsion to tweak, test, and upgrade, often obsessively.                        |
-| **Focus**           | Uses gear to better enjoy the music.                                           | Uses music to justify the gear; the *system* becomes the art.                     |
-| **Satisfaction**    | Finds joy in balanced upgrades and great playback.                             | Rarely satisfied; always chasing the next improvement.                            |
-| **Relationship**    | Music is the end goal.                                                         | The gear is the end goal.                                                         |
+The Audiopheliac is a living documentation project — part engineering archive, part passion project — meticulously cataloging my fully integrated home audio-visual and studio ecosystem.
+From network infrastructure and playback signal chains to instrument specs and vinyl collections, this repository serves as both a technical reference and an evolving narrative of high-fidelity design.
 
----
-
-### 📂 Project Note
-
-This definition underpins *The Audiopheliac* project — a personal hi-fi, AV, and vinyl inventory and branding effort.  
-It’s both a name and an ethos: *sound not only loved, but obsessively pursued.*
+Everything here interconnects: NAS → Network → Processing → Amplification → Output.
+Each document in this repo cross-references the others, creating a complete map of *The Audiopheliac Environment*.
 
 ---
 
-## 📀 About This Project
+## 🎛️ Core Documentation (v2025.12)
 
-This repository serves as a hub for **hi-fi and home AV documentation**, including:
-- Vinyl collection logs (pressings, condition, sound notes, upgrade paths)  
-- Stereo & AV gear inventories  
-- Network and home automation experiments  
-- Branding assets and project documentation  
-
-It’s equal parts listening diary, technical notebook, and sandbox for future projects.
+| Document                                                                                                                                               | Description                                                                                  |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
+| 🎶 [**Vinyl & Gear Master List – v2025.12**](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/Vinyl/vinyl_and_gear_master_v_2025_12_full.md) | Unified catalog of vinyl, audio gear, and accessories, with valuations and acquisition notes |
+| 🧾 [**AV Master Inventory – v2025.12**](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/docs/av_master_inventory_2025.md)                   | Comprehensive, room-by-room equipment documentation with serials and purchase data           |
+| 🗺️ [**Audiopheliac Signal Map – v2025.12**](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/config/audiopheliac_signal_map_v_2025_12.md)   | Complete connection diagram for all rooms, network, and signal routing                       |
 
 ---
 
-## 📂 Repository Structure
+## 🎧 The Audiopheliac Defined
 
-### 🏠 Root
-- [.gitignore](./.gitignore)
-- [LICENSE](./LICENSE)
-- [README.md](./README.md)
+The Audiopheliac is not merely an audio engineer’s toolkit — it’s a curated ecosystem designed for perfect signal flow, aesthetic precision, and emotional fidelity.
+It’s the intersection of technical mastery and artistic devotion — where every frequency, cable, and component tells a story.
 
----
+### Core Principles
 
-### 🎨 [`assets/`](./assets/)
-- [Branding_Kit.md](./assets/Branding_Kit.md)
-- [ChatGPT Image Sep 12, 2025, 11_56_26 PM.jpg](./assets/ChatGPT%20Image%20Sep%2012%2C%202025%2C%2011_56_26%20PM.jpg)
-- [ChatGPT Image Sep 20, 2025, 11_54_20 PM.png](./assets/ChatGPT%20Image%20Sep%2020%2C%202025%2C%2011_54_20%20PM.png)
+* 🎚️ **Purity of Path** – Fewer conversions, cleaner sound.
+* 🔄 **System Cohesion** – All components serve the whole.
+* 🎛️ **Optimization Over Obsession** – Measure what matters.
+* 🎶 **Emotion in Fidelity** – Gear is the means, not the end.
 
 ---
 
-### ⚙️ [`config/`](./config/)
-- [instructions.md](./config/instructions.md)
-- [training_prompt.md](./config/training_prompt.md)
-- [training_prompt.json](./config/training_prompt.json)
+## 🗂️ Navigation Index
+
+| Section   | Path                                                                         | Purpose                                        |
+| --------- | ---------------------------------------------------------------------------- | ---------------------------------------------- |
+| 📂 Docs   | [/docs](https://github.com/MarcArmy2003/The-Audiopheliac/tree/main/docs)     | Technical documentation and specs              |
+| ⚙️ Config | [/config](https://github.com/MarcArmy2003/The-Audiopheliac/tree/main/config) | Network maps, automation, and setup files      |
+| 💿 Vinyl  | [/Vinyl](https://github.com/MarcArmy2003/The-Audiopheliac/tree/main/Vinyl)   | Collection catalogs and curation records       |
+| 🖼️ Media | [/media](https://github.com/MarcArmy2003/The-Audiopheliac/tree/main/media)   | Logos, signal diagrams, and supporting visuals |
 
 ---
 
-### 📘 [`docs/`](./docs/)
-- [AV_Network_Master_List_v2025.10.07.md](./docs/AV_Network_Master_List_v2025.10.07.md)
-- [Dell_Precision_7540_Specs.md](./docs/Dell_Precision_7540_Specs.md)
-- [Lifestyle_650_Console_Summary.md](./docs/Lifestyle_650_Console_Summary.md)
-- [Repeated_Instructions_Addendum.md](./docs/Repeated_Instructions_Addendum.md)
-- [block_diagram.md](./docs/block_diagram.md)
-- [device_network.md](./docs/device_network.md)
+### 🧾 Version History
+
+| Version   | Date         | Description                              |
+| --------- | ------------ | ---------------------------------------- |
+| 2025.12.1 | Dec 22, 2025 | README redesigned for v2025.12 ecosystem |
 
 ---
 
-### 💿 [`Vinyl/`](./Vinyl/)
-- [Grading the Condition of Records – Sound Exchange Tampa Bay.pdf](./Vinyl/Grading%20the%20Condition%20of%20Records%20%E2%80%93%20Sound%20Exchange%20Tampa%20Bay.pdf)
-- [Vinyl_Wish_List.txt](./Vinyl/Vinyl_Wish_List.txt)
-- [vinyl inventory and wish list.txt](./Vinyl/vinyl%20inventory%20and%20wish%20list.txt)
-- [vinyl_entry_template.md](./Vinyl/vinyl_entry_template.md)
-- [vinyl_inventory.csv](./Vinyl/vinyl_inventory.csv)
-- [vinyl_inventory.md](./Vinyl/vinyl_inventory.md)
-
----
-
-## 🔗 Quick Links to Key Documents
-
-### 🎚️ Core System Documentation
-- [AV Network Master List](./docs/AV_Network_Master_List_v2025.10.07.md)
-- [Lifestyle 650 Console Summary](./docs/Lifestyle_650_Console_Summary.md)
-- [Dell Precision 7540 Specs](./docs/Dell_Precision_7540_Specs.md)
-- [Device Network Overview](./docs/device_network.md)
-- [Block Diagram](./docs/block_diagram.md)
-
-### ⚙️ Configuration & Behavior
-- [Repeated Instructions Addendum](./docs/Repeated_Instructions_Addendum.md)
-- [Instructions](./config/instructions.md)
-- [Training Prompt](./config/training_prompt.md)
-- [Training Prompt JSON](./config/training_prompt.json)
-
-### 💿 Vinyl Collection & Reference
-- [Vinyl Inventory (Markdown)](./Vinyl/vinyl_inventory.md)
-- [Vinyl Inventory (CSV)](./Vinyl/vinyl_inventory.csv)
-- [Vinyl Entry Template](./Vinyl/vinyl_entry_template.md)
-- [Vinyl Wish List](./Vinyl/Vinyl_Wish_List.txt)
-- [Grading the Condition of Records – Sound Exchange Tampa Bay (PDF)](./Vinyl/Grading%20the%20Condition%20of%20Records%20%E2%80%93%20Sound%20Exchange%20Tampa%20Bay.pdf)
-
-### 🧩 Branding & Visual Assets
-- [Branding Kit](./assets/Branding_Kit.md)
-- [ChatGPT Image Sep 20, 2025, 11_54_20 PM.png](./assets/ChatGPT%20Image%20Sep%2020%2C%202025%2C%2011_54_20%20PM.png)
-
----
-
-## 🌟 Why This Exists
-
-Because music isn’t just background noise.  
-It’s a ritual. A pursuit.  
-A collection of moments that sound better when you capture them, track them, and keep improving the chain between needle and ear.
-
----
-
-## 🚀 Future Directions
-
-- Automating cataloging (Discogs API, barcode/label scanning)  
-- AV and home automation scripting  
-- Publishing curated listening lists and setup guides  
-- AI-powered media curation using The Audiopheliac knowledge base  
-
----
-
-> “Audiophiles don’t use their equipment to listen to your music.  
-> Audiophiles use your music to listen to their equipment.”  
-> — Alan Parsons
+*Authored & Maintained by Gillon “Gill” Marchetti (MarcArmy2003)*
