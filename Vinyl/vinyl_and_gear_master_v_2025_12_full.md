@@ -47,7 +47,6 @@ Version: 2025.12 | Updated: December 22, 2025
 | Queen | *A Night at the Opera* | 1975 / 2015 | ✅ Owned | 180g pressing | $35 |
 | Rage Against the Machine | *RATM (Self-Titled)* | 1992 / 2022 | ✅ Owned | 30th anniversary edition | $38 |
 | Red Hot Chili Peppers | *Californication* | 1999 / 2015 | ✅ Owned | 180g double LP | $40 |
-| Rush | *Moving Pictures* | 1981 / 2015 | ✅ Owned | 40th anniversary edition | $35 |
 | Soundgarden | *Superunknown* | 1994 / 2014 | ✅ Owned | 20th anniversary reissue | $42 |
 | Stone Temple Pilots | *Core* | 1992 / 2017 | ✅ Owned | 25th anniversary edition | $38 |
 | Taylor Swift | *Fearless (Taylor’s Version)* | 2021 | ✅ Owned | Owned, collection verified | $35 |
@@ -59,9 +58,6 @@ Version: 2025.12 | Updated: December 22, 2025
 | Tom Petty & The Heartbreakers | *Greatest Hits* | 1993 / 2016 | ✅ Owned | Classic reissue | $35 |
 | Tom Petty | *Wildflowers & All the Rest* | 1994 / 2020 | ⚪ Conditional | Own 2020 box, want One-Step | $160 |
 | Tool | *Lateralus* | 2001 / 2022 | 🔸 Wishlist | Picture disc edition | $80 |
-| Van Halen | *1984* | 1984 / 2015 | 🔸 Wishlist | 2015 Bellman remaster | $35 |
-| Various Artists | *Guardians of the Galaxy: Awesome Mix Vol. 1* | 2014 | 🔸 Wishlist | OST pressing | $25 |
-
 ---
 
 ## 🎛️ Gear & Accessories
