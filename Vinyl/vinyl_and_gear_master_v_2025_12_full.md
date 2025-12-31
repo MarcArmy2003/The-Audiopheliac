@@ -4,6 +4,18 @@
 Version: 2025.12 | Updated: **December 26, 2025**
 
 ---
+## 🔎 Strategic Collection Guidance
+
+## Five Rule Strategy
+1. No “Greatest Hits”	Focus on single-artist, studio-defined albums.
+2. Pre-1995 or post-2010 only. Avoid 1995–2010 “digital purgatory.”
+3. Used preferred -	Prioritize Capricorn, Columbia, Warner, and Asylum pressings.
+4. Modern vinyl intent - Focus on modern artists who master for vinyl (Taylor, Post, Stapleton, Silk Sonic, etc.).
+5. Compilation/Greatest Hits Exceptions:	
+   - Emotional value -for example, "Sublime," Marshall Mathers LP 2, etc.
+   - Critically acclaimed film soundtracks or collaborations
+   - Artists I'm unlikely to purchase individual albums from
+---
 
 ## 🎶 Vinyl Collection (Owned, Wishlist, Conditional)
 
