@@ -1,0 +1,9 @@
+# Ignore temporary and cache files inside literacy docs
+*.bak
+*.tmp
+*.pdf
+*.DS_Store
+Thumbs.db
+~$*
+__pycache__/
+.cache/

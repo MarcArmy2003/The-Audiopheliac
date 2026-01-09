@@ -1,0 +1,18 @@
+[submodule "docs/guitar-literacy/theory/external/vaughan"]
+	path = docs/guitar-literacy/theory/external/vaughan
+	url = https://github.com/pedromsantos/vaughan
+[submodule "docs/guitar-literacy/guitar/external/alphaTab"]
+	path = docs/guitar-literacy/guitar/external/alphaTab
+	url = https://github.com/yshlin/alphaTab
+[submodule "docs/guitar-literacy/guitar/external/guitarjoe"]
+	path = docs/guitar-literacy/guitar/external/guitarjoe
+	url = https://github.com/ChrisDeFreitas/guitarjoe
+[submodule "docs/guitar-literacy/guitar/external/acordia"]
+	path = docs/guitar-literacy/guitar/external/acordia
+	url = https://github.com/andresmegias/acordia
+[submodule "docs/guitar-literacy/resources/external/awesome-guitar"]
+	path = docs/guitar-literacy/resources/external/awesome-guitar
+	url = https://github.com/sfischer13/awesome-guitar
+[submodule "docs/guitar-literacy/guitar/external/guitar-tabs-to-MIDI"]
+	path = docs/guitar-literacy/guitar/external/guitar-tabs-to-MIDI
+	url = https://github.com/Sarath18/guitar-tabs-to-MIDI
