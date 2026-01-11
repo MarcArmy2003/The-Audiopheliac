@@ -1,16 +1,25 @@
-# Fix encoding issue by replacing unsupported unicode characters and regenerating the PDF
+"""
+Lanai Entertainment System - PDF Generator
+Author: The Audiopheliac (MarcArmy2003)
+Version: 2026.01.10
+Purpose: Generate a printable configuration guide for the lanai signal setup.
+"""
 
+import os
 from fpdf import FPDF
 
+# Initialize PDF
 pdf = FPDF()
 pdf.set_auto_page_break(auto=True, margin=15)
 pdf.add_page()
 pdf.set_font("Arial", size=12)
 
+# Header
 title = "LANAI ENTERTAINMENT SYSTEM - MASTER CONNECTION GUIDE"
 pdf.cell(200, 10, txt=title, ln=True, align="C")
 pdf.ln(10)
 
+# Document content
 content_fixed = """
 Version: 2026.01.10
 Designed for: Gill Marchetti (MarcArmy2003)
@@ -107,10 +116,16 @@ FINAL VERIFICATION CHECKLIST
 - [ ] All converters grounded
 """
 
+# Write the document body
 pdf.multi_cell(0, 8, content_fixed)
 
-# Save the PDF file
-output_path_fixed = "/mnt/data/Lanai_Entertainment_System_Master_Guide.pdf"
-pdf.output(output_path_fixed)
+# Use environment-safe output directory
+base_dir = os.path.dirname(os.path.abspath(__file__))
+output_dir = os.path.join(base_dir, "output")
+os.makedirs(output_dir, exist_ok=True)
 
-output_path_fixed
+output_path = os.path.join(output_dir, "Lanai_Entertainment_System_Master_Guide.pdf")
+
+pdf.output(output_path)
+
+print(f"✅ PDF successfully generated:\n{output_path}")
