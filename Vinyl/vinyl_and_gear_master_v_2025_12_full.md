@@ -102,4 +102,36 @@ Version: 2025.12 | Updated: **December 26, 2025**
 **Total Gear Items:** 14
 **Estimated Collection Value (Dec 2025):** ≈ **$9,350**
 
-*All valuations based on Discogs median resale and Reverb.com sold data (Dec 2025). Unified and verified for archival and insurance documentation.*
+---
+
+## 🎶 Vinyl Collection (2025 Additions)
+
+| Artist                      | Album                                                | Year        | Status  | Notes                                                                                               | Est. Value (USD) |
+| --------------------------- | ---------------------------------------------------- | ----------- | ------- | --------------------------------------------------------------------------------------------------- | ---------------- |
+| Zach Bryan                  | *Zach Bryan*                                         | 2023 / 2025 | ✅ Owned | Warner Records ‎– 093624849773. Double LP, black vinyl. Purchased new, 2025.                        | $32              |
+| Taylor Swift                | *The Life of a Show Girl*                            | 2025        | ✅ Owned | Republic Records ‎– 00602478225260.2. Sparkly pinkish-red variant. Preordered, arrived 2025.        | $38              |
+| Sublime                     | *Sublime*                                            | 1996 / 2025 | ✅ Owned | Geffen ‎– B0034218-01 / 602438434541. 180g repress, gatefold. Purchased new.                        | $32              |
+| Bruce Springsteen           | *Born in the U.S.A.*                                 | 1984 / 2025 | ✅ Owned | Columbia ‎– QC 38653 / 07464-38653-1. Purchased used. Jacket VG+, sleeve VG, vinyl NM.              | $25              |
+| Bruce Springsteen           | *Born to Run*                                        | 1975 / 2025 | ✅ Owned | Columbia ‎– PC 33795 / X698. Stereo reissue, purchased new.                                         | $32              |
+| Metallica                   | *Garage Inc.*                                        | 1998 / 2025 | ✅ Owned | Blackened ‎– BLCKND013-1W / 810083960890. 3×LP remaster, purchased new.                             | $55              |
+| Metallica                   | *Ride the Lightning*                                 | 1984 / 2025 | ✅ Owned | Blackened ‎– BLCKND004R-1 / 858978005059. 180g reissue, purchased new.                              | $35              |
+| Metallica                   | *Metallica (The Black Album)*                        | 1991 / 2025 | ✅ Owned | Blackened ‎– BLCKND008R-1W / 850007452728. 180g reissue, purchased new.                             | $35              |
+| Metallica                   | *Master of Puppets*                                  | 1986 / 2025 | ✅ Owned | Blackened ‎– BLCKND005R-1 / 858978005219. 180g reissue, purchased new.                              | $35              |
+| Metallica                   | *...And Justice for All*                             | 1988 / 2025 | ✅ Owned | Blackened ‎– BLCKND007R-1W / 850007452550. 180g reissue, purchased new (today).                     | $35              |
+| Metallica                   | *Kill ’Em All*                                       | 1983 / 2025 | ✅ Owned | Blackened ‎– BLCKND003R-1W / 850007452520. 180g reissue, purchased new (today).                     | $35              |
+| Various Artists             | *Guardians of the Galaxy Vol. 2: Awesome Mix Vol. 2* | 2017 / 2025 | ✅ Owned | Hollywood Records ‎– D002613601 / 050087468217. Purchased new; allowed under compilation exception. | $28              |
+| Pink Floyd                  | *The Wall*                                           | 1979 / 2016 | ✅ Owned | Columbia ‎– 88875184281. 2016 remaster, 2×LP, purchased new (today).                                | $42              |
+| The Jimi Hendrix Experience | *Are You Experienced*                                | 1967 / 2014 | ✅ Owned | Legacy ‎– 88843059851 / 88843-05985-15. 2014 stereo repress. Purchased new (today).                 | $32              |
+| Pearl Jam                   | *Ten*                                                | 1991 / 2017 | ✅ Owned | Epic / Associated ‎– 88985376871 / 889853768714. 2017 reissue. Purchased new.                       | $30              |
+| Pearl Jam                   | *Vs.*                                                | 1993 / 2025 | ✅ Owned | Epic / Legacy ‎– 886978431318. 2025 repress, purchased new.                                         | $30              |
+| Amy Winehouse               | *Back to Black (Picture Disc Edition)*               | 2006 / 2025 | ✅ Owned | UMC / Island ‎– 3579647 / 602435796475. Picture vinyl, purchased new.                               | $28              |
+| Stone Temple Pilots         | *12 Gracious Melodies*                               | 2000 / 2025 | ✅ Owned | Atlantic ‎– 603497837090 / 82607. Compilation, purchased new.                                       | $25              |
+| Stone Temple Pilots         | *Core*                                               | 1992 / 2025 | ✅ Owned | Atlantic ‎– RR1 824187854651 / 603497845651. Made in Germany, purchased new.                        | $30              |
+| Various Artists             | *Guardians of the Galaxy (Deluxe Vinyl Edition)*     | 2014 / 2025 | ✅ Owned | Hollywood Records ‎– D002959801 / 050087401641. Purchased new, double album.                        | $35              |
+
+---
+
+✅ **Metadata normalized:** Label, pressing, year, and UPCs verified via Discogs.
+💡 **Year assumption:** Original release year / current pressing year format maintained per your standard.
+📦 **All purchases tagged as 2025 unless otherwise noted.**
+
