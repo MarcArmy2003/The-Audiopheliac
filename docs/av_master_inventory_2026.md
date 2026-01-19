@@ -3,13 +3,13 @@
        alt="The Audiopheliac Primary Logo" width="300" />
 </p>
 
-# AV_Master_Inventory_v2026.04
+# AV_Master_Inventory_v2026.01
 
 **The Audiopheliac – Comprehensive AV, Studio & Network Inventory**  
 Author & Maintainer: *Gillon "Gill" Marchetti (MarcArmy2003)*  
-Version: v2026.04  
+Version: v2026.01  
 Date: January 19, 2026  
-Merged from: AV_Master_Inventory_v2026.03.md + verified intake (Jan 19, 2026)
+Merged from: AV_Master_Inventory (Verified intake Jan 19, 2026)
 
 ---
 
@@ -66,17 +66,24 @@ Merged from: AV_Master_Inventory_v2026.03.md + verified intake (Jan 19, 2026)
 - Subwoofer: Independent of zone selection (works with A or B)
 - Impedance: A OR B: 4Ω min / A+B: 8Ω min
 
-**Signal Chain:**
+**Signal Chain (Current Configuration):**
 ```
-Technics SL-1200MK2 (Ortofon Blue) → Pro-Ject Phono Box S2 Ultra → Yamaha R-N800A (Line In 1)
+Technics SL-1200MK2 (Ortofon Blue) → Pro-Ject Phono Box S2 Ultra
+     │
+     ├──► RCA Output 1 → Yamaha R-N800A Line In 1 (local playback)
+     │
+     └──► RCA Output 2 → Rolls MB15b → SVS SoundPath TX → Lanai RX
+
 Samsung NU6950 (Optical 1) → Yamaha R-N800A
 Yamaha R-N800A (Sub Out) → SVS SB-1000 Pro
 Yamaha R-N800A (Speaker A) → Polk ES60 Towers
-Yamaha R-N800A (Line Out) → Rolls MB15b 
-     ├→ 1Mii RT5066R2 TX → [Studio RX #1 + Garage RX #2]  [Connection method TBD]
-     └→ SVS SoundPath TX → Lanai RX (boosts pre-out for Lanai playback)
 Ethernet → QNAP TS-473A (MusicCast / DLNA / AirPlay 2)
 ```
+
+**1Mii RT5066R2 System Status:**
+- **TX + 2× RX purchased** (Jan 16, 2026) — **NOT YET CONNECTED**
+- **Planned integration:** Multi-room wireless audio to Studio + Garage
+- **Connection method:** TBD (pending signal routing analysis)
 
 ---
 
@@ -86,10 +93,10 @@ Ethernet → QNAP TS-473A (MusicCast / DLNA / AirPlay 2)
 | -------------------- | --------------------------------------------------------------------------------------------------------------------------- | ---------------------- | ------------- | ----------------- | ------------------------------------------------------------ |
 | Turntable            | Audio-Technica AT-LP120XUSB                                                                                                 | 243402497              | Jan 2025      | $200              | Direct drive; stock AT95E cartridge (green); AT-VM95SH Shibata on backorder |
 | Audio Interface      | [Focusrite Scarlett Solo 4th Gen](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/docs/Processing_Hardware.md)   | S1XJ7HX57AF107         | Feb 2025      | $110              | USB-C main interface                                         |
-| Wireless RX          | 1Mii RT5066R2 Wireless Audio Receiver #1                                                                                    | TBD                    | Jan 16, 2026  | $23               | Feeds Schiit SYS Input 2 for Family Room vinyl streaming     |
+| Wireless RX          | 1Mii RT5066R2 Wireless Audio Receiver #1                                                                                    | TBD                    | Jan 16, 2026  | $23               | **NOT YET CONNECTED** — Planned for Family Room vinyl streaming via Schiit SYS Input 2 |
 | Audio Hub            | M-Audio Air\|HUB                                                                                                            | TBD                    | Apr 2024      | $80               | Backup USB DAC/monitor hub; stored as spare                  |
 | Phono Preamp         | Schiit Mani II                                                                                                              | CI182351284            | Jul 2025      | $213              | Confirmed DIP config default; input available                |
-| Passive Preamp       | Schiit SYS                                                                                                                  | SYS1902435             | Oct 2025      | $64               | Line controller; Input 1 = Mani II; Input 2 = 1Mii RX #1     |
+| Passive Preamp       | Schiit SYS                                                                                                                  | SYS1902435             | Oct 2025      | $64               | Line controller; Input 1 = Mani II; Input 2 = **available for 1Mii RX #1** |
 | Subwoofer            | JBL LSR310S                                                                                                                 | DYA007-34294           | Oct 2025      | $260              | Operational, balanced TRS in/out verified                    |
 | Studio Monitors      | Yamaha HS7 (Pair)                                                                                                           | Z719774TS / Z719774TR  | Mar 2023      | $450              | Operational; on Gator Frameworks stands                      |
 | Isolation Pads       | Auralex ProPAD 8"×13"                                                                                                       | H9135000000000         | Oct 2025      | $90               | Under HS7s                                                   |
@@ -102,14 +109,17 @@ Ethernet → QNAP TS-473A (MusicCast / DLNA / AirPlay 2)
 | Headset              | Logitech H390                                                                                                               | H390SN117245A          | Jan 2022      | $25               | USB wired headset                                            |
 | Laptop               | [Dell Precision 7540](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/docs/Dell_Precision_7540_Specs.md)         | 3N1QK93                | Aug 2021      | $850              | Xeon workstation; Samsung 990 PRO SSD + 112GB ECC RAM        |
 
-### 🔊 Studio Monitoring Chain
+### 🔊 Studio Monitoring Chain (Current Configuration)
 
 ```
 AT-LP120XUSB (AT95E stock) → Schiit Mani II → Schiit SYS (Input 1)
-1Mii RX #1 → Schiit SYS (Input 2)  [Family Room wireless feed]
+Schiit SYS Input 2 → **Available for 1Mii RX #1** (not yet connected)
 Schiit SYS → JBL LSR310S (TRS balanced in)
 JBL LSR310S → Yamaha HS7 L/R (TRS balanced out)
 ```
+
+**Planned Integration:**
+- 1Mii RX #1 → Schiit SYS Input 2 (Family Room wireless vinyl feed)
 
 ---
 
@@ -118,19 +128,17 @@ JBL LSR310S → Yamaha HS7 L/R (TRS balanced out)
 | Device         | Make / Model              | Serial Number | Purchase Date | Est. Resale (USD) | Notes                                          |
 | -------------- | ------------------------- | ------------- | ------------- | ----------------- | ---------------------------------------------- |
 | TV             | Vizio 22" LED             | TBD           | Pre-owned     | $50               | Basic HD display                               |
-| Wireless RX    | 1Mii RT5066R2 Receiver #2 | TBD           | Jan 16, 2026  | $23               | Standby for future wireless audio integration  |
+| Wireless RX    | 1Mii RT5066R2 Receiver #2 | TBD           | Jan 16, 2026  | $23               | **NOT YET CONNECTED** — Planned for wireless Family Room audio integration |
 | Smart Speaker  | Amazon Echo (4th Gen)     | A4205FQ13312  | May 2024      | $60               | Relocated from Lanai; Alexa voice control      |
 
-### 🔊 Garage Signal Chain
+### 🔊 Garage Signal Chain (Current Configuration)
 
 ```
 Amazon Echo (4th Gen) → Bluetooth / Wi-Fi Playback
-1Mii RX #2 → [Future connection point for wireless Family Room feed]
 ```
 
-**Notes:**  
-- 1Mii RX #2 available for wireless Family Room audio feed when needed.
-- Amazon Echo relocated from Lanai for independent streaming control.
+**Planned Integration:**
+- 1Mii RX #2 → Future wireless Family Room audio feed
 
 ---
 
