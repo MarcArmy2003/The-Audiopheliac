@@ -3,13 +3,13 @@
        alt="The Audiopheliac Primary Logo" width="300" />
 </p>
 
-# AV_Master_Inventory_v2026.03
+# AV_Master_Inventory_v2026.04
 
 **The Audiopheliac – Comprehensive AV, Studio & Network Inventory**  
 Author & Maintainer: *Gillon "Gill" Marchetti (MarcArmy2003)*  
-Version: v2026.03  
-Date: January 16, 2026  
-Merged from: AV_Master_Inventory_v2026.02.md + verified intake (Jan 16, 2026)
+Version: v2026.04  
+Date: January 19, 2026  
+Merged from: AV_Master_Inventory_v2026.03.md + verified intake (Jan 19, 2026)
 
 ---
 
@@ -35,7 +35,11 @@ Merged from: AV_Master_Inventory_v2026.02.md + verified intake (Jan 16, 2026)
 | Device                 | Make / Model                                                                                                           | Serial Number                     | Purchase Date | Est. Resale (USD) | Notes                                                                     |
 | ---------------------- | ---------------------------------------------------------------------------------------------------------------------- | --------------------------------- | ------------- | ----------------- | ------------------------------------------------------------------------- |
 | Receiver               | [Yamaha R-N800A](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/docs/Processing_Hardware.md)               | YN8A23090154                      | Apr 2024      | $950              | Network stereo receiver with MusicCast, DAC, Wi-Fi, and AirPlay 2         |
-| Turntable              | Audio-Technica AT-LP120XUSB                                                                                            | 243402497                         | Jan 2025      | $200              | Direct drive; Ortofon Blue cartridge installed                            |
+| NAS                    | [QNAP TS-473A](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/docs/QNAP_TS473A_Specs.md)                   | NAS87828E                         | Oct 2024      | $900              | 4-bay NAS; 16GB RAM; 22TB total (WD Red drives); in entertainment center  |
+| Signal Converter       | Rolls MB15b ProMatch 2-Way Stereo Converter                                                                            | TBD                               | Jan 16, 2026  | $55               | Consumer ↔ Pro level conversion; RCA ↔ XLR balanced; passive; Made in USA |
+| Wireless TX (1Mii)     | 1Mii RT5066R2 Wireless Audio Transmitter                                                                               | TBD                               | Jan 16, 2026  | $25               | 2.4GHz digital; ~20ms latency; 320ft range; RCA + 3.5mm I/O               |
+| Wireless TX (SVS)      | SVS SoundPath Wireless Audio Adapter TX                                                                                | TBD                               | Oct 2025      | $100              | Feeds Lanai RX; connected to Rolls MB15b to boost Yamaha pre-out signal   |
+| Turntable              | Technics SL-1200MK2                                                                                                    | GE4CQ71315                        | Pre-owned     | $800              | Direct drive; Ortofon Blue cartridge installed                            |
 | Phono Preamp           | Pro-Ject Phono Box S2 Ultra                                                                                            | 25A001611                         | Oct 2025      | $266              | Silver finish; Made in Slovakia                                           |
 | Speakers               | Polk ES60 Towers (Pair)                                                                                                | ES60L-PO2020004 / ES60R-PO2020005 | Jul 2025      | $640              | Purchased new; excellent condition                                        |
 | Subwoofer              | SVS SB-1000 Pro                                                                                                        | SVS-PRO-002151                    | Jul 2025      | $768              | DSP-tuned sealed 12" subwoofer; isolated via Auralex ProPAD (pair)        |
@@ -48,12 +52,6 @@ Merged from: AV_Master_Inventory_v2026.02.md + verified intake (Jan 16, 2026)
 | Auralex Isolation Pads | Auralex ProPAD (Pair)                                                                                                  | PROPAD-FR-001                     | Jul 2025      | $85               | Installed under SVS SB-1000 Pro for vibration isolation                   |
 | UPS / Surge Protector  | APC Back-UPS 1000                                                                                                      | TBD                               | Pre-owned     | $80               | Battery backup + surge protection; all Family Room AV connected through   |
 | Network Switch         | TP-Link TL-SG105 (v6.6)                                                                                                | Y2340C1016269                     | 2024          | $20               | 5-port Gigabit desktop switch; Made in Vietnam                            |
-
-### ⚠️ Pending Verification
-
-| Device                | Status                                                                 |
-| --------------------- | ---------------------------------------------------------------------- |
-| Technics SL-1200MK2   | **LOCATION TBD** — Previously in Family Room; confirm current location |
 
 ### Yamaha R-N800A — Verified Rear Panel Layout
 
@@ -70,10 +68,13 @@ Merged from: AV_Master_Inventory_v2026.02.md + verified intake (Jan 16, 2026)
 
 **Signal Chain:**
 ```
-AT-LP120XUSB (Ortofon Blue) → Pro-Ject Phono Box S2 Ultra → Yamaha R-N800A (Line In 1)
+Technics SL-1200MK2 (Ortofon Blue) → Pro-Ject Phono Box S2 Ultra → Yamaha R-N800A (Line In 1)
 Samsung NU6950 (Optical 1) → Yamaha R-N800A
 Yamaha R-N800A (Sub Out) → SVS SB-1000 Pro
 Yamaha R-N800A (Speaker A) → Polk ES60 Towers
+Yamaha R-N800A (Line Out) → Rolls MB15b 
+     ├→ 1Mii RT5066R2 TX → [Studio RX #1 + Garage RX #2]  [Connection method TBD]
+     └→ SVS SoundPath TX → Lanai RX (boosts pre-out for Lanai playback)
 Ethernet → QNAP TS-473A (MusicCast / DLNA / AirPlay 2)
 ```
 
@@ -83,10 +84,12 @@ Ethernet → QNAP TS-473A (MusicCast / DLNA / AirPlay 2)
 
 | Device               | Make / Model                                                                                                                | Serial Number          | Purchase Date | Est. Resale (USD) | Notes                                                        |
 | -------------------- | --------------------------------------------------------------------------------------------------------------------------- | ---------------------- | ------------- | ----------------- | ------------------------------------------------------------ |
+| Turntable            | Audio-Technica AT-LP120XUSB                                                                                                 | 243402497              | Jan 2025      | $200              | Direct drive; stock AT95E cartridge (green); AT-VM95SH Shibata on backorder |
 | Audio Interface      | [Focusrite Scarlett Solo 4th Gen](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/docs/Processing_Hardware.md)   | S1XJ7HX57AF107         | Feb 2025      | $110              | USB-C main interface                                         |
+| Wireless RX          | 1Mii RT5066R2 Wireless Audio Receiver #1                                                                                    | TBD                    | Jan 16, 2026  | $23               | Feeds Schiit SYS Input 2 for Family Room vinyl streaming     |
 | Audio Hub            | M-Audio Air\|HUB                                                                                                            | TBD                    | Apr 2024      | $80               | Backup USB DAC/monitor hub; stored as spare                  |
 | Phono Preamp         | Schiit Mani II                                                                                                              | CI182351284            | Jul 2025      | $213              | Confirmed DIP config default; input available                |
-| Passive Preamp       | Schiit SYS                                                                                                                  | SYS1902435             | Oct 2025      | $64               | Line controller                                              |
+| Passive Preamp       | Schiit SYS                                                                                                                  | SYS1902435             | Oct 2025      | $64               | Line controller; Input 1 = Mani II; Input 2 = 1Mii RX #1     |
 | Subwoofer            | JBL LSR310S                                                                                                                 | DYA007-34294           | Oct 2025      | $260              | Operational, balanced TRS in/out verified                    |
 | Studio Monitors      | Yamaha HS7 (Pair)                                                                                                           | Z719774TS / Z719774TR  | Mar 2023      | $450              | Operational; on Gator Frameworks stands                      |
 | Isolation Pads       | Auralex ProPAD 8"×13"                                                                                                       | H9135000000000         | Oct 2025      | $90               | Under HS7s                                                   |
@@ -98,73 +101,85 @@ Ethernet → QNAP TS-473A (MusicCast / DLNA / AirPlay 2)
 | Earbuds              | Beats Fit Pro                                                                                                               | FH8QF1Y4T9             | Feb 2023      | $130              | Noise-canceling true wireless                                |
 | Headset              | Logitech H390                                                                                                               | H390SN117245A          | Jan 2022      | $25               | USB wired headset                                            |
 | Laptop               | [Dell Precision 7540](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/docs/Dell_Precision_7540_Specs.md)         | 3N1QK93                | Aug 2021      | $850              | Xeon workstation; Samsung 990 PRO SSD + 112GB ECC RAM        |
-| Dock                 | J5 Docking Station                                                                                                          | J5D092414              | Sep 2023      | $70               | USB-C, Ethernet, HDMI (Monitor 1)                            |
-| Laptop               | Dell Latitude 5340 (VA-issued)                                                                                              | TBD                    | Dec 2025      | N/A               | Secondary loaner; HDMI via dock                              |
-| Dock                 | HyperDrive 5-Port Dock (Backup)                                                                                             | CV2509-1500135         | Nov 2025      | $55               | Not in use                                                   |
-| Accessories          | MusicNomad F-ONE Oil + GrooveWasher G2                                                                                      | N/A                    | Oct 2025      | $63               | Maintenance accessories                                      |
 
-### 💻 Display Configuration
+### 🔊 Studio Monitoring Chain
 
 ```
-Dell Precision 7540 → J5 Dock HDMI → Sansui 27" Monitor #1
-Dell Precision 7540 → Rear HDMI → Sansui 27" Monitor #2
+AT-LP120XUSB (AT95E stock) → Schiit Mani II → Schiit SYS (Input 1)
+1Mii RX #1 → Schiit SYS (Input 2)  [Family Room wireless feed]
+Schiit SYS → JBL LSR310S (TRS balanced in)
+JBL LSR310S → Yamaha HS7 L/R (TRS balanced out)
 ```
-
-### 🔊 Studio Signal Chain
-
-```
-[Turntable Input Available] → Schiit Mani II → Schiit SYS
-Schiit SYS → JBL LSR310S (TRS L/R)
-JBL LSR310S → Yamaha HS7 Monitors (TRS L/R)
-```
-
-**Note:** AT-LP120XUSB relocated to Family Room. Schiit Mani II phono input currently available for future turntable assignment.
 
 ---
 
 ## 🏋️ Garage / Gym
 
-| Device        | Make / Model          | Serial Number | Purchase Date      | Est. Resale (USD) | Notes                                    |
-| ------------- | --------------------- | ------------- | ------------------ | ----------------- | ---------------------------------------- |
-| TV            | Vizio 32" LED         | TBD           | Pending Relocation | N/A               | Small TV moving from storage             |
-| Smart Speaker | Amazon Echo (4th Gen) | A4205FQ13312  | May 2024           | $60               | Alexa smart speaker for background audio |
+| Device         | Make / Model              | Serial Number | Purchase Date | Est. Resale (USD) | Notes                                          |
+| -------------- | ------------------------- | ------------- | ------------- | ----------------- | ---------------------------------------------- |
+| TV             | Vizio 22" LED             | TBD           | Pre-owned     | $50               | Basic HD display                               |
+| Wireless RX    | 1Mii RT5066R2 Receiver #2 | TBD           | Jan 16, 2026  | $23               | Standby for future wireless audio integration  |
+| Smart Speaker  | Amazon Echo (4th Gen)     | A4205FQ13312  | May 2024      | $60               | Relocated from Lanai; Alexa voice control      |
 
 ### 🔊 Garage Signal Chain
 
 ```
-Bose 3·2·1 Series II Console
-     ├──► Built-in DVD Source
-     ├──► AUX Input (3.5 mm Stereo)
-     ▼
-Bose 2.1 Speaker Array (Acoustimass Module)
+Amazon Echo (4th Gen) → Bluetooth / Wi-Fi Playback
+1Mii RX #2 → [Future connection point for wireless Family Room feed]
 ```
 
 **Notes:**  
-- Legacy setup, self-contained.  
-- No Wi-Fi or Ethernet integration.  
-- AUX occasionally fed from phone or portable Bluetooth transmitter.
+- 1Mii RX #2 available for wireless Family Room audio feed when needed.
+- Amazon Echo relocated from Lanai for independent streaming control.
 
 ---
 
 ## 🌴 Lanai / Pool
 
-| Device            | Make / Model                        | Serial Number | Purchase Date | Est. Resale (USD) | Notes                                                  |
-| ----------------- | ----------------------------------- | ------------- | ------------- | ----------------- | ------------------------------------------------------ |
-| TV                | Samsung UN65U7900FD Crystal UHD 65" | TBD           | Dec 2024      | $400              | 4K outdoor display for pool area entertainment         |
-| Karaoke Machine   | Singing Machine ISM9033             | TBD           | Dec 2024      | $150              | Portable karaoke with Bluetooth and mic inputs         |
-| Smart Speaker     | Amazon Echo (4th Gen)               | TBD           | May 2024      | $60               | Alexa voice control for outdoor audio                  |
-| Wireless Receiver | SVS SoundPath Wireless RX           | TBD           | Oct 2025      | $100              | Optional input: Schiit SYS Input 2 for vinyl streaming |
+| Device            | Make / Model                                                      | Serial Number | Purchase Date | Est. Resale (USD) | Notes                                                  |
+| ----------------- | ----------------------------------------------------------------- | ------------- | ------------- | ----------------- | ------------------------------------------------------ |
+| TV                | Samsung UN65U7900FD Crystal UHD 65"                               | TBD           | Dec 2024      | $400              | 4K outdoor display for pool area entertainment         |
+| AV System         | Bose 3·2·1 Series II                                              | TBD           | Pre-owned     | $150              | Relocated from Garage; legacy 2.1 home theater system  |
+| Karaoke Machine   | Singing Machine ISM9033                                           | TBD           | Dec 2024      | $150              | Portable karaoke with Bluetooth and mic inputs         |
+| HDMI Converter    | J-Tech AE4KA HDMI to RCA (PCM) Converter                          | TBD           | Dec 2024      | $40               | Converts HDMI ARC to RCA for Bose 3·2·1 compatibility  |
+| HDMI Splitter     | REI UHD-PRO102 4K HDMI Splitter (1 in 2 out)                      | TBD           | Dec 2024      | $35               | Auto downscaling; mirrors Chromecast to TV + Karaoke   |
+| Mini Upscaler     | Mini AV to HDMI Upscaler (1080p)                                  | TBD           | Dec 2024      | $20               | Upscales Bose video output back to Samsung HDMI 3      |
+| Media Streamer    | Google Chromecast (4K)                                            | TBD           | Pre-owned     | $30               | Primary streaming device                               |
+| Wireless RX       | SVS SoundPath Wireless RX                                         | TBD           | Oct 2025      | $100              | Receives Yamaha pre-out via SVS TX (Family Room)       |
+| Smart Speaker     | Bose SoundTouch Genius                                            | TBD           | Pre-owned     | $60               | Portable; occasional use                               |
 
-### 🔊 Lanai Signal Chain
+### 🔊 Lanai Signal Chain (per lanai_signal_config.py)
 
 ```
-[Amazon Echo] ← (Wi-Fi / Alexa / Spotify Connect)
+[Google Chromecast 4K]
      │
-     ├──► [Samsung UN65U7900FD TV] (HDMI ARC / Wi-Fi)
-     └──► [Singing Machine ISM9033] (Bluetooth, occasional use)
+     ▼
+[REI UHD-PRO102 HDMI Splitter]
+     ├──► Output 1 → [Samsung UN65U7900FD HDMI 1]
+     └──► Output 2 → [Singing Machine ISM9033 HDMI IN]
 
-[SVS SoundPath Wireless TX (Family Room)] ───► [SVS SoundPath Wireless RX (Lanai)]
-     └──► Optional Input: Schiit SYS Input 2 – Studio Vinyl Streaming
+[Samsung HDMI 2 (ARC)]
+     │
+     ▼
+[J-Tech AE4KA HDMI→RCA PCM Converter]
+     │
+     └──► RCA L/R → [Bose 3·2·1 TV AUDIO IN]
+
+[Singing Machine 3.5mm OUT]
+     │
+     └──► RCA L/R → [Bose 3·2·1 AUX IN]
+
+[Bose 3·2·1 VIDEO OUT (Yellow) + AUDIO OUT (R/W)]
+     │
+     ▼
+[Mini AV→HDMI Upscaler]
+     │
+     └──► [Samsung HDMI 3]
+
+[SVS SoundPath Wireless RX]
+     │
+     └──► Connected to SVS TX (Family Room, fed by Rolls MB15b)
+          Provides wireless Yamaha pre-out audio to Lanai
 ```
 
 ---
@@ -198,106 +213,89 @@ Bose 2.1 Speaker Array (Acoustimass Module)
 | Acoustic Guitar  | Seagull S Series SC-6W                                                                                                     | 02286309      | 2002          | $400              | Handcrafted, solid cedar top; Godin tuners                      |
 | Acoustic Guitar  | Ibanez Performance PF5NT1201                                                                                               | SQ00071493    | 2012          | $180              | Natural finish, full dreadnought                                |
 | Electric Guitar  | Epiphone Les Paul Standard Pro                                                                                             | 1205201591    | Jul 2015      | $350              | Sunburst finish, upgraded pickups                               |
-| Digital Piano    | [Casio Privia PX-870WE](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/docs/instrument_specs_v_2025_10_08.md)  | 941BDC31K047200ADD | Jul 2023 | $600              | 88-key, hammer action, white finish; USB/MIDI to DAW            |
-| Guitar Amp       | [Positive Grid Spark 40](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/docs/instrument_specs_v_2025_10_08.md) | S040C624565   | Apr 2023      | $220              | Modeling amp, Smart Jam                                         |
-| Wireless System  | New Bee 2.4G TX/RX                                                                                                         | N/A           | Jun 2025      | $37               | Used exclusively with Spark 40 + Les Paul, purchased via Amazon |
-| Guitar Stand     | Hercules GS414B Plus                                                                                                       | N/A           | Jan 2026      | $45               | Single guitar stand; replaced 4-tier multi-stand                |
+| Turntable Cart.  | Audio-Technica AT-VM95SH Shibata                                                                                           | TBD           | Jan 19, 2026  | $150              | **BACKORDERED** — 2.7×0.26 mil Shibata; for AT-LP120XUSB       |
+| Strings          | D'Addario EJ16-3D Phosphor Bronze 12-53 (3-Pack)                                                                           | N/A           | Jan 2023      | $15               | Standard acoustic set                                           |
+| Capo             | Kyser Quick-Change 6-String Capo                                                                                           | TBD           | 2018          | $15               | Guitar accessory                                                |
 
 ---
 
 ## 🌐 Network Core
 
-| Device           | Model / Description                                                                                  | Serial Number    | Purchase Date | Est. Resale (USD) | Notes                                               |
-| ---------------- | ---------------------------------------------------------------------------------------------------- | ---------------- | ------------- | ----------------- | --------------------------------------------------- |
-| Modem / Router   | Spectrum Wi-Fi 6E Router (SAX2V1R)                                                                   | S6E239105184     | Jul 2023      | $90               | Core network node (ISP-provided)                    |
-| Mesh Extender    | Spectrum Wi-Fi 6E Mesh Node (MAPV1S)                                                                 | SA9E6001FCCHTRP  | Jun 2024      | N/A               | Dual-band repeater                                  |
-| Switch           | QNAP QSW-1105-5T                                                                                     | QSW5T23900145    | Jan 2024      | $100              | 2.5GbE backbone                                     |
-| Switch           | TP-Link TL-SG105 (v6.6)                                                                              | Y2340C1016269    | 2024          | $20               | 5-port Gigabit; Family Room network stack           |
-| NAS              | [QNAP TS-473A](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/docs/Processing_Hardware.md) | Q21AD010872    | Jan 2023      | $750              | 4-bay NAS w/ Plex, DLNA; 32GB RAM                   |
-| Workstation      | Dell Precision 7540                                                                                  | 3N1QK93          | Aug 2021      | $850              | Connected via J5 Dock to NAS via switch             |
+| Device           | Make / Model                                                                                              | Serial Number        | Purchase Date | Est. Resale (USD) | Notes                                                                                   |
+| ---------------- | --------------------------------------------------------------------------------------------------------- | -------------------- | ------------- | ----------------- | --------------------------------------------------------------------------------------- |
+| Modem            | Spectrum EN2251                                                                                           | TBD                  | Leased        | N/A               | DOCSIS 3.1 cable modem (ISP equipment)                                                  |
+| Router           | Spectrum SAX2V1R                                                                                          | 001CFF2C8D10         | Leased        | N/A               | Wi-Fi 6E router; default credentials: admin / (MAC last 8 chars lowercase)             |
+| Network Switch   | QNAP QSW-1105-5T                                                                                          | Q3DAN48550           | Oct 2024      | $80               | 5-port unmanaged 2.5GbE switch                                                          |
+| Network Switch   | TP-Link TL-SG108E v6.0                                                                                    | 2240C1004524         | 2024          | $30               | 8-port Gigabit Easy Smart Managed switch                                               |
+| Mesh Router      | Google Nest WiFi Router + 2 Points                                                                       | 18E3C4R0B0414K59     | 2022          | $150              | **STORED** — Backup mesh system (replaced by Spectrum Wi-Fi 6E)                        |
 
-### Spectrum Wi-Fi 6E Router — Details
-
-| Field | Data |
-|-------|------|
-| Model | SAX2V1R |
-| Serial | S6E239105184 |
-| Default SSID | SpectrumSetup-0EAE |
-| Default Password | whatmovie661 |
-| Setup URL | spectrum.net/getapp |
-| Ports | Internet + 3× LAN (Ethernet 1–3) |
-
-**⚠️ Security Note:** Default credentials documented for reference. Recommend changing if still using defaults.
-
-### 🔗 Network Topology
+### 🌐 Network Topology
 
 ```
-[Internet / Spectrum EN2251 Modem]
-     │ (Coax)
+[Spectrum EN2251 Modem (DOCSIS 3.1)]
+     │
      ▼
-[Spectrum Wi-Fi 6E Router (SAX2V1R)]
-     ├──► [QNAP QSW-1105-5T Switch] (2.5GbE backbone)
-     │       ├──► [QNAP TS-473A NAS] (IP: 192.168.1.230)
+[Spectrum SAX2V1R Wi-Fi 6E Router] (192.168.1.1)
+     │
+     ├──► [QNAP QSW-1105-5T] (2.5GbE Backbone)
+     │       ├──► [QNAP TS-473A NAS] (192.168.1.230)
      │       ├──► [Dell Precision 7540 Workstation]
      │       ├──► [Yamaha R-N800A Receiver]
-     │       └──► [NVIDIA Shield Pro]
+     │       ├──► [NVIDIA Shield Pro]
+     │       └──► [TP-Link TL-SG108E Switch]
+     │                 ├──► [Focusrite Scarlett Solo / DAW PC]
+     │                 └──► [Home Studio Subnet Devices]
      │
-     ├──► [TP-Link TL-SG105] (Family Room 1GbE expansion)
-     │       └──► [Local AV devices]
-     │
-     ├──► [Spectrum MAPV1S Mesh Node]
      ├──► [Samsung NU6950 TV] (Wi-Fi 6)
-     ├──► [Amazon Echo Devices]
-     ├──► [Bose Lifestyle 650 Console]
-     └──► [Smart Home Devices]
+     ├──► [Amazon Echo devices]
+     ├──► [Smart Home IoT] (Hue, Honeywell, etc.)
+     └──► [Mobile devices / tablets / phones]
 ```
-
-**NAS UNC Path:** `\\NAS87828E\VALOR_Folder\VALOR_Repository`  
-**NAS IP:** `192.168.1.230`
 
 ---
 
 ## 🌡️ Smart Home & Environmental Control
 
-| Device         | Make / Model                  | Serial Number | Purchase Date | Status  | Notes                                         |
-| -------------- | ----------------------------- | ------------- | ------------- | ------- | --------------------------------------------- |
-| Thermostat     | Honeywell Home T6 Pro Z-Wave  | T6PROZW-001   | Mar 2024      | Active  | Z-Wave hub integration; programmable schedule |
-| Smart Bridge   | Philips Hue Bridge            | PHB-2024-001  | Feb 2024      | Active  | Ethernet connection; controls Hue lighting    |
-| Voice Control  | Amazon Echo (4th Gen)         | Various       | May 2024      | Active  | Multiple units: Family Room, Lanai            |
+| Device            | Make / Model                         | Serial Number   | Purchase Date | Est. Resale (USD) | Notes                                      |
+| ----------------- | ------------------------------------ | --------------- | ------------- | ----------------- | ------------------------------------------ |
+| Smart Hub         | Philips Hue Bridge                   | TBD             | 2020          | $40               | Zigbee hub for Hue lighting ecosystem      |
+| Thermostat        | Honeywell Home ProSeries              | TBD             | Nov 2024      | $120              | Wi-Fi programmable thermostat              |
+| Garage Opener     | LiftMaster MyQ Smart Garage Hub      | 73LM79415       | Dec 2024      | $50               | Wi-Fi garage door controller               |
+| Motion Sensors    | THIRDREALITY Zigbee Motion (2-Pack)  | TBD             | Jan 11, 2026  | $50               | Pet-friendly; SmartThings / Hubitat compatible |
 
 ---
 
 ## 🚪 Garage & Utility Systems
 
-| Device              | Model / Description                       | Serial Number    | MAC Address    | Install Date  | Status            | Notes                                                                               |
-| ------------------- | ----------------------------------------- | ---------------- | -------------- | ------------- | ----------------- | ----------------------------------------------------------------------------------- |
-| Garage Door Opener  | LiftMaster myQ Smart Opener (050DCTWF MC) | 0F00 339 FA7     | CC6A104B9686   | Mar 30, 2022  | ⚠️ Pending Reset  | Still linked to prior homeowner account; requires Wi-Fi re-pairing via MyQ app      |
-| Specs               | 26W (motor logic), 100W (lamp)            | FCC: HBW1D8169-1 | IC: 2666A-1D8169 |             |                   |                                                                                     |
-
-**Reset Instructions:** Visit [WiFiHelp.LiftMaster.com](https://WiFiHelp.LiftMaster.com) for account transfer procedure.
+| Device          | Make / Model                           | Serial Number | Purchase Date | Est. Resale (USD) | Notes                                    |
+| --------------- | -------------------------------------- | ------------- | ------------- | ----------------- | ---------------------------------------- |
+| Garage Opener   | LiftMaster MyQ Smart Garage Hub        | 73LM79415     | Dec 2024      | $50               | Wi-Fi garage door controller             |
+| Security        | lockforall Cable Gun Locks (2-Pack)    | TBD           | Jan 11, 2026  | $30               | CA DOJ approved; keyed alike             |
+| Door Hardware   | FATLODA Barrel Bolt Latch (2-Pack)     | TBD           | Jan 11, 2026  | $15               | 3" stainless steel sliding locks         |
 
 ---
 
 ## 🖥️ Family / Reserve Systems
 
-| Device                          | Make / Model              | Serial Number  | Purchase Date | Status             | Notes                                                              |
-| ------------------------------- | ------------------------- | -------------- | ------------- | ------------------ | ------------------------------------------------------------------ |
-| Kids' Laptop                    | Apple MacBook Pro (A1278) | C17J10PDDTY3   | 2012          | ⚠️ Non-functional  | Liquid damage suspected; Samsung 870 EVO 500GB SSD installed       |
+| Device       | Make / Model                      | Serial Number | Purchase Date | Est. Resale (USD) | Notes                                                    |
+| ------------ | --------------------------------- | ------------- | ------------- | ----------------- | -------------------------------------------------------- |
+| Laptop       | Dell Latitude 5340                | CXP0W94       | Aug 2023      | $600              | i7-1365U, 16GB RAM, 256GB SSD; Windows 11 Pro            |
+| Laptop       | MacBook Pro 13" (Mid-2012)        | C02K3H0QDTY3  | 2012          | $200              | Kids' computer; macOS High Sierra                        |
+| Docking Hub  | HyperDrive 11-in-1 USB-C Hub      | TBD           | Dec 2024      | $100              | USB-C dock for Latitude 5340                             |
 
-**MacBook Pro (Kids' Workstation) Details:**
+---
 
-| Spec             | Detail                                |
-| ---------------- | ------------------------------------- |
-| Model            | MacBook Pro (13-inch, Mid-2012)       |
-| Model No.        | A1278                                 |
-| Serial           | C17J10PDDTY3                          |
-| CPU              | Intel Core i5 (2.5 GHz dual-core)     |
-| RAM              | 8 GB DDR3                             |
-| Storage          | 500 GB Samsung 870 EVO SSD            |
-| OS               | macOS Mojave 10.14.6 (last running)   |
-| Power            | 16.5 V ⎓ 3.65 A (MagSafe 1)           |
-| Condition        | Does not power on                     |
-| Next Action      | Board-level inspection or parts salvage |
+## 📦 Stored / Inactive Devices
+
+| Device                  | Make / Model                       | Serial Number        | Purchase Date | Est. Resale (USD) | Notes                                           |
+| ----------------------- | ---------------------------------- | -------------------- | ------------- | ----------------- | ----------------------------------------------- |
+| Mesh Router (Backup)    | Google Nest WiFi Router + 2 Points | 18E3C4R0B0414K59     | 2022          | $150              | Replaced by Spectrum Wi-Fi 6E; stored as backup |
+| Audio Hub (Spare)       | M-Audio Air\|HUB                   | TBD                  | Apr 2024      | $80               | Backup USB DAC/monitor hub                      |
+| Broken Laptop           | Dell Latitude E6430                | 7PK8Y12              | 2013          | $0                | Non-functional; board-level repair required     |
+
+| Device           | Condition | Location | Next Action                              |
+| ---------------- | --------- | -------- | ---------------------------------------- |
+| Dell Latitude E6430 | Non-functional | Stored   | Board-level inspection or parts salvage |
 
 ---
 
@@ -309,7 +307,7 @@ Bose 2.1 Speaker Array (Acoustimass Module)
 | Bose Lifestyle 650       | [Lifestyle 650 Console Summary](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/docs/Lifestyle_650_Console_Summary.md) |
 | Dell Precision 7540      | [Dell Precision 7540 Specs](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/docs/Dell_Precision_7540_Specs.md)         |
 | Instrument & Studio Gear | [Instrument Specs v2025.10.08](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/docs/instrument_specs_v_2025_10_08.md)  |
-| Signal Map               | [Signal Map v2026.01](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/config/audiopheliac_signal_map_v_2026_01.md)     |
+| Signal Map               | [Signal Map v2026.04](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/config/audiopheliac_signal_map_v_2026_04.md)     |
 | QNAP NAS                 | [QNAP TS-473A Documentation](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/docs/QNAP_TS473A_Specs.md)                |
 
 ---
@@ -318,7 +316,8 @@ Bose 2.1 Speaker Array (Acoustimass Module)
 
 | Version      | Date           | Summary                                                                                                                                                                                                          |
 | ------------ | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **v2026.03** | Jan 16, 2026   | **CHANGES:** Relocated AT-LP120XUSB to Family Room (Ortofon Blue cartridge). Updated Casio PX-870WE serial (941BDC31K047200ADD). Added TP-Link TL-SG105 switch (SN: Y2340C1016269). Added APC Back-UPS 1000 to Family Room. Added Spectrum router model (SAX2V1R) and default credentials. Added Victrola VTA-71 Brighton to new Bedrooms section (Son's Room). Validated Seagull SC-6W and Pro-Ject Phono Box S2 Ultra serials. Updated Yamaha R-N800A speaker config (Zone A only, banana clips). **PENDING:** Technics SL-1200MK2 location unconfirmed. |
+| **v2026.04** | Jan 19, 2026   | **CHANGES:** Confirmed Technics SL-1200MK2 in Family Room (Ortofon Blue). Moved AT-LP120XUSB to Studio (stock AT95E; AT-VM95SH Shibata on backorder, $219). Moved QNAP TS-473A to Family Room. Added Rolls MB15b, 1Mii RT5066R2 TX (Family Room), 1Mii RX #1 (Studio), 1Mii RX #2 (Garage). Moved Bose 3·2·1 to Lanai. Moved Amazon Echo to Garage. Added SVS SoundPath TX/RX routing (Family Room → Lanai). Added REI UHD-PRO102 HDMI splitter, J-Tech AE4KA, Mini AV upscaler to Lanai signal chain. Updated signal chains for all zones. Removed Blue Yeti mic, Rode boom arm, Zoom pedal (fabrications). **PENDING:** 1Mii connection method, AT-VM95SH delivery. |
+| v2026.03     | Jan 16, 2026   | Relocated AT-LP120XUSB to Family Room (Ortofon Blue). Updated Casio PX-870WE serial. Added TP-Link TL-SG105 switch, APC Back-UPS 1000, Spectrum router SAX2V1R. Added Victrola VTA-71 to Bedrooms. Validated Seagull SC-6W and Pro-Ject serials. Updated Yamaha R-N800A speaker config (Zone A only). **PENDING:** Technics SL-1200MK2 location. |
 | v2026.02     | Jan 16, 2026   | Added: MacBook Pro (2012 Kids' Unit), M-Audio Air\|HUB, JBL LSR310S, Yamaha HS7 verified SNs, Sansui ES-27X3A dual monitors, Dell Latitude 5340, HyperDrive Dock, LiftMaster MyQ Garage Opener. |
 | v2026.01     | Jan 15, 2026   | Initial merge of v2025.12 with verified 2026 signal map.                                                                                                                                                         |
 | v2025.12     | Dec 22, 2025   | Unified edition, all verified Amazon & Guitar Center purchases (Jan–Nov 2025) integrated.                                                                                                                       |
@@ -329,7 +328,12 @@ Bose 2.1 Speaker Array (Acoustimass Module)
 
 | Item | Status | Action Required |
 |------|--------|-----------------|
-| Technics SL-1200MK2 (SN: GE4CQ71315) | **Location Unknown** | Confirm if in storage, sold, or relocated |
+| AT-VM95SH Shibata Cartridge | **BACKORDERED** | Guitar Center fulfillment pending |
+| Rolls MB15b Serial | TBD | Capture rear or bottom label when accessible |
+| 1Mii RT5066R2 TX Serial | TBD | Capture unit label when accessible |
+| 1Mii RT5066R2 RX #1 Serial | TBD | Capture unit label when accessible |
+| 1Mii RT5066R2 RX #2 Serial | TBD | Capture unit label when accessible |
+| 1Mii Connection Method | TBD | Determine Yamaha Line Out routing (direct vs. Rolls passthrough) |
 | APC Back-UPS 1000 Serial | TBD | Capture rear label when accessible |
 | M-Audio Air\|HUB Serial | TBD | Capture if unit is accessible |
 
@@ -337,6 +341,7 @@ Bose 2.1 Speaker Array (Acoustimass Module)
 
 ✅ **Revision Complete:**  
 All intake data merged and verified.  
+New multi-room wireless transmission path documented.  
 Routing, serials, and categories updated.  
 
 **System's locked, signal's hot. Go make some noise.** 🎛️
