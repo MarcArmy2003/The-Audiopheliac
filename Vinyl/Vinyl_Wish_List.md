@@ -62,3 +62,16 @@ When committed, use the pattern:
 | Kacey Musgraves | *Golden Hour* | Vinyl | Country-pop done right; rich tonal balance. | 30–45 |
 | Brothers Osborne | *Skeletons* | Vinyl | Contemporary country-rock with punchy mix. | 25–35 |
 | Tracy Chapman | *Tracy Chapman* | Vinyl | Timeless, clean mastering; quiet pressing. | 30–40 |
+
+---
+
+### 🕊️ SOUL ESSENTIALS — NEW ADDITIONS
+
+| Artist | Album | Target Format | Notes | Typical Market (USD) |
+|--------|--------|----------------|--------|------------------------|
+| Sam Cooke | *Night Beat* | Vinyl (Analogue Productions 45RPM or ABKCO reissue) | His most intimate, audiophile-grade recording; pure warmth and presence. | 40–70 |
+| Sam Cooke | *Live at the Harlem Square Club, 1963* | Vinyl | Raw, energetic, emotional peak; a must for soul collectors. | 35–55 |
+| Sam Cooke | *The Best of Sam Cooke* | Vinyl | Excellent compilation if you want “Cupid” and “Chain Gang” in one place. | 25–35 |
+| Al Green | *Call Me* | Vinyl (Hi Records / Fat Possum reissue) | Smooth, lush, perfectly analog; the definition of groove. | 30–45 |
+| Al Green | *Let’s Stay Together* | Vinyl (Hi Records) | Essential soul masterpiece; stunning on full-range playback. | 30–45 |
+| Al Green | *I’m Still in Love with You* | Vinyl | Warm production, deep bass; beautiful synergy with your setup. | 30–40 |
