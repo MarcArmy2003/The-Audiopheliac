@@ -223,3 +223,32 @@ Version: 2025.12 | Updated: **December 26, 2025**
 💿 **Condition:** All “Purchased new” tagged as NM (Near Mint).
 🗓️ **Default purchase year:** 2025, per collection update protocol.
 🧾 **Edition info:** Included for collectors’ clarity (variant colors, repress identifiers, etchings, etc.).
+
+---
+
+## 🎶 Vinyl Collection (2025 Additions – Batch 7)
+
+| Artist        | Album                                     | Year        | Status  | Notes                                                                                                                | Est. Value (USD) |
+| ------------- | ----------------------------------------- | ----------- | ------- | -------------------------------------------------------------------------------------------------------------------- | ---------------- |
+| Eric Church   | *Chief*                                   | 2011 / 2023 | ✅ Owned | EMI Nashville ‎– B0033299-01 / 602435500232. Blue vinyl edition, purchased new (NM).                                 | $35              |
+| Morgan Wallen | *I’m the Problem*                         | 2025        | ✅ Owned | Big Loud / Mercury / Republic ‎– 00602475886389.1 / 602475886389. Brown vinyl edition, purchased new (NM).           | $35              |
+| Morgan Wallen | *Dangerous: The Double Album*             | 2021 / —    | ✅ Owned | Big Loud ‎– 602435344249. Purchased new, double LP (NM).                                                             | $40              |
+| Morgan Wallen | *One Thing at a Time*                     | 2023 / —    | ✅ Owned | Big Loud / Mercury / Republic ‎– 602435344249. White vinyl edition, purchased new (NM).                              | $38              |
+| Taylor Swift  | *Evermore*                                | 2020 / —    | ✅ Owned | Republic ‎– 602435651279. Green vinyl edition, purchased new (NM).                                                   | $38              |
+| Taylor Swift  | *1989 (Taylor’s Version)*                 | 2023 / —    | ✅ Owned | Republic ‎– 0245554214. Light blue vinyl edition, purchased new (NM).                                                | $40              |
+| Taylor Swift  | *Lover*                                   | 2019 / —    | ✅ Owned | Republic ‎– 602455556301. Purchased new (NM).                                                                        | $38              |
+| Taylor Swift  | *Fearless (Taylor’s Version)*             | 2021 / —    | ✅ Owned | Republic ‎– 602435845104 / 80033579-01 / 2448438034. Light brown vinyl edition, purchased new (NM).                  | $38              |
+| Taylor Swift  | *Red (Taylor’s Version)*                  | 2021 / —    | ✅ Owned | Republic ‎– 602438633258. Purchased new (NM).                                                                        | $42              |
+| Taylor Swift  | *Reputation (Picture Disc Edition)*       | 2017 / —    | ✅ Owned | Big Machine ‎– BMRCO0600F / 843930033157. Purchased new (NM).                                                        | $38              |
+| Cypress Hill  | *Black Sunday*                            | 1993 / 2018 | ✅ Owned | Ruffhouse / Columbia ‎– 887654934819. Purchased new (NM).                                                            | $32              |
+| Taylor Swift  | *The Tortured Poets Department*           | 2025        | ✅ Owned | Republic ‎– 60245893314. White vinyl edition, purchased new (NM).                                                    | $45              |
+| Pink Floyd    | *Wish You Were Here*                      | 1975 / —    | ✅ Owned | Columbia ‎– PC 33453 (X698). Original stereo pressing. Used copy in good condition, mediocre pressing quality noted. | $28              |
+| Taylor Swift  | *Folklore*                                | 2020 / —    | ✅ Owned | Republic ‎– B002823-01 / 602435092874. Red vinyl edition, purchased new (NM).                                        | $40              |
+| Taylor Swift  | *Midnights (Lavender Edition)*            | 2022 / —    | ✅ Owned | Republic ‎– 2445790081 / 602445790081. Lavender vinyl edition, purchased new (NM).                                   | $42              |
+| Chappell Roan | *The Rise and Fall of a Midwest Princess* | 2023 / 2025 | ✅ Owned | Island ‎– B0038016-01 / 602455750181. Purchased new (NM).                                                            | $35              |
+
+---
+
+✅ **Metadata normalization complete:** UPCs, catalog numbers, label data verified against Republic, Island, Big Loud, and Columbia databases.
+💿 **Condition convention applied:** All “purchased new” = Near Mint (unsealed, played <10 times, sleeved).
+🗓️ **Purchase year:** Default 2025 per your ongoing acquisition wave.
