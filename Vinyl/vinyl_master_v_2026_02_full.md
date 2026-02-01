@@ -166,6 +166,7 @@
 | Young MC                                       | *Bust A Move (Single)*                                          |      1989 | Owned       | Delicious Vinyl DV1005 / 016244100505. VG+                |                   22 |                       30 |
 | Zach Bryan                                     | *Zach Bryan*                                                    |      2023 | Owned       | Warner 093624849773. NM                                   |                   32 |                       45 |
 | ZZ Top                                         | *Eliminator (Yellow Edition)*                                   |      1983 | Owned       | Warner 603497845712. NM                                   |                   30 |                       45 |
+| Jethro Tull | *Aqualung (2011 Steven Wilson Mix)* | 1971 | Owned | Chrysalis ‎0825646146604. NM | 35 | 50 |
 
 ---
 
