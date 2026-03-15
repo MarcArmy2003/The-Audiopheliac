@@ -18,13 +18,13 @@ Each document in this repo cross-references the others, creating a complete map 
 
 ---
 
-## 🎛️ Core Documentation (v2025.12)
+## 🎛️ Core Documentation (v2026.05)
 
-| Document                                                                                                                                               | Description                                                                                  |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
-| 🎶 [**Vinyl & Gear Master List – v2025.12**](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/Vinyl/vinyl_and_gear_master_v_2025_12_full.md) | Unified catalog of vinyl, audio gear, and accessories, with valuations and acquisition notes |
-| 🧾 [**AV Master Inventory – v2025.12**](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/docs/av_master_inventory_2025.md)                   | Comprehensive, room-by-room equipment documentation with serials and purchase data           |
-| 🗺️ [**Audiopheliac Signal Map – v2025.12**](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/config/audiopheliac_signal_map_v_2025_12.md)   | Complete connection diagram for all rooms, network, and signal routing                       |
+| Document                                                                                                                                         | Description                                                                                  |
+| ------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
+| 🎶 [**Vinyl Master List – v2026.02**](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/Vinyl/vinyl_master_v_2026_02_full.md)           | Unified catalog of vinyl, audio gear, and accessories, with valuations and acquisition notes |
+| 🧾 [**AV Master Inventory – v2026.05**](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/docs/av_master_inventory_2026.md)             | Comprehensive, room-by-room equipment documentation with serials and purchase data           |
+| 🗺️ [**Audiopheliac Signal Map – v2026.01**](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/config/audiopheliac_signal_map_v_2026_01.md) | Complete connection diagram for all rooms, network, and signal routing                    |
 
 ---
 
@@ -55,9 +55,10 @@ It’s the intersection of technical mastery and artistic devotion — where eve
 
 ### 🧾 Version History
 
-| Version   | Date         | Description                              |
-| --------- | ------------ | ---------------------------------------- |
-| 2025.12.1 | Dec 22, 2025 | README redesigned for v2025.12 ecosystem |
+| Version   | Date         | Description                                                                    |
+| --------- | ------------ | ------------------------------------------------------------------------------ |
+| 2026.05.1 | Mar 15, 2026 | Updated all doc links to current versions; network registry and IP records added |
+| 2025.12.1 | Dec 22, 2025 | README redesigned for v2025.12 ecosystem                                       |
 
 ---
 
