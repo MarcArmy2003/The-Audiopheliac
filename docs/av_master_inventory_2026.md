@@ -3,13 +3,13 @@
        alt="The Audiopheliac Primary Logo" width="300" />
 </p>
 
-# AV_Master_Inventory_v2026.01
+# AV_Master_Inventory_v2026.05
 
-**The Audiopheliac – Comprehensive AV, Studio & Network Inventory**  
-Author & Maintainer: *Gillon "Gill" Marchetti (MarcArmy2003)*  
-Version: v2026.01  
-Date: January 19, 2026  
-Merged from: AV_Master_Inventory (Verified intake Jan 19, 2026)
+**The Audiopheliac – Comprehensive AV, Studio & Network Inventory**
+Author & Maintainer: *Gillon "Gill" Marchetti (MarcArmy2003)*
+Version: v2026.05
+Date: March 15, 2026
+Merged from: AV_Master_Inventory_v2026.01 + Dell Precision network record update
 
 ---
 
@@ -107,7 +107,7 @@ Ethernet → QNAP TS-473A (MusicCast / DLNA / AirPlay 2)
 | Headphones           | Audio-Technica ATH-M50x                                                                                                     | ATHM50X19050271        | Jun 2025      | $90               | Closed-back monitoring headphones                            |
 | Earbuds              | Beats Fit Pro                                                                                                               | FH8QF1Y4T9             | Feb 2023      | $130              | Noise-canceling true wireless                                |
 | Headset              | Logitech H390                                                                                                               | H390SN117245A          | Jan 2022      | $25               | USB wired headset                                            |
-| Laptop               | [Dell Precision 7540](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/docs/Dell_Precision_7540_Specs.md)         | 3N1QK93                | Aug 2021      | $850              | Xeon workstation; Samsung 990 PRO SSD + 112GB ECC RAM        |
+| Laptop               | [Dell Precision 7540](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/docs/Dell_Precision_7540_Specs.md)         | 3N1QK93                | Aug 2021      | $850              | Xeon workstation; Samsung 990 PRO SSD + 112GB ECC RAM; **Excellent condition** — internal keyboard needs repair (external KB workaround in use); IP: 192.168.1.75 / Hostname: GDMARCHE / MAC: 4c:1d:96:3f:95:62 / WiFi 5GHz |
 
 ### 🔊 Studio Monitoring Chain (Current Configuration)
 
@@ -247,7 +247,7 @@ Amazon Echo (4th Gen) → Bluetooth / Wi-Fi Playback
      │
      ├──► [QNAP QSW-1105-5T] (2.5GbE Backbone)
      │       ├──► [QNAP TS-473A NAS] (192.168.1.230)
-     │       ├──► [Dell Precision 7540 Workstation]
+     │       ├──► [Dell Precision 7540 Workstation] (192.168.1.75 / GDMARCHE / MAC: 4c:1d:96:3f:95:62)
      │       ├──► [Yamaha R-N800A Receiver]
      │       ├──► [NVIDIA Shield Pro]
      │       └──► [TP-Link TL-SG108E Switch]
@@ -324,6 +324,7 @@ Amazon Echo (4th Gen) → Bluetooth / Wi-Fi Playback
 
 | Version      | Date           | Summary                                                                                                                                                                                                          |
 | ------------ | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **v2026.05** | Mar 15, 2026   | **CHANGES:** Added Dell Precision 7540 network record: IP 192.168.1.75 / Hostname GDMARCHE / MAC 4c:1d:96:3f:95:62 / WiFi 5GHz. Corrected condition status — unit is excellent; internal keyboard needs repair (external KB in use). Updated network topology to reflect assigned IP. |
 | **v2026.04** | Jan 19, 2026   | **CHANGES:** Confirmed Technics SL-1200MK2 in Family Room (Ortofon Blue). Moved AT-LP120XUSB to Studio (stock AT95E; AT-VM95SH Shibata on backorder, $219). Moved QNAP TS-473A to Family Room. Added Rolls MB15b, 1Mii RT5066R2 TX (Family Room), 1Mii RX #1 (Studio), 1Mii RX #2 (Garage). Moved Bose 3·2·1 to Lanai. Moved Amazon Echo to Garage. Added SVS SoundPath TX/RX routing (Family Room → Lanai). Added REI UHD-PRO102 HDMI splitter, J-Tech AE4KA, Mini AV upscaler to Lanai signal chain. Updated signal chains for all zones. Removed Blue Yeti mic, Rode boom arm, Zoom pedal (fabrications). **PENDING:** 1Mii connection method, AT-VM95SH delivery. |
 | v2026.03     | Jan 16, 2026   | Relocated AT-LP120XUSB to Family Room (Ortofon Blue). Updated Casio PX-870WE serial. Added TP-Link TL-SG105 switch, APC Back-UPS 1000, Spectrum router SAX2V1R. Added Victrola VTA-71 to Bedrooms. Validated Seagull SC-6W and Pro-Ject serials. Updated Yamaha R-N800A speaker config (Zone A only). **PENDING:** Technics SL-1200MK2 location. |
 | v2026.02     | Jan 16, 2026   | Added: MacBook Pro (2012 Kids' Unit), M-Audio Air\|HUB, JBL LSR310S, Yamaha HS7 verified SNs, Sansui ES-27X3A dual monitors, Dell Latitude 5340, HyperDrive Dock, LiftMaster MyQ Garage Opener. |
