@@ -25,13 +25,11 @@
 
 | Artist | Album | Target Format | Notes | Typical Market (USD) |
 |------|------|---------------|------|----------------------|
-| The Allman Brothers Band | *At Fillmore East* | Vinyl (2×LP, 180g) | Definitive live Southern jam-rock. | 35–60 |
-| The Allman Brothers Band | *Eat a Peach* | Vinyl | Complements *Fillmore*; “Melissa”, “Blue Sky”. | 30–50 |
 | Electric Light Orchestra | *Out of the Blue* | Vinyl (2×LP) | Grand orchestral rock; huge imaging. | 30–45 |
 | Lynyrd Skynyrd | *Pronounced ’Lĕh-’nérd ’Skin-’nérd* | Vinyl | Essential Southern rock debut. | 25–40 |
 | Johnny Cash | *At Folsom Prison* | Vinyl | Raw live energy; minimal processing. | 25–35 |
 | Chris Stapleton | *Starting Over* | Vinyl | Natural follow-up to *Traveller*. | 30–40 |
-| Tyler Childers | *Purgatory* | Vinyl | Appalachian neo-country classic. | 35–45 |
+| Ella Langley | *Still Hungover* | Vinyl | Contemporary country breakout, gritty and sharp. | TBD |
 | Sturgill Simpson | *Metamodern Sounds in Country Music* | Vinyl | Genre-bending modern country. | 30–45 |
 | Zach Bryan | *Elisabeth* | Vinyl | Early raw press; complements S/T. | 35–50 |
 | Willie Nelson | *Red Headed Stranger* | Vinyl | Sparse, analog-pure storytelling. | 25–35 |
@@ -44,6 +42,7 @@
 | Eagles | *On the Border* | Vinyl | Bridges *Desperado* → *Hotel California*. | 25–35 |
 | Fleetwood Mac | *Tusk* | Vinyl (2×LP) | Experimental; huge soundstage. | 35–50 |
 | Prince | *Sign o’ the Times* | Vinyl | His most complete studio work. | 40–60 |
+| Michael Jackson | *Bad* | Vinyl | Essential follow-up to *Thriller*, pop/R&B cornerstone. | TBD |
 | Etta James | *At Last!* | Vinyl | Soul warmth; wide stereo spread. | 25–35 |
 | Norah Jones | *Come Away With Me* | Vinyl | Relaxed, balanced mastering. | 25–40 |
 | The Rolling Stones | *Let It Bleed* | Vinyl | Late-60s peak Stones. | 35–50 |
@@ -68,9 +67,12 @@
 | Al Green | *Call Me* | Vinyl (Hi / Fat Possum) | Lush, perfectly analog. | 30–45 |
 | Al Green | *Let’s Stay Together* | Vinyl (Hi Records) | Soul masterpiece. | 30–45 |
 | Al Green | *I’m Still in Love with You* | Vinyl | Deep bass, warm mix. | 30–40 |
+| Marvin Gaye | *What’s Going On* | Vinyl | Soul landmark, emotionally essential, system-worthy. | 30–50 |
 
 ---
 
 ### ✅ Reconciliation Note
-As of **Vinyl Master Inventory v2026.02**, no wishlist entries are currently owned.  
-This file is confirmed accurate and conflict-free.
+Reconciled against **Vinyl Master Inventory v2026.02** as baseline.  
+User-reported updates applied to this wishlist: **The Allman Brothers Band – *At Fillmore East***, **The Allman Brothers Band – *Eat a Peach***, and **Tyler Childers – *Purgatory*** were purchased and removed from the wishlist.  
+Added to wishlist: **Ella Langley – *Still Hungover*** and **Michael Jackson – *Bad***.  
+Typical market values for newly added titles are **TBD** pending validation.
