@@ -432,7 +432,26 @@ These must never be committed. Store in `.env` (gitignored) or Windows User envi
 
 ---
 
-## 15. Knowledge Priority Hierarchy
+## 15. Cross-Surface Architecture
+
+This project uses the same three-surface workflow as VALOR:
+- **Lena (Chat/claude.ai):** Design decisions, content strategy, gear research
+- **Sully (Cowork/Projects):** File organization, documentation, directory manifests
+- **Rafa (CLI/Claude Code):** Code execution, git, NAS operations, proxy development
+
+However, Audiopheliac does NOT use:
+- Notion session state (VALOR-only)
+- valor-session-sync skill (VALOR-only)
+- valor_pipeline.py plugin commands (VALOR-only)
+- NOTION_HANDOFF_TOKEN (VALOR-only)
+
+Session alignment for Audiopheliac is lightweight. The `_DIRECTORY_LOG.md` serves as the structural manifest, `docs/Instruction_Addendum_log.md` tracks rule changes, and the `audio:` plugin commands (Section 13) provide fast state reads. No Notion integration required.
+
+For VALOR cross-surface alignment protocol, see: `valor-core/CLAUDE.md` Sections 14-15.
+
+---
+
+## 16. Knowledge Priority Hierarchy
 
 When answering questions about gear, signal chains, or the AV system:
 
