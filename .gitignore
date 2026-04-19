@@ -1,34 +1,81 @@
+Paste this exactly into **Notepad (.gitignore)**, replacing everything:
+
+```plaintext
 # ===================================================================
-# Custom .gitignore for The Audiopheliac Project
-# Purpose: A streamlined ignore file for a documentation-heavy
-# repository with planned Python automation.
+# The Audiopheliac – Production .gitignore
 # ===================================================================
 
-# System / OS Generated Files
-# -------------------------------------------------------------------
-# Ignore metadata files created by macOS and Windows.
+# -----------------------------
+# OS / System Files
+# -----------------------------
 .DS_Store
 Thumbs.db
+desktop.ini
 
-# IDE & Code Editor Settings
-# -------------------------------------------------------------------
-# Ignore user-specific settings for popular editors.
+# -----------------------------
+# Editor / IDE
+# -----------------------------
 .vscode/
 .idea/
-.spyderproject
-.spyproject
+*.code-workspace
 
-# Secrets & Configuration (For Future API Use)
-# -------------------------------------------------------------------
-# NEVER commit files containing API keys, passwords, or credentials.
-# The planned Discogs API key would go in one of these.
+# -----------------------------
+# Environment / Secrets
+# -----------------------------
 .env
+.env.*
 /config/
+*.key
+*.pem
 
-# Python Environment & Cache (For Future Automation)
-# -------------------------------------------------------------------
-# Ignore virtual environments and Python's cache directory.
+# -----------------------------
+# Python
+# -----------------------------
 .venv/
 env/
 venv/
 __pycache__/
+*.pyc
+
+# -----------------------------
+# Ableton Live / Audio Production
+# -----------------------------
+# Cache + temp (critical to ignore)
+Ableton Cache/
+Ableton Temp/
+*.asd
+
+# Freeze / render junk
+Freeze/
+*.wav.tmp
+*.aif.tmp
+
+# -----------------------------
+# Sample Libraries (DO NOT TRACK)
+# -----------------------------
+Splice Samples/
+Samples/
+*.flac
+*.wav
+*.aiff
+
+# -----------------------------
+# NAS / Sync / Cloud Garbage
+# -----------------------------
+.tmp.driveupload/
+.tmp.drivedownload/
+*.sync
+*.qsync
+
+# -----------------------------
+# Logs
+# -----------------------------
+*.log
+
+# -----------------------------
+# Optional (uncomment if needed)
+# -----------------------------
+# Renders/
+# Exports/
+# Stems/
+```
