@@ -79,3 +79,6 @@ Samples/
 # Exports/
 # Stems/
 ```
+
+!config/
+!config/music_sources.json

@@ -1,0 +1,14 @@
+{
+  "local_project_root": "C:\\Users\\gillo\\The-Audiopheliac",
+  "master_project_root": "D:\\The Audiopheliac",
+  "flac_library_root": "\\\\NAS87828E\\Multimedia\\Music",
+  "additional_music_roots": [
+    "D:\\The Audiopheliac"
+  ],
+  "spotify": {
+    "enabled": true
+  },
+  "discogs": {
+    "enabled": true
+  }
+}
