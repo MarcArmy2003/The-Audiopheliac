@@ -1,0 +1,70 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #0f1115;
+    color: #f5f7fa;
+    line-height: 1.6;
+}
+
+.container {
+    width: min(1000px, 90%);
+    margin: 0 auto;
+}
+
+.hero {
+    padding: 100px 0 80px;
+    text-align: center;
+    background: linear-gradient(180deg, #151922 0%, #0f1115 100%);
+}
+
+.hero h1 {
+    margin: 0;
+    font-size: 3rem;
+    letter-spacing: 0.04em;
+}
+
+.tagline {
+    margin-top: 12px;
+    font-size: 1.25rem;
+    color: #9fb3c8;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+}
+
+.subtext {
+    max-width: 700px;
+    margin: 24px auto 0;
+    color: #cfd8e3;
+    font-size: 1.05rem;
+}
+
+.section {
+    padding: 64px 0;
+}
+
+.section.alt {
+    background: #151922;
+}
+
+h2 {
+    margin-top: 0;
+    font-size: 2rem;
+    color: #ffffff;
+}
+
+p, li {
+    color: #d7dee8;
+    font-size: 1rem;
+}
+
+ul {
+    padding-left: 20px;
+}
+
+.footer {
+    padding: 28px 0;
+    text-align: center;
+    border-top: 1px solid #222936;
+    color: #8ea0b3;
+    font-size: 0.95rem;
+}
