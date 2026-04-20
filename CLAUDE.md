@@ -42,8 +42,7 @@ CONTENT LAYER
 
 STORAGE LAYER
   NAS share:      \\NAS87828E\The Audiopheliac (mapped A:)
-  Local clone:    C:\Users\gillo\Veteran Analytics LLC\GitHub Clones\The-Audiopheliac\
-  Qsync mirror:   C:\Users\gillo\The-Audiopheliac\ (bidirectional NAS sync, not canonical)
+  Local clone:    C:\Users\gillo\The-Audiopheliac\ (canonical working tree)
 ```
 
 **Important:** The `config/` directory is gitignored (see `.gitignore`). Signal maps, persona instructions, and the global instruction framework live there locally but are not committed. This was an intentional design decision to keep API keys and config out of the public repo. Reference these files by path when needed; never move them to tracked directories.
@@ -84,8 +83,7 @@ STORAGE LAYER
 |----------|------|
 | NAS share (audio) | `\\NAS87828E\The Audiopheliac` |
 | NAS drive map | A: (may be disconnected — verify with `net use` before assuming) |
-| Local repo clone (canonical) | `C:\Users\gillo\Veteran Analytics LLC\GitHub Clones\The-Audiopheliac\` |
-| Qsync local mirror | `C:\Users\gillo\The-Audiopheliac\` |
+| Local repo clone (canonical) | `C:\Users\gillo\The-Audiopheliac\` |
 | NAS IP | 192.168.1.230 |
 | NAS SSH | NAS87828E |
 | pdfworker container input | `\\NAS87828E\Container\pdf_pipeline\input` |
@@ -98,7 +96,7 @@ net use A: "\\NAS87828E\The Audiopheliac" /persistent:yes
 
 Always use UNC paths in scripts. Mapped drives are session-dependent and may be disconnected at session start.
 
-**The Qsync mirror at `C:\Users\gillo\The-Audiopheliac\` is NOT the canonical working clone.** It is a NAS mirror delivered by Qsync and may lag behind. All Claude Code work must operate on the GitHub Clones copy.
+**The canonical working clone is `C:\Users\gillo\The-Audiopheliac\`.** This is the single working tree for the Audiopheliac repo. The `C:\Users\gillo\Veteran Analytics LLC\GitHub Clones\` folder holds VALOR and Veteran Analytics LLC repos only and must not contain an Audiopheliac clone. All Claude Code work for this repo must operate on the canonical path.
 
 ---
 
@@ -307,15 +305,20 @@ The-Audiopheliac/
 |   +-- Set-SampleRate.ps1            <- Sample rate PowerShell utility
 |
 +-- docs/                             <- Tracked documentation
+|   +-- Audiopheliac_Domain_Registration.md  <- Domain registration record (new 2026-04)
+|   +-- Audiopheliac_Listening_Profile_v2026_04.md  <- Listening profile snapshot (new 2026-04)
+|   +-- Audiopheliac_Project_Instructions_v2026_04.md  <- Project instructions v2026.04 (new)
 |   +-- av_master_inventory_2026.md   <- SINGLE SOURCE OF TRUTH for gear
-|   +-- Processing_Hardware.md        <- Yamaha R-N800A and processing gear specs
-|   +-- Lifestyle_650_Console_Summary.md  <- Bose Lifestyle 650 reference
 |   +-- Bose_321_Manual.md
 |   +-- Dell_Precision_7540_Specs.md
+|   +-- family_room_network_topology.md  <- Family room signal flow ASCII diagram
 |   +-- Instruction_Addendum_log.md
-|   +-- Repeated_Instructions_Addendum.md  <- Response preferences and rules
 |   +-- instrument_specs_v_2025_10_08.md
+|   +-- Lifestyle_650_Console_Summary.md  <- Bose Lifestyle 650 reference
+|   +-- Playlist_Generation_Spec_v2026_04.md  <- Playlist generation spec kernel (new 2026-04)
 |   +-- powershell_export_sop.md
+|   +-- Processing_Hardware.md        <- Yamaha R-N800A and processing gear specs
+|   +-- Repeated_Instructions_Addendum.md  <- Response preferences and rules
 |   +-- guitar-literacy/              <- Guitar Literacy submodule
 |
 +-- media/                            <- Visual assets (logos, badge images)
@@ -332,7 +335,7 @@ The-Audiopheliac/
 
 At the start of any Claude Code session in this repo:
 
-1. Confirm working directory is `C:\Users\gillo\Veteran Analytics LLC\GitHub Clones\The-Audiopheliac\`
+1. Confirm working directory is `C:\Users\gillo\The-Audiopheliac\`
 2. Read this CLAUDE.md
 3. Check `docs/Instruction_Addendum_log.md` for any recent rule additions or corrections
 4. For gear questions: read `docs/av_master_inventory_2026.md` before answering
