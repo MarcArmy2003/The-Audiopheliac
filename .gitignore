@@ -1,8 +1,5 @@
-Paste this exactly into **Notepad (.gitignore)**, replacing everything:
-
-```plaintext
 # ===================================================================
-# The Audiopheliac – Production .gitignore
+# The Audiopheliac - Production .gitignore
 # ===================================================================
 
 # -----------------------------
@@ -25,6 +22,7 @@ desktop.ini
 .env
 .env.*
 /config/
+!config/music_sources.json
 *.key
 *.pem
 
@@ -60,6 +58,12 @@ Samples/
 *.aiff
 
 # -----------------------------
+# Generated Data (regenerable, never tracked)
+# -----------------------------
+data/**
+!data/**/.gitkeep
+
+# -----------------------------
 # NAS / Sync / Cloud Garbage
 # -----------------------------
 .tmp.driveupload/
@@ -78,7 +82,3 @@ Samples/
 # Renders/
 # Exports/
 # Stems/
-```
-
-!config/
-!config/music_sources.json
