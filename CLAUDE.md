@@ -285,7 +285,6 @@ The-Audiopheliac/
 +-- README.md                         <- Public project overview
 +-- LICENSE                           <- License
 +-- .gitignore                        <- config/ is intentionally ignored
-+-- .gitmodules                       <- Guitar Literacy submodule refs
 |
 +-- amazon_proxy/                     <- Amazon Product Advertising API integration
 |   +-- audiopheliac_amazon_proxy_openapi_fixed.yaml  <- Use this one
@@ -319,7 +318,6 @@ The-Audiopheliac/
 |   +-- powershell_export_sop.md
 |   +-- Processing_Hardware.md        <- Yamaha R-N800A and processing gear specs
 |   +-- Repeated_Instructions_Addendum.md  <- Response preferences and rules
-|   +-- guitar-literacy/              <- Guitar Literacy submodule
 |
 +-- media/                            <- Visual assets (logos, badge images)
 |
