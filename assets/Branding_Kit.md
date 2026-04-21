@@ -13,7 +13,7 @@ The primary mark is a circular vinyl record rendered as a full-spectrum rainbow 
 **Canonical source file:** `media/The_Audiopheliac_Primary_Logo_Only.png` (1024x1024, raster PNG).
 **Format deliverables:**
 - Raster PNG: exists (canonical source, 1024x1024)
-- Favicon set: `site/assets/favicons/favicon-16.png`, `favicon-32.png`, `apple-touch-icon.png` (180), `icon-192.png`, `icon-512.png`, `favicon.ico` (multi-resolution)
+- Favicon set: `site/public/favicons/favicon-16.png`, `favicon-32.png`, `apple-touch-icon.png` (180), `icon-192.png`, `icon-512.png`, `favicon.ico` (multi-resolution)
 - SVG: deferred to a dedicated design session (raster-to-vector auto-trace does not produce acceptable results on this gradient mark; manual SVG rebuild required)
 
 **Mark is used only on the canonical near-black field (`--ink #0A0A0B`).** Do not place on white or saturated backgrounds. The PNG's canvas is a charcoal `#181818`; when re-exported it will match `--ink`. In the interim, set containers to `--ink` and accept a subtle one-pixel seam where needed.
@@ -22,7 +22,7 @@ The primary mark is a circular vinyl record rendered as a full-spectrum rainbow 
 
 ## 2. Color tokens
 
-All color values are sourced from pixel sampling of the canonical mark, clustered and snapped to a clean hex. Full token spec lives at `site/assets/css/tokens.css`.
+All color values are sourced from pixel sampling of the canonical mark, clustered and snapped to a clean hex. Full token spec lives at `site/src/styles/tokens.css`.
 
 ### Core field
 | Token | Hex | Role |
@@ -81,7 +81,7 @@ Accessibility baseline: yellow-on-black ratio is approximately 16.6:1, passes WC
 
 ## 5. Icon pack
 
-Derived from the canonical primary mark via LANCZOS downsampling. All icons live under `site/assets/favicons/`.
+Derived from the canonical primary mark via LANCZOS downsampling. All icons live under `site/public/favicons/`.
 
 | File | Size | Use |
 |------|------|-----|
