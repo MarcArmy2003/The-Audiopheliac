@@ -1,0 +1,13 @@
+{
+  "name": "The Audiopheliac",
+  "short_name": "Audiopheliac",
+  "description": "Where signal flow meets soul.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0A0A0B",
+  "theme_color": "#0A0A0B",
+  "icons": [
+    { "src": "/favicons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/favicons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
