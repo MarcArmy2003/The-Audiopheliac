@@ -1,0 +1,32 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Home">
+  <section class="hero">
+    <h1>Where signal flow meets soul.</h1>
+    <p class="tagline">
+      A personal audio project. Signal-first engineering, emotion-literate curation,
+      home hi-fi listening as a philosophy.
+    </p>
+    <a href="/about" class="cta cta--hero">Enter the system</a>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    padding: var(--sp-9) 0;
+    text-align: center;
+  }
+  h1 {
+    font-size: var(--fs-900);
+    max-width: 20ch;
+    margin: 0 auto var(--sp-5);
+  }
+  .tagline {
+    font-size: var(--fs-400);
+    color: var(--n-300);
+    max-width: 42rem;
+    margin: 0 auto var(--sp-6);
+    line-height: var(--lh-normal);
+  }
+</style>

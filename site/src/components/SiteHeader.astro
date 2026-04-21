@@ -1,0 +1,55 @@
+---
+const links = [
+  { href: '/', label: 'Home' },
+  { href: '/about', label: 'About' },
+  { href: '/gear', label: 'Gear' },
+  { href: '/vinyl', label: 'Vinyl' },
+  { href: '/dashboard', label: 'Dashboard' },
+];
+---
+<header>
+  <nav>
+    <a href="/" class="brand">The Audiopheliac</a>
+    <ul>
+      {links.filter(l => l.href !== '/').map(l => (
+        <li><a href={l.href}>{l.label}</a></li>
+      ))}
+    </ul>
+  </nav>
+</header>
+
+<style>
+  header {
+    border-bottom: 1px solid var(--n-700);
+    padding: var(--sp-4) var(--sp-5);
+  }
+  nav {
+    max-width: 72rem;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .brand {
+    font-family: var(--font-display);
+    font-size: var(--fs-500);
+    color: var(--paper);
+    letter-spacing: 0.02em;
+    border-bottom: none;
+  }
+  ul {
+    list-style: none;
+    display: flex;
+    gap: var(--sp-5);
+    padding: 0;
+    margin: 0;
+  }
+  ul a {
+    color: var(--n-300);
+    border-bottom: none;
+    font-size: var(--fs-200);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+  ul a:hover { color: var(--paper); }
+</style>

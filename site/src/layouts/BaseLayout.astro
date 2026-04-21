@@ -1,0 +1,35 @@
+---
+export interface Props {
+  title: string;
+  description?: string;
+}
+const { title, description = 'Where signal flow meets soul.' } = Astro.props;
+import '../styles/global.css';
+import SiteHeader from '../components/SiteHeader.astro';
+---
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{title} — The Audiopheliac</title>
+
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png" />
+    <link rel="icon" href="/favicons/favicon.ico" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+
+    <meta property="og:title" content={`${title} — The Audiopheliac`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content="/favicons/icon-512.png" />
+    <meta property="og:type" content="website" />
+  </head>
+  <body>
+    <SiteHeader />
+    <main>
+      <slot />
+    </main>
+  </body>
+</html>

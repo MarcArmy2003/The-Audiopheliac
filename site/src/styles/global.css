@@ -1,0 +1,30 @@
+/* Google Fonts — Unica One (display) + Inter (body) */
+@import url('https://fonts.googleapis.com/css2?family=Unica+One&family=Inter:wght@400;500;600;700&display=swap');
+
+/* Import brand tokens */
+@import './tokens.css';
+
+/* Baseline resets — tokens.css handles html/body/headings */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--spectrum-1);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--dur-fast) var(--ease-standard);
+}
+a:hover { border-bottom-color: var(--spectrum-1); }
+
+main {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: var(--sp-6) var(--sp-5);
+}
