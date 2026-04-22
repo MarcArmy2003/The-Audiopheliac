@@ -85,3 +85,5 @@ data/**
 
 # Development working files (not tracked)
 _dev/
+# External vendored libraries (kept on NAS, not in repo)
+docs/guitar-literacy/guitar/external/
