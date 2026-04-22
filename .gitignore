@@ -87,3 +87,5 @@ data/**
 _dev/
 # External vendored libraries (kept on NAS, not in repo)
 docs/guitar-literacy/guitar/external/
+# Cross-project contamination guard (added after quarantine 2026-04-21)
+VeteranIntel Development/
