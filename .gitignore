@@ -99,6 +99,8 @@ equipment_spec_sheets/
 
 # Suno reference PDFs (large; tracked as disk-only reference)
 Suno/*.pdf
+# Stray CLAUDE.md copy inside Suno/
+Suno/CLAUDE.md
 
 # Stray AI image exports at root (ChatGPT, Gemini exports)
 ChatGPT Image*.png
