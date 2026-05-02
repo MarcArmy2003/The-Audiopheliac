@@ -1,8 +1,8 @@
 /* ============================================================
    The Audiopheliac — Design Tokens
-   Phase 1 brand layer. Sourced from actual pixel sampling of
-   media/The_Audiopheliac_Primary_Logo_Only.png (rainbow-spectrum
-   vinyl mark on black).
+   Phase 2 brand layer. Nashville Midnight palette derived from
+   listening profile emotional lanes: late-night stage, bronze
+   spotlights, honky-tonk neon. Approved 2026-04-28.
    ============================================================ */
 
 :root {
@@ -11,33 +11,32 @@
   --paper:      #F5F5F7;   /* body text on dark field */
   --hairline:   #FFFFFF;   /* pure white for outlines, rules */
 
-  /* --- Brand spectrum (logo order, yellow to violet) ----- */
-  --spectrum-1: #F8E91F;   /* yellow        36% of mark */
-  --spectrum-2: #99E257;   /* light green */
-  --spectrum-3: #41D99A;   /* green */
-  --spectrum-4: #0ABED3;   /* teal          reserved, not a CTA */
-  --spectrum-5: #0F82DF;   /* blue */
-  --spectrum-6: #5E54D4;   /* violet */
+  /* --- Nashville Midnight palette (cream to midnight) ---- */
+  --spectrum-1: #E8D5A3;   /* neon cream    CTA primary */
+  --spectrum-2: #B87333;   /* stage bronze  accent */
+  --spectrum-3: #3D5A80;   /* steel blue    body accent */
+  --spectrum-4: #1B2340;   /* deep indigo   structural */
+  --spectrum-5: #1A1A2E;   /* midnight      deep field */
+  --spectrum-6: #D4B08C;   /* warm gold     CTA hover lift */
 
   --spectrum-gradient:
     linear-gradient(135deg,
       var(--spectrum-1) 0%,
-      var(--spectrum-3) 33%,
-      var(--spectrum-4) 55%,
-      var(--spectrum-5) 78%,
-      var(--spectrum-6) 100%
+      var(--spectrum-2) 40%,
+      var(--spectrum-3) 75%,
+      var(--spectrum-4) 100%
     );
 
   /* --- Functional brand --------------------------------- */
-  --brand-hero:    var(--spectrum-1);              /* yellow */
-  --brand-accent:  var(--spectrum-4);              /* teal, body accent only */
+  --brand-hero:    var(--spectrum-1);              /* neon cream */
+  --brand-accent:  var(--spectrum-3);              /* steel blue, body accent only */
 
   /* --- CTA contract ------------------------------------- */
-  /* Solid yellow is the default CTA treatment everywhere.   */
+  /* Solid neon cream is the default CTA on ink (~14.1:1).   */
   --cta-bg:         var(--brand-hero);
   --cta-text:       var(--ink);
-  --cta-bg-hover:   #FFF04A;                       /* lifted yellow */
-  --cta-ring:       rgba(248, 233, 31, 0.45);      /* focus ring */
+  --cta-bg-hover:   var(--spectrum-6);              /* warm gold lift */
+  --cta-ring:       rgba(232, 213, 163, 0.45);     /* focus ring */
 
   /* Gradient CTA is reserved for 1-2 hero moments only:    */
   /*   landing page primary CTA                              */
