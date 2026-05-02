@@ -89,3 +89,21 @@ _dev/
 docs/guitar-literacy/guitar/external/
 # Cross-project contamination guard (added after quarantine 2026-04-21)
 VeteranIntel Development/
+
+# -----------------------------
+# Windows utilities / tools (disk-only, not project content)
+# -----------------------------
+MultiMonitorTool/
+skills/
+equipment_spec_sheets/
+
+# Suno reference PDFs (large; tracked as disk-only reference)
+Suno/*.pdf
+
+# Stray AI image exports at root (ChatGPT, Gemini exports)
+ChatGPT Image*.png
+Gemini_Generated*.png
+Googe Cloud Admin/
+
+# Node modules (if ever scaffolded locally)
+node_modules/
