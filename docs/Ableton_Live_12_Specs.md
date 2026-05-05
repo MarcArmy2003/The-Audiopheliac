@@ -100,16 +100,9 @@ The connector is scoped to Ableton-published material. It is not a general music
 
 ## 6. Activation Keys (Reference Only)
 
-License keys are sensitive and are not stored in this repo. The `.gitignore` blocks `keys/`, `Software_and_Keys.md`, `Software_Licenses.md`, `*.lic`, `*.license`, and similar patterns at any depth.
+License keys are sensitive and are not stored in this repo. The `.gitignore` blocks `keys/`, `**/Keys/`, `Software_and_Keys.md`, `Software_Licenses.md`, `*_Licenses.md`, `*_License_Keys.md`, `*.lic`, `*.license` at any depth.
 
-Storage locations (local, never committed):
-
-| Copy | Path |
-|------|------|
-| Master | `C:\Users\gillo\Keys\Audiopheliac_Software_Licenses.md` |
-| Project copy | `D:\Audiopheliac\docs\Software_and_Keys.md` |
-
-Both copies hold the same content; keep them in sync if a key rotates.
+Single source of truth (local, never committed): `C:\Users\gillo\Keys\Audiopheliac_Software_Licenses.md`. No project-side copies exist; secrets live in one place to avoid divergence.
 
 ---
 
