@@ -146,8 +146,8 @@ The D: drive is the second internal drive on GDMARCHE (original factory drive, s
 ### Workstation
 - **Dell Precision 7540** (hostname: GDMARCHE)
 - Intel Xeon E-2286M | 112GB ECC RAM | Samsung 990 PRO NVMe (C:) + original HDD (D:)
-- IP: 192.168.1.75 | MAC: 4C:1D:96:3F:95:62 | Wi-Fi 5GHz via Spectrum SAX2V1R
-- DHCP reservation at 192.168.1.75 is an open action item
+- IP: 192.168.1.119 | MAC: 98:e7:43:d3:de:90 | Wi-Fi 5GHz via Spectrum SAX2V1R
+- DHCP reservation at 192.168.1.119 confirmed (toggle set in Spectrum router admin 2026-05-05)
 
 ### Audio Interface
 - Focusrite Scarlett Solo Gen 4 (ASIO driver; simultaneous WDM + ASIO supported)
@@ -478,7 +478,7 @@ C:\Users\gillo\The-Audiopheliac\Suno\
 | Item | Status |
 |------|--------|
 | Merge vinyl wishlist PR to `main` | Pending |
-| DHCP reservation for GDMARCHE at 192.168.1.75 | Open |
+| DHCP reservation for GDMARCHE at 192.168.1.119 | Complete |
 | Realtek HD Audio driver fix on GDMARCHE (use Dell Service Tag at dell.com/support, not generic Realtek package) | Open |
 | WireGuard/Tailscale necessity for VALOR remote NAS access | Unresolved |
 | Qfiling recipes for 217A working folder and VALOR repo | Deferred |
