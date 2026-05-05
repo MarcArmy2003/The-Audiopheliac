@@ -114,8 +114,8 @@ The D: drive is the second internal drive on GDMARCHE (original factory drive, s
 - **Authorized users:** gillon.marchetti@gmail.com, gillon.marchetti@veterananalytics.com
 
 ### Suno
-- **Handle:** `@marcarmy2003`
-- **Public profile:** https://suno.com/@marcarmy2003
+- **Handle:** `@audiopheliac`
+- **Public profile:** https://suno.com/@audiopheliac
 - **Display name:** The Audiopheliac
 - **Plan:** Premier (Annual) | Next billing: Apr 29, 2027
 - **Credits:** 10,000/month, up to 2,000 songs/month | Model: v5.5
@@ -420,7 +420,7 @@ python automation\spotify_gap_report.py
 ## SUNO PRODUCTION ENVIRONMENT
 
 ### Account State
-- **Handle:** `@marcarmy2003` | https://suno.com/@marcarmy2003
+- **Handle:** `@audiopheliac` | https://suno.com/@audiopheliac
 - **Plan:** Premier Annual | 10,000 credits/month | Up to 2,000 songs/month | Model: v5.5
 - **Suno Studio:** Enabled | Commercial use rights: Included
 - **Profile:** Bio, profile photo, and background image not yet configured
