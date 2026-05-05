@@ -26,6 +26,17 @@ desktop.ini
 *.key
 *.pem
 
+# License keys / software activation: never commit anywhere in the tree
+keys/
+**/keys/
+**/Keys/
+*.lic
+*.license
+**/Software_and_Keys.md
+**/Software_Licenses.md
+**/*_Licenses.md
+**/*_License_Keys.md
+
 # -----------------------------
 # Python
 # -----------------------------
