@@ -426,7 +426,7 @@ python automation\spotify_gap_report.py
 - **Profile:** Bio, profile photo, and background image not yet configured
 - **My Taste:** Empty (0/2000) — populate to improve AI style suggestions
 - **My Styles:** Toggle enabled (no effect until Taste profile has data)
-- **Existing playlist:** "Ackypaleto" (placeholder; to be renamed or repurposed)
+- **Existing playlist:** "Ackypaleto" — active collaborative project with Kevin (Backlog on Suno). Band/duo concept originating from junior high. At least one song exists as a children's track. Playlist functions as project folder. Do not rename or delete.
 
 ### Profile Setup (Open Action Items)
 - **Display Name:** The Audiopheliac (set 2026-05-05)
@@ -486,7 +486,7 @@ C:\Users\gillo\The-Audiopheliac\Suno\
 | Phase 2 authorization for Astro + Cloudflare Pages scaffold | Pending decisions (see Website State) |
 | Suno profile: bio, profile photo, background image | Open |
 | Suno My Taste profile: draft and save taste descriptor (2,000 char max) | Open |
-| Suno "Ackypaleto" playlist: rename or repurpose | Open |
+| Ackypaleto (Suno): build out project with Kevin (Backlog on Suno) | Active |
 | Set up Robocopy job: C:\Users\gillo\The-Audiopheliac > D:\The Audiopheliac\The-Audiopheliac\ (nightly /MIR /XO) | Open |
 | Clean up D:\The Audiopheliac\The-Audiopheliac\ stale files after Robocopy is running | Pending Robocopy |
 | Verify and archive GitHub worktree at C:\Users\gillo\Veteran Analytics LLC\GitHub Clones\the-audiopheliac | Open |
