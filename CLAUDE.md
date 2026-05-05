@@ -116,7 +116,7 @@ The D: drive is the second internal drive on GDMARCHE (original factory drive, s
 ### Suno
 - **Handle:** `@marcarmy2003`
 - **Public profile:** https://suno.com/@marcarmy2003
-- **Display name:** Gdmarche Marchetti (pending brand alignment update)
+- **Display name:** The Audiopheliac
 - **Plan:** Premier (Annual) | Next billing: Apr 29, 2027
 - **Credits:** 10,000/month, up to 2,000 songs/month | Model: v5.5
 - **Features:** Suno Studio, full feature unlock, commercial use rights
@@ -427,7 +427,7 @@ python automation\spotify_gap_report.py
 - **Existing playlist:** "Ackypaleto" (placeholder; to be renamed or repurposed)
 
 ### Profile Setup (Open Action Items)
-- **Display Name:** Pending decision — options: "The Audiopheliac", "Gill Marchetti", "Gill Marchetti | The Audiopheliac"
+- **Display Name:** The Audiopheliac (set 2026-05-05)
 - **Bio:** Draft a brand-aligned bio using the Listening Profile and Audiopheliac persona (1,200 char max)
 - **Profile photo:** Use Audiopheliac primary mark or a derivative
 - **Background image:** Brand-consistent header image (warm tone or Nashville Midnight palette)
@@ -482,7 +482,7 @@ C:\Users\gillo\The-Audiopheliac\Suno\
 | Qfiling recipes for 217A working folder and VALOR repo | Deferred |
 | Amazon PA-API access (monitor Associates for qualifying sales) | Monitoring |
 | Phase 2 authorization for Astro + Cloudflare Pages scaffold | Pending decisions (see Website State) |
-| Suno profile: display name decision, bio, profile photo, background image | Open |
+| Suno profile: bio, profile photo, background image | Open |
 | Suno My Taste profile: draft and save taste descriptor (2,000 char max) | Open |
 | Suno "Ackypaleto" playlist: rename or repurpose | Open |
 | Set up Robocopy job: C:\Users\gillo\The-Audiopheliac > D:\The Audiopheliac\The-Audiopheliac\ (nightly /MIR /XO) | Open |
