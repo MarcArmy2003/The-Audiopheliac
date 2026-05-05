@@ -297,9 +297,11 @@ C:\Users\gillo\The-Audiopheliac   (live repo — edit here)
 - **Ableton paths:**
   - Cache: `D:\Ableton Cache`
   - User Library: `D:\Ableton User Library`
-- **Spotify:** Microsoft Store install | username: `gdmarche-user`
-  Path: `C:\Users\gillo\AppData\Local\Packages\SpotifyAB.SpotifyMusic_zpdnekdrzrea0\LocalState\Spotify\`
+- **Spotify:** Microsoft Store install | username: `MarcArmy2003` | display name: The Audiopheliac
+  Profile URL: `https://open.spotify.com/user/marcarmy2003`
+  App path: `C:\Users\gillo\AppData\Local\Packages\SpotifyAB.SpotifyMusic_zpdnekdrzrea0\LocalState\Spotify\`
   Network path: Streamed from GDMARCHE to Yamaha R-N800A
+  Note: `gdmarche-user` is the Microsoft Store app identifier, not the Spotify social username.
 - **Default script location:** `C:\Scripts` unless a project folder already exists
 
 ---
