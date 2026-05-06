@@ -57,6 +57,8 @@ All tools listed in `permissions.allow` run without prompting Gill for approval.
 
 **Behavioral rule for Rafa:** When a task has been scoped and Sully/Gill have provided context, execute the entire scope without interrupting for git checkpoints or deployment confirmations. Pre-auth means the task runs start to finish. If something goes wrong, report it in the closeout summary — do not pause mid-task to seek permission already granted.
 
+**Scope independence:** This repo is independent of VALOR scope. When Rafa is addressed directly for Audiopheliac tasks, that address is sufficient authorization — no VALOR scope-guard confirmation required. The canonical working tree is C:\Users\gillo\The-Audiopheliac. Do not apply VALOR identity, VALOR branch conventions, or VALOR pipeline rules here.
+
 ---
 
 ## WORKSPACE BINDINGS
@@ -489,7 +491,7 @@ C:\Users\gillo\The-Audiopheliac\Suno\
 | Ackypaleto (Suno): build out project with Kevin (Backlog on Suno) | Active |
 | Set up Robocopy job: C:\Users\gillo\The-Audiopheliac > D:\The Audiopheliac\The-Audiopheliac\ (nightly /MIR /XO) | Complete |
 | Clean up D:\The Audiopheliac\The-Audiopheliac\ stale files after Robocopy is running | Monitor — extras retained (QSync layer); review after several nightly runs |
-| Remove remaining VALOR worktree: GitHub Clones\The-Audiopheliac\tender-wright-900476 | Open |
+| Remove remaining VALOR worktree: GitHub Clones\The-Audiopheliac\tender-wright-900476 | Complete |
 | Canva brand kit kAHGkHrcJYU: update with Nashville Midnight palette | Open |
 | Suno first album project: concept, prompts, production | In Progress |
 
