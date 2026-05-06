@@ -487,9 +487,9 @@ C:\Users\gillo\The-Audiopheliac\Suno\
 | Suno profile: bio, profile photo, background image | Open |
 | Suno My Taste profile: draft and save taste descriptor (2,000 char max) | Complete |
 | Ackypaleto (Suno): build out project with Kevin (Backlog on Suno) | Active |
-| Set up Robocopy job: C:\Users\gillo\The-Audiopheliac > D:\The Audiopheliac\The-Audiopheliac\ (nightly /MIR /XO) | Open |
-| Clean up D:\The Audiopheliac\The-Audiopheliac\ stale files after Robocopy is running | Pending Robocopy |
-| Verify and archive GitHub worktree at C:\Users\gillo\Veteran Analytics LLC\GitHub Clones\the-audiopheliac | Open |
+| Set up Robocopy job: C:\Users\gillo\The-Audiopheliac > D:\The Audiopheliac\The-Audiopheliac\ (nightly /MIR /XO) | Complete |
+| Clean up D:\The Audiopheliac\The-Audiopheliac\ stale files after Robocopy is running | Monitor — extras retained (QSync layer); review after several nightly runs |
+| Remove remaining VALOR worktree: GitHub Clones\The-Audiopheliac\tender-wright-900476 | Open |
 | Canva brand kit kAHGkHrcJYU: update with Nashville Midnight palette | Open |
 | Suno first album project: concept, prompts, production | In Progress |
 
