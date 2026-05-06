@@ -1,0 +1,25 @@
+--- SUNO PROMPT GENERATOR ---
+Target Engine: Suno v5.5 (Custom Mode)
+
+[ STYLE OF MUSIC ] (Copy this into the Style box):
+classic rock, hard rock, driving rhythm, analog warmth, bass-conscious, full low mids, clear lead vocals, muscular drums, high-fidelity, hi-fi, wide soundstage, energetic mood, mid-tempo tempo
+
+[ LYRICS ] (Copy this into the Lyrics box and fill in):
+[Title: Midnight Drive]
+
+[Verse 1]
+
+[Chorus]
+
+[Verse 2]
+
+[Chorus]
+
+[Bridge]
+
+[Guitar Solo]
+
+[Chorus]
+
+[Outro]
+
