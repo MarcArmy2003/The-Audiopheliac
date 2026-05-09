@@ -108,10 +108,11 @@ MultiMonitorTool/
 skills/
 equipment_spec_sheets/
 
-# Suno reference PDFs (large; tracked as disk-only reference)
-Suno/*.pdf
-# Stray CLAUDE.md copy inside Suno/
-Suno/CLAUDE.md
+# Suno workspace (creative drafts, account exports, PII — local only)
+Suno/
+
+# Paperclip agent run logs (reproducible scan/review outputs)
+paperclip-runs/
 
 # Stray AI image exports at root (ChatGPT, Gemini exports)
 ChatGPT Image*.png

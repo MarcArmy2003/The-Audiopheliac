@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Audiopheliac — Cockpit v0 Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unica+One&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     NASHVILLE MIDNIGHT — Audiopheliac brand tokens
+     ============================================================ */
+  :root {
+    --neon-cream: #E8D5A3;
+    --stage-bronze: #B87333;
+    --steel-blue: #3D5A80;
+    --deep-indigo: #1B2340;
+    --midnight: #1A1A2E;
+    --warm-gold: #D4B08C;
+    --ink: #0A0A0B;
+    --paper: #F5F5F7;
+    --hairline: rgba(255, 255, 255, 0.08);
+    --hairline-strong: rgba(255, 255, 255, 0.16);
+
+    /* Album-art-extracted accent (default; updates per-track) */
+    --accent-current: #B87333;
+    --accent-current-soft: rgba(184, 115, 51, 0.18);
+    --accent-current-glow: rgba(184, 115, 51, 0.45);
+
+    --font-display: 'Unica One', 'Inter', system-ui, sans-serif;
+    --font-body: 'Inter', system-ui, sans-serif;
+
+    /* Spacing scale */
+    --s-1: 4px;
+    --s-2: 8px;
+    --s-3: 12px;
+    --s-4: 16px;
+    --s-5: 24px;
+    --s-6: 32px;
+    --s-7: 48px;
+    --s-8: 64px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--midnight);
+    color: var(--paper);
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body {
+    background: radial-gradient(ellipse at top left, var(--deep-indigo) 0%, var(--midnight) 50%, var(--ink) 100%);
+    background-attachment: fixed;
+  }
+
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--hairline-strong); border-radius: 4px; }
+
+  /* ============================================================
+     APP SHELL — top nav, three-column layout
+     ============================================================ */
+  .app {
+    display: grid;
+    grid-template-rows: 64px 1fr auto;
+    min-height: 100vh;
+  }
+
+  header.topnav {
+    display: grid;
+    grid-template-columns: 240px 1fr 320px;
+    align-items: center;
+    padding: 0 var(--s-5);
+    border-bottom: 1px solid var(--hairline);
+    background: rgba(10, 10, 11, 0.6);
+    backdrop-filter: blur(12px);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+  }
+
+  .brand-mark {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, var(--neon-cream), var(--stage-bronze), var(--steel-blue), var(--deep-indigo), var(--neon-cream));
+    position: relative;
+    box-shadow: 0 0 0 1px var(--hairline-strong), inset 0 0 0 4px var(--midnight);
+  }
+  .brand-mark::after {
+    content: '';
+    position: absolute;
+    inset: 12px;
+    border-radius: 50%;
+    background: var(--stage-bronze);
+    box-shadow: 0 0 0 2px var(--midnight);
+  }
+
+  .brand-text {
+    font-family: var(--font-display);
+    font-size: 18px;
+    letter-spacing: 0.06em;
+    color: var(--neon-cream);
+  }
+  .brand-text small {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 10px;
+    color: var(--steel-blue);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .mode-tabs {
+    display: flex;
+    justify-content: center;
+    gap: var(--s-2);
+  }
+
+  .mode-tab {
+    font-family: var(--font-display);
+    font-size: 14px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(245, 245, 247, 0.5);
+    padding: var(--s-2) var(--s-5);
+    border: 1px solid transparent;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    border-radius: 2px;
+  }
+  .mode-tab:hover { color: var(--paper); border-color: var(--hairline-strong); }
+  .mode-tab.active {
+    color: var(--neon-cream);
+    border-color: var(--neon-cream);
+    background: rgba(232, 213, 163, 0.06);
+  }
+
+  .topnav-right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--s-3);
+  }
+
+  .agent-indicator {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    padding: var(--s-2) var(--s-3);
+    border: 1px solid var(--hairline-strong);
+    border-radius: 100px;
+    font-size: 11px;
+    color: var(--paper);
+    letter-spacing: 0.06em;
+  }
+  .agent-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--neon-cream);
+    box-shadow: 0 0 8px var(--neon-cream);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .user-chip {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--stage-bronze), var(--deep-indigo));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 13px;
+    color: var(--neon-cream);
+    letter-spacing: 0.04em;
+    border: 1px solid var(--hairline-strong);
+  }
+
+  /* ============================================================
+     MAIN GRID — left rail | canvas | right rail
+     ============================================================ */
+  main.cockpit {
+    display: grid;
+    grid-template-columns: 240px 1fr 360px;
+    gap: 0;
+    min-height: 0;
+  }
+
+  /* Left rail — zones */
+  aside.zone-rail {
+    border-right: 1px solid var(--hairline);
+    padding: var(--s-5) 0;
+    background: rgba(10, 10, 11, 0.3);
+  }
+
+  .rail-label {
+    font-family: var(--font-display);
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    color: var(--steel-blue);
+    text-transform: uppercase;
+    padding: 0 var(--s-5);
+    margin-bottom: var(--s-3);
+  }
+
+  .zone-list {
+    list-style: none;
+  }
+
+  .zone-item {
+    display: grid;
+    grid-template-columns: 32px 1fr auto;
+    align-items: center;
+    gap: var(--s-3);
+    padding: var(--s-3) var(--s-5);
+    cursor: pointer;
+    border-left: 2px solid transparent;
+    transition: all 0.16s ease;
+    color: rgba(245, 245, 247, 0.7);
+  }
+
+  .zone-item:hover {
+    background: rgba(232, 213, 163, 0.04);
+    color: var(--paper);
+  }
+
+  .zone-item.active {
+    background: var(--accent-current-soft);
+    border-left-color: var(--accent-current);
+    color: var(--paper);
+  }
+
+  .zone-item.disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  .zone-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--hairline);
+    color: var(--neon-cream);
+    font-size: 14px;
+  }
+  .zone-item.active .zone-icon {
+    background: var(--accent-current);
+    color: var(--midnight);
+  }
+
+  .zone-name {
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .zone-substate {
+    font-size: 10px;
+    color: var(--steel-blue);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .zone-status {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(245, 245, 247, 0.2);
+  }
+  .zone-status.playing { background: var(--neon-cream); box-shadow: 0 0 6px var(--neon-cream); }
+  .zone-status.paused { background: var(--warm-gold); }
+  .zone-status.linked { background: var(--steel-blue); }
+
+  .group-toggle {
+    margin: var(--s-4) var(--s-5) var(--s-5);
+    padding: var(--s-3);
+    border: 1px dashed var(--hairline-strong);
+    border-radius: 4px;
+    text-align: center;
+    color: var(--warm-gold);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+  .group-toggle:hover {
+    border-color: var(--neon-cream);
+    color: var(--neon-cream);
+    background: rgba(232, 213, 163, 0.04);
+  }
+
+  /* ============================================================
+     CENTER CANVAS — Now Playing + signal flow
+     ============================================================ */
+  section.canvas {
+    padding: var(--s-6) var(--s-6) var(--s-5);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-6);
+    overflow-y: auto;
+  }
+
+  .now-playing {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: var(--s-6);
+    align-items: end;
+    position: relative;
+  }
+
+  .now-playing::before {
+    content: '';
+    position: absolute;
+    inset: -32px -64px;
+    background: radial-gradient(ellipse at 25% 50%, var(--accent-current-glow) 0%, transparent 60%);
+    z-index: 0;
+    pointer-events: none;
+    transition: background 0.6s ease;
+  }
+
+  .album-art {
+    position: relative;
+    z-index: 1;
+    width: 280px;
+    height: 280px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow:
+      0 16px 48px rgba(0, 0, 0, 0.5),
+      0 0 0 1px var(--hairline-strong),
+      0 0 60px var(--accent-current-glow);
+    background: linear-gradient(135deg, var(--stage-bronze), var(--deep-indigo) 60%, var(--midnight));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: box-shadow 0.6s ease;
+  }
+
+  .album-art-mock {
+    width: 100%;
+    height: 100%;
+    background:
+      linear-gradient(135deg, transparent 0%, rgba(0,0,0,0.4) 100%),
+      radial-gradient(circle at 30% 30%, var(--neon-cream) 0%, transparent 40%),
+      radial-gradient(circle at 70% 70%, var(--stage-bronze) 0%, transparent 50%),
+      linear-gradient(45deg, var(--deep-indigo), var(--midnight));
+    display: flex;
+    align-items: flex-end;
+    padding: var(--s-5);
+    color: var(--paper);
+    font-family: var(--font-display);
+    font-size: 28px;
+    letter-spacing: 0.04em;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.8);
+  }
+
+  .now-meta {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+    padding-bottom: var(--s-3);
+  }
+
+  .source-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    padding: 4px var(--s-3);
+    border-radius: 3px;
+    background: var(--accent-current);
+    color: var(--midnight);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-weight: 600;
+    width: fit-content;
+  }
+
+  .now-track {
+    font-family: var(--font-display);
+    font-size: 44px;
+    line-height: 1.1;
+    letter-spacing: 0.02em;
+    color: var(--paper);
+    margin: var(--s-2) 0;
+  }
+  .now-artist {
+    font-size: 18px;
+    color: var(--neon-cream);
+    font-weight: 400;
+  }
+  .now-album {
+    font-size: 13px;
+    color: rgba(245, 245, 247, 0.5);
+    font-style: italic;
+  }
+
+  .now-tech {
+    display: flex;
+    gap: var(--s-4);
+    margin-top: var(--s-4);
+    color: var(--steel-blue);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .now-tech span {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+
+  /* Transport */
+  .transport {
+    margin-top: var(--s-5);
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+  }
+
+  .transport-btn {
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--hairline-strong);
+    background: transparent;
+    color: var(--paper);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.16s;
+    font-size: 16px;
+  }
+  .transport-btn:hover {
+    border-color: var(--neon-cream);
+    color: var(--neon-cream);
+  }
+  .transport-btn.primary {
+    width: 56px;
+    height: 56px;
+    background: var(--neon-cream);
+    color: var(--midnight);
+    border-color: var(--neon-cream);
+    font-size: 22px;
+  }
+  .transport-btn.primary:hover { background: var(--warm-gold); border-color: var(--warm-gold); }
+
+  .progress {
+    flex: 1;
+    margin-left: var(--s-4);
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+    color: var(--steel-blue);
+    font-size: 11px;
+  }
+  .progress-bar {
+    flex: 1;
+    height: 4px;
+    background: var(--hairline-strong);
+    border-radius: 2px;
+    position: relative;
+    cursor: pointer;
+  }
+  .progress-fill {
+    position: absolute;
+    inset: 0 65% 0 0;
+    background: linear-gradient(90deg, var(--accent-current), var(--neon-cream));
+    border-radius: 2px;
+  }
+  .progress-fill::after {
+    content: '';
+    position: absolute;
+    right: -6px;
+    top: -4px;
+    width: 12px;
+    height: 12px;
+    background: var(--neon-cream);
+    border-radius: 50%;
+    box-shadow: 0 0 0 1px var(--midnight);
+  }
+
+  /* Queue strip */
+  .queue {
+    margin-top: var(--s-5);
+    border-top: 1px solid var(--hairline);
+    padding-top: var(--s-5);
+  }
+  .queue-label {
+    font-family: var(--font-display);
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    color: var(--steel-blue);
+    text-transform: uppercase;
+    margin-bottom: var(--s-3);
+  }
+  .queue-list {
+    display: grid;
+    gap: var(--s-2);
+  }
+  .queue-item {
+    display: grid;
+    grid-template-columns: 24px 1fr auto;
+    gap: var(--s-3);
+    align-items: center;
+    padding: var(--s-2) 0;
+    color: rgba(245, 245, 247, 0.7);
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .queue-item:hover { color: var(--paper); }
+  .queue-num { color: var(--steel-blue); font-size: 11px; font-variant-numeric: tabular-nums; }
+  .queue-track { font-weight: 500; }
+  .queue-artist { color: var(--steel-blue); font-size: 11px; margin-top: 2px; }
+  .queue-duration { color: var(--steel-blue); font-size: 11px; font-variant-numeric: tabular-nums; }
+
+  /* Signal flow */
+  .signal-flow {
+    border-top: 1px solid var(--hairline);
+    padding-top: var(--s-5);
+  }
+  .signal-flow-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--s-4);
+  }
+  .signal-flow-label h3 {
+    font-family: var(--font-display);
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    color: var(--steel-blue);
+    text-transform: uppercase;
+  }
+  .signal-flow-label .legend {
+    display: flex;
+    gap: var(--s-4);
+    font-size: 10px;
+    color: var(--steel-blue);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-swatch { width: 8px; height: 8px; border-radius: 50%; }
+
+  .flow-svg { width: 100%; height: 220px; display: block; }
+
+  /* ============================================================
+     RIGHT RAIL — sources + Hue + LLM chat
+     ============================================================ */
+  aside.right-rail {
+    border-left: 1px solid var(--hairline);
+    padding: var(--s-5);
+    background: rgba(10, 10, 11, 0.3);
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-6);
+    overflow-y: auto;
+  }
+
+  .panel h3 {
+    font-family: var(--font-display);
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    color: var(--steel-blue);
+    text-transform: uppercase;
+    margin-bottom: var(--s-3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .source-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--s-2);
+  }
+
+  .source-card {
+    padding: var(--s-3);
+    border: 1px solid var(--hairline-strong);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.16s;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: rgba(245, 245, 247, 0.02);
+    position: relative;
+  }
+  .source-card:hover {
+    border-color: var(--accent-current);
+    background: var(--accent-current-soft);
+  }
+  .source-card.active {
+    border-color: var(--accent-current);
+    background: var(--accent-current-soft);
+  }
+  .source-card.active::after {
+    content: '';
+    position: absolute;
+    top: var(--s-2);
+    right: var(--s-2);
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--neon-cream);
+    box-shadow: 0 0 8px var(--neon-cream);
+  }
+
+  .source-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--paper);
+    letter-spacing: 0.02em;
+  }
+  .source-type {
+    font-size: 9px;
+    color: var(--steel-blue);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* Hue scenes */
+  .scene-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--s-2);
+  }
+  .scene-card {
+    height: 64px;
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--hairline-strong);
+    transition: all 0.16s;
+  }
+  .scene-card:hover {
+    border-color: var(--neon-cream);
+    transform: translateY(-1px);
+  }
+  .scene-card.active {
+    border-color: var(--neon-cream);
+    box-shadow: 0 0 12px var(--accent-current-glow);
+  }
+  .scene-card .scene-name {
+    position: absolute;
+    bottom: 6px;
+    left: 8px;
+    right: 8px;
+    font-family: var(--font-display);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--paper);
+    text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+  }
+
+  .scene-vinyl-night { background: linear-gradient(135deg, #B87333, #1B2340); }
+  .scene-studio { background: linear-gradient(135deg, #E8D5A3, #3D5A80); }
+  .scene-saturday { background: linear-gradient(135deg, #D4B08C, #B87333); }
+  .scene-dinner { background: linear-gradient(135deg, #1B2340, #5E54D4); }
+  .scene-music-sync {
+    background: linear-gradient(135deg, var(--accent-current), var(--steel-blue));
+    border-color: var(--neon-cream);
+  }
+  .scene-off { background: var(--midnight); }
+
+  /* LLM chat */
+  .chat-panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+    flex: 1;
+  }
+  .chat-history {
+    max-height: 280px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--s-3);
+    padding-right: var(--s-2);
+  }
+  .chat-msg {
+    font-size: 12px;
+    line-height: 1.6;
+    padding: var(--s-3);
+    border-radius: 4px;
+  }
+  .chat-msg.user {
+    background: rgba(232, 213, 163, 0.1);
+    border-left: 2px solid var(--neon-cream);
+    color: var(--paper);
+  }
+  .chat-msg.agent {
+    background: rgba(61, 90, 128, 0.12);
+    border-left: 2px solid var(--steel-blue);
+    color: rgba(245, 245, 247, 0.85);
+  }
+  .chat-msg .msg-tool {
+    margin-top: var(--s-2);
+    padding-top: var(--s-2);
+    border-top: 1px dashed var(--hairline-strong);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--warm-gold);
+    letter-spacing: 0.04em;
+  }
+
+  .chat-input {
+    display: flex;
+    gap: var(--s-2);
+    padding: var(--s-2);
+    border: 1px solid var(--hairline-strong);
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.2);
+  }
+  .chat-input:focus-within { border-color: var(--neon-cream); }
+  .chat-input input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--paper);
+    font-family: var(--font-body);
+    font-size: 13px;
+    outline: none;
+    padding: var(--s-2) var(--s-3);
+  }
+  .chat-input input::placeholder {
+    color: var(--steel-blue);
+    font-style: italic;
+  }
+  .chat-send {
+    background: var(--neon-cream);
+    border: none;
+    color: var(--midnight);
+    padding: 0 var(--s-4);
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: var(--font-display);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+  }
+
+  /* ============================================================
+     FOOTER — status bar
+     ============================================================ */
+  footer.statusbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--s-3) var(--s-5);
+    border-top: 1px solid var(--hairline);
+    background: rgba(10, 10, 11, 0.6);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--steel-blue);
+  }
+  .status-cluster { display: flex; gap: var(--s-5); }
+  .status-cluster span { display: flex; align-items: center; gap: var(--s-2); }
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--neon-cream);
+    box-shadow: 0 0 4px var(--neon-cream);
+  }
+  .status-dot.warn { background: var(--warm-gold); box-shadow: 0 0 4px var(--warm-gold); }
+  .status-dot.dim { background: var(--hairline-strong); box-shadow: none; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- =============== TOP NAV =============== -->
+  <header class="topnav">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div class="brand-text">
+        THE AUDIOPHELIAC
+        <small>Cockpit / v0</small>
+      </div>
+    </div>
+
+    <nav class="mode-tabs">
+      <button class="mode-tab active">Cockpit</button>
+      <button class="mode-tab">Library</button>
+      <button class="mode-tab">Studio</button>
+    </nav>
+
+    <div class="topnav-right">
+      <div class="agent-indicator">
+        <span class="agent-dot"></span>
+        Claude Haiku
+      </div>
+      <div class="user-chip">GM</div>
+    </div>
+  </header>
+
+  <!-- =============== MAIN GRID =============== -->
+  <main class="cockpit">
+
+    <!-- =============== ZONES (LEFT RAIL) =============== -->
+    <aside class="zone-rail">
+      <div class="rail-label">Zones</div>
+      <ul class="zone-list">
+        <li class="zone-item active">
+          <div class="zone-icon">▤</div>
+          <div>
+            <div class="zone-name">Office Studio</div>
+            <div class="zone-substate">Playing · MX28 → HS7</div>
+          </div>
+          <div class="zone-status playing"></div>
+        </li>
+        <li class="zone-item">
+          <div class="zone-icon">◉</div>
+          <div>
+            <div class="zone-name">Family Room</div>
+            <div class="zone-substate">Linked · MusicCast</div>
+          </div>
+          <div class="zone-status linked"></div>
+        </li>
+        <li class="zone-item">
+          <div class="zone-icon">☼</div>
+          <div>
+            <div class="zone-name">Lanai</div>
+            <div class="zone-substate">Standby</div>
+          </div>
+          <div class="zone-status"></div>
+        </li>
+        <li class="zone-item">
+          <div class="zone-icon">⌂</div>
+          <div>
+            <div class="zone-name">Garage</div>
+            <div class="zone-substate">Standby</div>
+          </div>
+          <div class="zone-status"></div>
+        </li>
+        <li class="zone-item disabled">
+          <div class="zone-icon">★</div>
+          <div>
+            <div class="zone-name">Master Bedroom</div>
+            <div class="zone-substate">Pending discovery</div>
+          </div>
+          <div class="zone-status dim"></div>
+        </li>
+      </ul>
+      <div class="group-toggle">+ Group Zones</div>
+
+      <div class="rail-label" style="margin-top:var(--s-6);">Now Spinning</div>
+      <div style="padding:var(--s-3) var(--s-5); font-size:11px; color:rgba(245,245,247,0.6); line-height:1.5;">
+        <strong style="color:var(--neon-cream); font-family:var(--font-display); letter-spacing:0.06em;">FAMILY ROOM PHONO</strong><br>
+        <span style="color:var(--paper);">Wilco — Yankee Hotel Foxtrot</span><br>
+        <span style="color:var(--steel-blue); font-size:10px;">Side B · entered manually 32 min ago</span>
+      </div>
+    </aside>
+
+    <!-- =============== CENTER CANVAS =============== -->
+    <section class="canvas">
+
+      <!-- Now Playing -->
+      <div class="now-playing">
+        <div class="album-art">
+          <div class="album-art-mock">American Heartbreak</div>
+        </div>
+        <div class="now-meta">
+          <div class="source-badge">⊙ MinimServer · FLAC 16/44.1</div>
+          <h1 class="now-track">Something in the Orange</h1>
+          <div class="now-artist">Zach Bryan</div>
+          <div class="now-album">American Heartbreak · 2022</div>
+          <div class="now-tech">
+            <span>● 16 bit</span>
+            <span>◯ 44.1 kHz</span>
+            <span>◌ FLAC</span>
+            <span>◫ NAS → ASIO → Scarlett</span>
+          </div>
+
+          <div class="transport">
+            <button class="transport-btn">⏮</button>
+            <button class="transport-btn primary">▶</button>
+            <button class="transport-btn">⏭</button>
+            <button class="transport-btn">⤥</button>
+            <button class="transport-btn">↻</button>
+            <div class="progress">
+              <span>2:14</span>
+              <div class="progress-bar"><div class="progress-fill"></div></div>
+              <span>3:53</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Queue -->
+      <div class="queue">
+        <div class="queue-label">Up Next · Office Studio</div>
+        <div class="queue-list">
+          <div class="queue-item">
+            <span class="queue-num">02</span>
+            <div>
+              <div class="queue-track">Heading South</div>
+              <div class="queue-artist">Zach Bryan</div>
+            </div>
+            <span class="queue-duration">3:48</span>
+          </div>
+          <div class="queue-item">
+            <span class="queue-num">03</span>
+            <div>
+              <div class="queue-track">Tyler Childers — All Your'n</div>
+              <div class="queue-artist">queued by agent</div>
+            </div>
+            <span class="queue-duration">3:32</span>
+          </div>
+          <div class="queue-item">
+            <span class="queue-num">04</span>
+            <div>
+              <div class="queue-track">Sam Barber — Indigo</div>
+              <div class="queue-artist">queued by agent</div>
+            </div>
+            <span class="queue-duration">3:21</span>
+          </div>
+          <div class="queue-item">
+            <span class="queue-num">05</span>
+            <div>
+              <div class="queue-track">Wyatt Flores — Please Don't Go</div>
+              <div class="queue-artist">queued by agent</div>
+            </div>
+            <span class="queue-duration">2:58</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Signal flow -->
+      <div class="signal-flow">
+        <div class="signal-flow-label">
+          <h3>Signal Flow · Office Studio</h3>
+          <div class="legend">
+            <div class="legend-item"><span class="legend-swatch" style="background:var(--neon-cream); box-shadow:0 0 6px var(--neon-cream);"></span>Active</div>
+            <div class="legend-item"><span class="legend-swatch" style="background:var(--steel-blue);"></span>Available</div>
+            <div class="legend-item"><span class="legend-swatch" style="background:var(--hairline-strong);"></span>Idle</div>
+          </div>
+        </div>
+
+        <svg class="flow-svg" viewBox="0 0 1000 220" xmlns="http://www.w3.org/2000/svg">
+          <!-- connections -->
+          <defs>
+            <linearGradient id="active-line" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="#B87333"/>
+              <stop offset="1" stop-color="#E8D5A3"/>
+            </linearGradient>
+            <filter id="glow"><feGaussianBlur stdDeviation="3"/></filter>
+          </defs>
+
+          <!-- Active path -->
+          <path d="M 80 60 Q 200 60 250 110" stroke="url(#active-line)" stroke-width="2.5" fill="none" filter="url(#glow)" opacity="0.7"/>
+          <path d="M 80 60 Q 200 60 250 110" stroke="#E8D5A3" stroke-width="1.5" fill="none"/>
+          <path d="M 320 110 L 460 110" stroke="#E8D5A3" stroke-width="1.5" fill="none"/>
+          <path d="M 530 110 L 670 110" stroke="#E8D5A3" stroke-width="1.5" fill="none"/>
+          <path d="M 740 110 L 880 60" stroke="#E8D5A3" stroke-width="1.5" fill="none"/>
+          <path d="M 740 110 L 880 160" stroke="#E8D5A3" stroke-width="1.5" fill="none"/>
+
+          <!-- Idle paths -->
+          <path d="M 80 160 Q 200 160 250 110" stroke="rgba(255,255,255,0.16)" stroke-width="1" stroke-dasharray="4 4" fill="none"/>
+          <path d="M 80 110 L 250 110" stroke="rgba(255,255,255,0.16)" stroke-width="1" stroke-dasharray="4 4" fill="none"/>
+
+          <!-- Source nodes -->
+          <g>
+            <circle cx="80" cy="60" r="22" fill="#B87333" stroke="#E8D5A3" stroke-width="1.5"/>
+            <text x="80" y="64" text-anchor="middle" fill="#1A1A2E" font-family="Inter" font-size="9" font-weight="600">NAS</text>
+            <text x="80" y="98" text-anchor="middle" fill="#E8D5A3" font-family="Unica One" font-size="9" letter-spacing="1">MINIMSERVER</text>
+          </g>
+          <g opacity="0.4">
+            <circle cx="80" cy="110" r="18" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+            <text x="80" y="114" text-anchor="middle" fill="#F5F5F7" font-family="Inter" font-size="9">SPOT</text>
+          </g>
+          <g opacity="0.4">
+            <circle cx="80" cy="160" r="18" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>
+            <text x="80" y="164" text-anchor="middle" fill="#F5F5F7" font-family="Inter" font-size="9">VINYL</text>
+          </g>
+
+          <!-- Routing nodes -->
+          <g>
+            <rect x="250" y="92" width="70" height="36" rx="4" fill="#1B2340" stroke="#E8D5A3" stroke-width="1.5"/>
+            <text x="285" y="108" text-anchor="middle" fill="#E8D5A3" font-family="Inter" font-size="10" font-weight="600">GDMARCHE</text>
+            <text x="285" y="120" text-anchor="middle" fill="#3D5A80" font-family="Inter" font-size="8">foobar2000</text>
+          </g>
+
+          <g>
+            <rect x="460" y="92" width="70" height="36" rx="4" fill="#1B2340" stroke="#3D5A80" stroke-width="1"/>
+            <text x="495" y="108" text-anchor="middle" fill="#F5F5F7" font-family="Inter" font-size="10">USB DAC</text>
+            <text x="495" y="120" text-anchor="middle" fill="#3D5A80" font-family="Inter" font-size="8">temporary</text>
+          </g>
+
+          <g>
+            <rect x="670" y="92" width="70" height="36" rx="4" fill="#1B2340" stroke="#E8D5A3" stroke-width="1.5"/>
+            <text x="705" y="108" text-anchor="middle" fill="#E8D5A3" font-family="Inter" font-size="10" font-weight="600">MX28</text>
+            <text x="705" y="120" text-anchor="middle" fill="#3D5A80" font-family="Inter" font-size="8">Mini-Mix VI</text>
+          </g>
+
+          <!-- Output nodes -->
+          <g>
+            <circle cx="900" cy="60" r="22" fill="#B87333" stroke="#E8D5A3" stroke-width="1.5"/>
+            <text x="900" y="64" text-anchor="middle" fill="#1A1A2E" font-family="Inter" font-size="9" font-weight="600">HS7</text>
+            <text x="900" y="40" text-anchor="middle" fill="#E8D5A3" font-family="Unica One" font-size="9" letter-spacing="1">YAMAHA L+R</text>
+          </g>
+          <g>
+            <circle cx="900" cy="160" r="22" fill="#B87333" stroke="#E8D5A3" stroke-width="1.5"/>
+            <text x="900" y="164" text-anchor="middle" fill="#1A1A2E" font-family="Inter" font-size="9" font-weight="600">SUB</text>
+            <text x="900" y="195" text-anchor="middle" fill="#E8D5A3" font-family="Unica One" font-size="9" letter-spacing="1">JBL LSR310S</text>
+          </g>
+        </svg>
+      </div>
+
+    </section>
+
+    <!-- =============== RIGHT RAIL =============== -->
+    <aside class="right-rail">
+
+      <!-- Sources panel -->
+      <div class="panel">
+        <h3>Sources <span style="color:var(--neon-cream); font-size:9px;">13 ENABLED</span></h3>
+        <div class="source-grid">
+          <div class="source-card active">
+            <div class="source-name">MinimServer</div>
+            <div class="source-type">Local FLAC · UPnP</div>
+          </div>
+          <div class="source-card">
+            <div class="source-name">Spotify</div>
+            <div class="source-type">Web API · Connect</div>
+          </div>
+          <div class="source-card">
+            <div class="source-name">Yamaha YXC</div>
+            <div class="source-type">R-N800A direct</div>
+          </div>
+          <div class="source-card">
+            <div class="source-name">Net Radio</div>
+            <div class="source-type">vTuner · built-in</div>
+          </div>
+          <div class="source-card">
+            <div class="source-name">Suno</div>
+            <div class="source-type">MCP wrapper · ⚠</div>
+          </div>
+          <div class="source-card">
+            <div class="source-name">Discogs</div>
+            <div class="source-type">Vinyl crate</div>
+          </div>
+          <div class="source-card">
+            <div class="source-name">Vinyl (manual)</div>
+            <div class="source-type">Now Spinning entry</div>
+          </div>
+          <div class="source-card">
+            <div class="source-name">Bose SoundTouch</div>
+            <div class="source-type">Garage · :8090</div>
+          </div>
+          <div class="source-card">
+            <div class="source-name">Chromecast 4K</div>
+            <div class="source-type">Lanai · Cast</div>
+          </div>
+          <div class="source-card">
+            <div class="source-name">Shield Pro</div>
+            <div class="source-type">Family Rm · Cast+ADB</div>
+          </div>
+          <div class="source-card">
+            <div class="source-name">Hue Bridge</div>
+            <div class="source-type">CLIP v2 · Entertain.</div>
+          </div>
+          <div class="source-card">
+            <div class="source-name">Ableton Live 12</div>
+            <div class="source-type">Action target · OSC</div>
+          </div>
+          <div class="source-card">
+            <div class="source-name">+ Add Source</div>
+            <div class="source-type">Scan LAN</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hue scenes -->
+      <div class="panel">
+        <h3>Hue · Office Studio <span style="color:var(--neon-cream); font-size:9px;">SYNC ON</span></h3>
+        <div class="scene-grid">
+          <div class="scene-card scene-music-sync active">
+            <div class="scene-name">Music Sync</div>
+          </div>
+          <div class="scene-card scene-vinyl-night">
+            <div class="scene-name">Vinyl Night</div>
+          </div>
+          <div class="scene-card scene-studio">
+            <div class="scene-name">Studio Bright</div>
+          </div>
+          <div class="scene-card scene-saturday">
+            <div class="scene-name">Saturday AM</div>
+          </div>
+          <div class="scene-card scene-dinner">
+            <div class="scene-name">Dinner</div>
+          </div>
+          <div class="scene-card scene-off">
+            <div class="scene-name">Off</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LLM chat -->
+      <div class="panel chat-panel">
+        <h3>Ask the Audiopheliac <span style="color:var(--steel-blue); font-size:9px;">!sonnet to escalate</span></h3>
+        <div class="chat-history">
+
+          <div class="chat-msg user">play something like Zach Bryan but more upbeat in the family room and dim the lights</div>
+
+          <div class="chat-msg agent">
+            On it. Searching Spotify for tempo-matched neighbors of "Something in the Orange," queueing the top 3 to the Family Room R-N800A via Spotify Connect, and dimming Hue Office Studio to 30% warm.
+            <div class="msg-tool">
+              ⊙ spotify.search(seed: 'zach bryan', bpm_min: 110, energy_min: 0.6) → 3 tracks<br>
+              ⊙ yamaha.setInput(zone: family_room, input: 'spotify') → ok<br>
+              ⊙ spotify.queue.add(device: 'R-N800A', tracks: [...]) → 3 added<br>
+              ⊙ hue.scene.activate(zone: 'office_studio', scene: 'warm_dim_30') → ok
+            </div>
+          </div>
+
+          <div class="chat-msg user">what was that track from earlier today around 10am?</div>
+
+          <div class="chat-msg agent">
+            Thursday 10:14 AM, Office Studio: Tyler Childers — "Whitehouse Road" from Purgatory (FLAC 16/44.1, played 4:18 of 4:21).
+            <div class="msg-tool">
+              ⊙ history.query(zone: office_studio, ts: '2026-05-08T10:00..11:00') → 1 match
+            </div>
+          </div>
+
+        </div>
+        <div class="chat-input">
+          <input type="text" placeholder="route, queue, mood, scene, anything…">
+          <button class="chat-send">SEND</button>
+        </div>
+      </div>
+
+    </aside>
+
+  </main>
+
+  <!-- =============== STATUS BAR =============== -->
+  <footer class="statusbar">
+    <div class="status-cluster">
+      <span><span class="status-dot"></span>Cloudflare Tunnel</span>
+      <span><span class="status-dot"></span>YXC MCP</span>
+      <span><span class="status-dot"></span>Hue MCP</span>
+      <span><span class="status-dot"></span>MinimServer</span>
+      <span><span class="status-dot warn"></span>Suno (gray)</span>
+      <span><span class="status-dot dim"></span>Ableton OSC</span>
+    </div>
+    <div class="status-cluster">
+      <span>Mockup v0 · Nashville Midnight · No backend wired</span>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  // ============================================================
+  // Mockup interactivity — minimal, illustrative only
+  // No backend; simulates source-switch + zone-switch + theme update
+  // ============================================================
+
+  // Zone selection
+  document.querySelectorAll('.zone-item:not(.disabled)').forEach(item => {
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.zone-item').forEach(i => i.classList.remove('active'));
+      item.classList.add('active');
+    });
+  });
+
+  // Source selection — toggles active state, updates --accent-current
+  const sourcePalettes = {
+    'MinimServer':    ['#B87333', '#E8D5A3'],
+    'Spotify':        ['#1DB954', '#191414'],
+    'Yamaha YXC':     ['#3D5A80', '#E8D5A3'],
+    'Net Radio':      ['#5E54D4', '#0ABED3'],
+    'Suno':           ['#0F82DF', '#E8D5A3'],
+    'Discogs':        ['#000000', '#FF7300'],
+    'Vinyl (manual)': ['#1B2340', '#D4B08C'],
+    'Bose SoundTouch':['#000000', '#E8D5A3'],
+    'Chromecast 4K':  ['#FF6D00', '#E8D5A3'],
+    'Shield Pro':     ['#76B900', '#1B2340'],
+    'Hue Bridge':     ['#9B59B6', '#E8D5A3'],
+    'Ableton Live 12':['#F4B400', '#1A1A2E'],
+  };
+
+  document.querySelectorAll('.source-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const name = card.querySelector('.source-name').textContent.trim();
+      if (name === '+ Add Source') return;
+      document.querySelectorAll('.source-card').forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+
+      const palette = sourcePalettes[name];
+      if (palette) {
+        const root = document.documentElement;
+        root.style.setProperty('--accent-current', palette[0]);
+        root.style.setProperty('--accent-current-soft', palette[0] + '2e');
+        root.style.setProperty('--accent-current-glow', palette[0] + '73');
+
+        // update source badge
+        const badge = document.querySelector('.source-badge');
+        badge.textContent = '⊙ ' + name + ' · live';
+      }
+    });
+  });
+
+  // Mode tab switching (visual only)
+  document.querySelectorAll('.mode-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      if (tab.textContent.trim() !== 'Cockpit') {
+        document.querySelector('.canvas').innerHTML =
+          '<div style="display:flex; align-items:center; justify-content:center; height:100%; color:var(--steel-blue); font-family:var(--font-display); font-size:24px; letter-spacing:0.18em;">' +
+          tab.textContent.toUpperCase() + ' · TBD' +
+          '</div>';
+      }
+    });
+  });
+
+  // Hue scene click
+  document.querySelectorAll('.scene-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.scene-card').forEach(s => s.classList.remove('active'));
+      card.classList.add('active');
+    });
+  });
+
+  // Chat input echo (no real LLM)
+  const chatInput = document.querySelector('.chat-input input');
+  const chatSend = document.querySelector('.chat-send');
+  const chatHistory = document.querySelector('.chat-history');
+
+  function sendChat() {
+    const txt = chatInput.value.trim();
+    if (!txt) return;
+    const userMsg = document.createElement('div');
+    userMsg.className = 'chat-msg user';
+    userMsg.textContent = txt;
+    chatHistory.appendChild(userMsg);
+
+    const agentMsg = document.createElement('div');
+    agentMsg.className = 'chat-msg agent';
+    agentMsg.innerHTML = '<em style="color:var(--steel-blue);">[mockup — no agent wired. In production, Claude would parse intent and call the appropriate MCP tools here.]</em>';
+    setTimeout(() => chatHistory.appendChild(agentMsg), 400);
+
+    chatInput.value = '';
+    setTimeout(() => chatHistory.scrollTop = chatHistory.scrollHeight, 500);
+  }
+
+  chatSend.addEventListener('click', sendChat);
+  chatInput.addEventListener('keypress', e => { if (e.key === 'Enter') sendChat(); });
+</script>
+</body>
+</html>

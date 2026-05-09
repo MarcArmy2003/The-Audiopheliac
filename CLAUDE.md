@@ -104,6 +104,13 @@ The D: drive is the second internal drive on GDMARCHE (original factory drive, s
 - **Mapped:** `A:\` (verify mapping is live before use)
 - **Backup path:** `\\NAS87828E\The Audiopheliac\The-Audiopheliac\` — QSync sync target of D: drive contents. The nesting is expected: D:\The Audiopheliac contains a subfolder The-Audiopheliac\ which QSync replicates at the NAS level.
 
+### Music Library (Album Output)
+- **Path:** `M:\The Audiopheliac`
+- **Purpose:** Local music library folder for Audiopheliac album outputs. Destination for downloaded Suno tracks, finished masters, and organized assets across albums (first album project and future releases).
+- **Established:** 2026-05-07
+- **UNC equivalent:** `\\NAS87828E\Music\The Audiopheliac\` (M: maps to `\\NAS87828E\Music`, confirmed 2026-05-09).
+- **Note:** M: is a mapped drive. Verify mapping is live before scripts target it; fall back to the UNC above when off-mapping.
+
 ---
 
 ## PLATFORM CREDENTIALS
@@ -452,6 +459,19 @@ C:\Users\gillo\The-Audiopheliac\Suno\
 - Ableton Knowledge MCP is active in Cowork sessions (Live 12 manual, Push, ~450 YouTube tutorials)
 - Woodshed learning mode: trigger word `/woodshed` — instructive, doing-first engagement. Exit: `/produce` or `/studio`
 
+### Song Archive Protocol
+Once Gill confirms a song is finalized (lyrics, style, exclusions, and a generated result he's happy with), save the following to disk before closing the session:
+
+**Lyrics file:** `C:\Users\gillo\The-Audiopheliac\Suno\lyrics\[Song-Title].md`
+Contents: full lyrics with section tags as used in Suno.
+
+**Prompt file:** `C:\Users\gillo\The-Audiopheliac\Suno\prompts\[Song-Title].md`
+Contents: the Final Output Template block — Song Title, Style field, Exclude Styles, Weirdness %, Style Influence %, and any iteration notes (v1/v2/v3 lessons if applicable).
+
+**Naming convention:** Use the song title, spaces replaced with hyphens, title case. Example: `Sweet-Tyla-Jean.md`.
+
+Create the `lyrics/` and `prompts/` subdirectories under `Suno/` if they do not yet exist. Do not wait for Gill to ask — saving on finalization is the default behavior.
+
 ---
 
 ## GEAR DISCOVERY PLATFORM (AUDIOPHELIAC GEAR PROXY)
@@ -595,6 +615,256 @@ Exit with /produce or /studio. See Suno Production Environment > Integration Not
 2. GitHub raw content (`https://raw.githubusercontent.com/MarcArmy2003/The-Audiopheliac/main/...`)
 3. Slack canvas (Session Development Log: https://veterananalyticsllc.slack.com/docs/T0AS3KMJ82X/F0AU7FEMA7M)
 4. Web search for firmware notes, changelogs, driver downloads (prefer manufacturer sources: focusrite.com, ableton.com, yamaha.com, qnap.com, help.suno.com)
+
+---
+
+## CROSS-SURFACE ARCHITECTURE
+
+**Lane discipline: Cowork > Rafa (CLI) > Paperclip (governance + audit). No bypasses.**
+
+Studio Assistant (claude.ai) is a research and validation sidebar (see "Companion project" under IDENTITY AND ROLE). Paperclip is the orchestration, governance, and audit layer (see PAPERCLIP SURFACE).
+
+| Surface | Persona/Tool | Role |
+|---|---|---|
+| Cowork | Audiopheliac (this CLAUDE.md governs behavior) | Primary development surface. File ops, docs, git staging, session state, Slack canvas management, MCP operations (Slack, GitHub, Ableton Knowledge). Bridges to paperclip via Rafa (Cowork cannot reach localhost). |
+| CLI | **Rafa** | Code execution, deployment, Cloudflare Pages publish, Python automation, scripts. Bridges to paperclip API (`http://localhost:3100/api`) on Cowork's behalf. Reports back to Cowork for Slack and disk-state updates. Never writes to Slack canvases directly. |
+| Chat | **Studio Assistant** (claude.ai project) | Complex research, reasoning, technical validation. Not a primary development surface. Cannot reach paperclip directly. |
+| Paperclip | **The Audiopheliac company** (agents pending, not yet created) | Orchestration, ticketed work, governance, immutable audit log, cost control, scheduled routines. Local instance at `http://localhost:3100`. Reachable only via Rafa from non-CLI surfaces. See PAPERCLIP SURFACE. |
+
+---
+
+## SESSION-INIT PROTOCOL
+
+**Trigger:** Gill types `audio:open` (or just `open`). See SESSION TRIGGER WORDS.
+**Required at start of every session. Execute before any other action.**
+
+1. Read this CLAUDE.md (sole persistent instruction source per COWORK OPERATING CONSTRAINTS)
+2. Read Slack canvas "The Audiopheliac - Session Development Log" (F0AU7FEMA7M): most recent entries for last action, blockers, in-flight work
+3. Read on-disk state files relevant to active work (e.g., `data/library_index/library_index.json`, `data/manifests/spotify_local_matches.json`, `Suno/suno_my_taste_draft.md`) as scoped by the task
+4. Read paperclip inbox via Rafa bridge: fetch open Audiopheliac-company issues, blocking approvals, last-touched issue. Cowork drafts a Rafa CLI prompt; Rafa runs `Invoke-RestMethod 'http://localhost:3100/api/agents/me/inbox-lite'` and reports back; Cowork parses. Skip with a note if Audiopheliac paperclip company does not yet exist (see PAPERCLIP SURFACE setup status).
+5. Output status block (paperclip line included, see format below)
+6. Proceed with session work
+
+**Status block format:**
+```
+AUDIOPHELIAC SESSION-INIT, [YYYY-MM-DD]
+Last action: [one-line from canvas or "first session of day"]
+Active: [top in-flight item or "none"]
+Blockers: [list or "none"]
+Paperclip: [N] open issues | [M] awaiting approval | last touched: [issue ID or "none" or "company not yet created"]
+Ready.
+```
+
+**Fallback (Slack unavailable):** Read CLAUDE.md, last-modified files in `docs/`, and any in-flight notes in `Suno/`. Report: "Slack unavailable, loaded from local fallbacks, may be stale."
+
+---
+
+## MID-SESSION SYNC PROTOCOL
+
+**Trigger:** Gill types `audio:sync` (or just `sync`). See SESSION TRIGGER WORDS.
+Run at any context compaction, natural pause point, or when Gill requests a sync.
+
+1. Post mid-session status update to `#theaudiopheliac` (channel ID `C0AUH2RLZ41`): work completed so far, pending Rafa items, active blockers
+2. Refresh any in-flight on-disk state. If a session brief convention is later established at `handoffs/` (not currently in use), refresh it here. Flag as setup if cross-surface alignment becomes a recurring need
+3. Rafa (if triggered) refreshes any in-flight on-disk state owned by automation (e.g., partial run of `automation/spotify_local_match.py` outputs)
+
+**Logs and issue trackers:** Not updated mid-session. Slack canvas updates and paperclip ticket transitions happen at SESSION-CLOSE only.
+
+---
+
+## SESSION-CLOSE PROTOCOL
+
+**Trigger:** Gill types `audio:close` (or just `close`). See SESSION TRIGGER WORDS.
+**Required at end of every session. Execute before reporting complete.**
+
+**Step 1, Documentation Updates:**
+- Update any docs in `docs/` modified this session
+- If a new correction pattern was identified, evaluate whether CLAUDE.md needs an update. This file is the sole persistent instruction source; updates are deliberate, not casual
+
+**Step 2, Git Commit:**
+- Stage only files modified this session, do not stage unrelated work
+- Commit message format: `docs: [short description]` or `feat: [short description]` per change type
+- Git author: `Gillon Marchetti <gillon.marchetti@gmail.com>` (Audiopheliac is personal scope, not Veteran Analytics LLC)
+- Run `git config user.name` before committing, correct if it returns wrong value
+- No `Co-Authored-By: Claude` trailer
+
+**Step 3, Update Slack Canvas:**
+- Add a new timestamped session entry to "The Audiopheliac - Session Development Log" (F0AU7FEMA7M): work done, commits, decisions, corrections, next actions
+- Convention: prepend new entries at top so the canvas reads newest-first. Verify against current canvas style on first close, adapt if existing convention is append-style
+
+**Step 3b, Update Paperclip via Rafa bridge:**
+For any paperclip issue touched this session (skip entirely if Audiopheliac paperclip company does not yet exist):
+- Cowork drafts a closing comment per issue: what was done, links to canvas / commits, next action for the assignee
+- Rafa posts via `POST /api/issues/<id>/comments`
+- Update issue status (`in_progress` > `in_review` or `done`) per actual completion state
+- Ensure approval state is current. Do not leave stale "awaiting approval" if Gill approved verbally
+- Spot-check Costs page for any agent that exceeded its soft warn threshold this session
+- If new sub-issues were created mid-session, confirm scope and assignment before close
+
+**Step 4, Report to Gill:** Confirm all steps complete. List anything that failed and why.
+
+---
+
+## SESSION TRIGGER WORDS
+
+Universal trigger words to standardize SESSION-INIT, MID-SESSION SYNC, and SESSION-CLOSE across all surfaces (Cowork / Studio Assistant / Rafa / Paperclip agents). Honored by every surface that runs against this CLAUDE.md.
+
+| Trigger | Surfaces | Maps to | Action |
+|---|---|---|---|
+| `audio:open` (or `open`) | Cowork, Studio Assistant, Rafa, Paperclip agents | SESSION-INIT PROTOCOL | Read CLAUDE.md + Slack canvas + on-disk state + paperclip inbox; output status block; ready to work |
+| `audio:sync` (or `sync`) | Cowork, Rafa | MID-SESSION SYNC PROTOCOL | Post mid-session status to `#theaudiopheliac`; refresh any in-flight on-disk state |
+| `audio:close` (or `close`) | Cowork + Rafa (Cowork orchestrates) | SESSION-CLOSE PROTOCOL | Update docs; commit; update canvas; update paperclip; report |
+
+**Recognition rules:**
+
+- Match is case-insensitive. `AUDIO:OPEN`, `audio:Open`, `open session`, and `Open` all trigger. Phrase tolerance > exactness.
+- The un-prefixed forms (`open` / `sync` / `close`) only fire inside this Audiopheliac workspace. Outside, use the project-prefixed form (e.g., `vi:open` for VeteranIntel, `val:open` for VeteranAnalytics).
+- All surfaces stop whatever they are doing and run the named protocol when one of these triggers appears in a user message. No "let me finish this first."
+- Paperclip agents recognize the trigger when Gill posts it in an issue chat, agent runs the protocol on its next heartbeat.
+
+**Cross-project consistency:** Same trigger pattern (`<project>:open`, `:sync`, `:close`) is being adopted across all Veteran Analytics LLC project folders and Gill's personal projects. The prefix changes per project, `audio:` for The Audiopheliac, `vi:` for VeteranIntel, `val:` for VeteranAnalytics, etc., but the protocol shape is identical in form.
+
+**Why these exist:** Eliminates ambiguity at session boundaries. One word triggers the full alignment ritual.
+
+**Optional adjuncts (not required, not substitutes):**
+
+- `/productivity:start` and `/productivity:update` are productivity-system slash commands and do NOT replace `audio:open`.
+- Mode triggers `/woodshed`, `/produce`, `/studio` (see MODE CONTRACTS) are independent of session triggers and may be used inline during a session.
+- General-purpose plugin slash commands (e.g., `/diagnose-why-work-stopped`) may be invoked inline as needed.
+
+**Paperclip slash commands available locally** (via paperclip skills installed in Claude Desktop config): `/paperclip`, `/paperclip-converting-plans-to-tasks`, `/paperclip-create-agent`, `/paperclip-create-plugin`, `/paperclip-dev`. Reachable from Rafa or from a paperclip agent's runtime. Cowork can ask Rafa to invoke them but cannot invoke them directly from Cowork.
+
+---
+
+## PAPERCLIP SURFACE
+
+Orchestration + governance + audit. Fourth permanent surface in the cross-platform architecture, alongside Studio Assistant (Chat), Cowork, and Rafa (CLI).
+
+**What it is:** Open-source orchestration platform running locally. Models a "company" with org chart, agents, goals, tasks, heartbeats, budgets, governance, approvals, routines, plugins, secrets, and an immutable audit log. Every mutating action is recorded. Single deployment can run multiple companies with full data isolation.
+
+**Local instance details:**
+
+| Item | Value |
+|---|---|
+| Repo / install location | `C:\Users\gillo\paperclip\` |
+| API base | `http://localhost:3100/api` |
+| UI | `http://localhost:3100` |
+| Database | Embedded PGlite (auto-created in dev, no `DATABASE_URL` needed) |
+| Process management | `pnpm dev` from repo root |
+| Telemetry | Default ON, disable with `PAPERCLIP_TELEMETRY_DISABLED=1` if needed |
+
+**Companies and agents (current):**
+
+| Company | Agents | Purpose |
+|---|---|---|
+| The Audiopheliac | Audiopheliac Operator (pending) | Dedicated company for Audiopheliac work (signal chain engineering, vinyl/Spotify/Discogs sync, Suno production, website ops). Data isolation from Veteran Analytics LLC products. Company id: `821ef660-0041-4ef6-a911-adb1ba038e15`. Issue prefix: `THE` (locked at creation, see invariant below). Brand color: `#7a1f2b`. Created: 2026-05-06. |
+
+**Setup status:** The Audiopheliac paperclip company exists (id `821ef660-0041-4ef6-a911-adb1ba038e15`, prefix `THE`, color `#7a1f2b`, created 2026-05-06). Initial agent "Audiopheliac Operator" not yet created; paperclip read/write at session boundaries remains gated until the agent exists. First open issue: `THE-1` (baseline closed 2026-05-08).
+
+**Invariant (paperclip prefix lock):** The Audiopheliac company prefix `THE` is locked at creation. Do not attempt to rename. PATCHing `issuePrefix` after issues exist is silently ignored by the API (intentional server-side invariant). Do not direct-edit PGlite. Do not delete and recreate. Issue keys must stay sticky.
+
+**Network reachability, critical constraint:**
+
+- **Cowork cannot reach `localhost:3100`.** Cowork sandbox is a Linux container without access to the host's network. All paperclip reads and writes go through Rafa.
+- **Studio Assistant (Chat) cannot reach paperclip**, same constraint.
+- **Rafa (CLI) hits paperclip directly**, `Invoke-RestMethod -Uri 'http://localhost:3100/api/...'` works natively from PowerShell.
+- **Paperclip's own agents** call out to MCPs and tools per their adapter config, not bound by Cowork's sandbox.
+
+**Lane discipline:**
+
+```
+Cowork  > designs work >  Rafa (CLI)  > executes work
+   |                            |
+   +---- reads/writes paperclip via Rafa REST bridge >  Paperclip (governance + audit)
+                                                                  |
+                                                                  v
+                                              Audiopheliac agent runs heartbeats,
+                                              picks up tickets, posts work products
+```
+
+**SESSION-INIT integration (referenced from SESSION-INIT PROTOCOL):**
+
+- Cowork drafts a Rafa CLI prompt to fetch paperclip state. Standard payload:
+  - `GET /api/agents/me/inbox-lite`, compact view of agent assignments
+  - `GET /api/companies/<id>/issues?status=todo,in_progress,in_review,blocked`, open work
+  - `GET /api/issues/<id>` for any in_review item with pending approval
+- Rafa runs the prompt, returns JSON to Cowork
+- Cowork parses and includes `Paperclip:` line in the SESSION-INIT status block
+- Cost telemetry not required at SESSION-INIT, surface only at SESSION-CLOSE or when troubleshooting
+
+**SESSION-CLOSE integration (referenced from SESSION-CLOSE PROTOCOL Step 3b):**
+
+- For every issue touched this session, Cowork drafts a closing comment
+- Rafa posts via `POST /api/issues/<id>/comments`
+- Issue status transitioned per actual completion: `in_progress` to `in_review` (awaiting Gill) or `done` (verified complete)
+- Approvals processed through Inbox if any are stale-awaiting
+
+**Approval gate discipline (first 90 days):**
+
+Until the loop is fully trusted, **destructive operations** running under any Audiopheliac-company agent MUST go through paperclip approval gates. Specifically:
+
+- File deletions on NAS (`\\NAS87828E\The Audiopheliac\`), more than 10 files OR any folder
+- Git history rewrites or force-pushes to `main`
+- Cloudflare Pages production deploys (`wrangler pages deploy --branch=main`)
+- Spotify, Discogs, or Suno API token rotation
+- Firmware flashes marked [MODERATE] or [HIGH] (per BEHAVIORAL RULES; [LOW] does not require paperclip gating)
+- DAW project file overwrites, never silently overwrite a `.als`
+- Adding cost-bearing routines (e.g., scheduled Suno or Spotify API calls if MCP wrappers are adopted)
+
+Approval gates are NOT optional during this trust-building phase. Gill is the board, he approves via paperclip UI (Inbox > Approvals).
+
+**Cost discipline:**
+
+- Each agent has a budget envelope. **Audiopheliac Operator default (when created): $50/month soft warn, $100/month hard stop.** Calibrate after one week of real cost telemetry.
+- Routine-driven agents (no LLM call per heartbeat unless work found) get smaller budgets, $10/month soft / $25/month hard typical.
+- Paperclip auto-pauses agents that hit hard stops.
+- Suno credits are NOT tracked through paperclip. Suno is browser-based and pre-paid via the Premier Annual subscription. Only LLM token spend by paperclip-managed agents is tracked here.
+
+**What does NOT belong in paperclip (anti-patterns):**
+
+- Synchronous human-driven dev work, stays on Cowork
+- Conversational interactions, paperclip is for ticketed work, not chat
+- Cross-company contamination, every entity is company-scoped, honor it
+- Recreating Cowork's job, Cowork handles human-driven dev, paperclip handles async, scheduled, agent-driven recurring work. Complementary, not redundant.
+- Granting paperclip agents elevated host-level permissions, each agent should have minimum-scope tooling
+
+**Cross-platform hand-off discipline (no document duplication):**
+
+| Document type | Canonical home | Who writes |
+|---|---|---|
+| Per-issue agent activity log | Paperclip's Activity tab | Audiopheliac Operator (auto, when active) |
+| Human-decision session log | Slack canvas "The Audiopheliac - Session Development Log" (F0AU7FEMA7M) | Cowork (at SESSION-CLOSE) |
+| In-flight on-disk state | `data/` outputs from automation pipeline | Cowork or Rafa (per pipeline) |
+| Behavioral corrections | THIS CLAUDE.md (sole persistent instruction source per COWORK OPERATING CONSTRAINTS) | Cowork (rare, deliberate updates) |
+| Cost telemetry | Paperclip Costs page | Paperclip (auto) |
+
+These do not duplicate each other. Each has its lane.
+
+**Paperclip primitives reference:**
+
+- **Issue / Ticket:** atomic unit of work. Single-assignee. Atomic checkout.
+- **Project:** grouping of related issues.
+- **Goal:** higher-level objective, issues trace back to a goal.
+- **Routine:** recurring scheduled task (cron / webhook / API trigger). Each execution creates a tracked issue.
+- **Heartbeat:** scheduled wakeup that fires the assigned agent.
+- **Approval gate:** board-level approval required before action proceeds.
+- **Audit log:** immutable record of all mutating actions, cost events, approvals, comments, work products.
+
+**What we are not yet using (will adopt as the loop matures):**
+
+- The Audiopheliac company itself, must be created first
+- Routines (strong candidates: nightly `music_indexer.py + spotify_pull.py + spotify_local_match.py + spotify_gap_report.py` pipeline; weekly Discogs collection sync when Discogs integration ships; Robocopy `C:\Users\gillo\The-Audiopheliac` > `D:\The Audiopheliac\The-Audiopheliac\` if reframed as routine-managed)
+- Plugins (out-of-process workers, custom tool exposure)
+- Multiple Human Users (currently solo, Gill is the only board member)
+- Cross-company orchestration (waiting on additional company creation)
+
+**Paperclip skills available locally** (installed via Claude Desktop config): `paperclip`, `paperclip-converting-plans-to-tasks`, `paperclip-create-agent`, `paperclip-create-plugin`, `paperclip-dev`. Loaded into Rafa's runtime, Cowork invokes them via Rafa CLI prompts. Reference: https://paperclip.ing/docs/
+
+---
+
+## HISTORY
+
+**2026-05-06:** CLAUDE.md upgraded to adopt the universal session-trigger plus paperclip integration pattern (canonical model: VeteranIntel.org CLAUDE.md §§9, 19, 20, 21, 31, 32). Added: CROSS-SURFACE ARCHITECTURE, SESSION-INIT PROTOCOL, MID-SESSION SYNC PROTOCOL, SESSION-CLOSE PROTOCOL, SESSION TRIGGER WORDS, PAPERCLIP SURFACE, this HISTORY section. Local prefix: `audio:`. Paperclip company "The Audiopheliac" not yet created, flagged as next setup step. All existing project-specific content (signal chains, hardware, listening profile, Suno production environment, RAFA pre-authorization, etc.) preserved without modification.
 
 ---
 
