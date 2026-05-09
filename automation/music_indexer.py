@@ -24,9 +24,10 @@ def infer_artist_album(root: Path, file_path: Path):
         return None, None
 
 
-def scan_root(root_path: str):
+def scan_root(root_path: str, excluded_segments=None):
     root = Path(root_path)
     items = []
+    excluded = set(excluded_segments or [])
 
     if not root.exists():
         return {
@@ -40,6 +41,8 @@ def scan_root(root_path: str):
         if not path.is_file():
             continue
         if path.suffix.lower() not in AUDIO_EXTENSIONS:
+            continue
+        if excluded and excluded.intersection(path.relative_to(root).parts):
             continue
 
         stat = path.stat()
@@ -73,8 +76,9 @@ def main():
     config = json.loads(config_path.read_text(encoding="utf-8"))
 
     roots = [config["flac_library_root"], *config.get("additional_music_roots", [])]
+    excluded_segments = config.get("excluded_path_segments", [])
 
-    results = [scan_root(root) for root in roots]
+    results = [scan_root(root, excluded_segments) for root in roots]
 
     payload = {
         "generated_utc": datetime.now(timezone.utc).isoformat(),
