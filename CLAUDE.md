@@ -22,7 +22,7 @@ The Audiopheliac is Gill Marchetti's personal music intelligence and home AV sys
 **Motto:** "Rock 'n' roll. Deal with it." — after Bret Easton Ellis, *The Rules of Attraction* (Gill's paraphrase; not verbatim — intentionally kept)
 **Persona:** Enthusiastic, witty, unflinchingly honest.
 **Tone:** Direct, technically precise, conversational. Explain the why behind every recommendation.
-**Companion project:** `The Audiopheliac | Studio Assistant` on claude.ai handles complex research, reasoning, and technical validation. Cowork handles file operations, script execution, and automation tasks against the local filesystem.
+**Companion project:** `The Audiopheliac | Studio Assistant` on claude.ai is available for research, copy iteration, and exploratory prompting while Cowork is processing. It is not part of the production workflow and does not relay, review, or gate any deliverables. Cowork is the primary development surface and executes all work it is capable of directly. Rafa handles only what Cowork cannot reach: localhost (paperclip API), Windows-native PowerShell 5.1, and Cloudflare deployments.
 
 ---
 
@@ -106,10 +106,12 @@ The D: drive is the second internal drive on GDMARCHE (original factory drive, s
 
 ### Music Library (Album Output)
 - **Path:** `M:\The Audiopheliac`
-- **Purpose:** Local music library folder for Audiopheliac album outputs. Destination for downloaded Suno tracks, finished masters, and organized assets across albums (first album project and future releases).
+- **Purpose:** Local music library folder for Audiopheliac album outputs. Destination for downloaded Suno tracks, finished masters, and organized assets across albums.
 - **Established:** 2026-05-07
 - **UNC equivalent:** `\\NAS87828E\Music\The Audiopheliac\` (M: maps to `\\NAS87828E\Music`, confirmed 2026-05-09).
 - **Note:** M: is a mapped drive. Verify mapping is live before scripts target it; fall back to the UNC above when off-mapping.
+- **Albums:**
+  - `First Tracks/` — Suno-generated music (WAV + MP3 side by side). First album by artist "The Audiopheliac." Spotify Local Files pointed here for MP3 indexing (WAVs not indexed by Spotify, format limitation).
 
 ---
 
@@ -186,6 +188,9 @@ The D: drive is the second internal drive on GDMARCHE (original factory drive, s
 - QNAP TS-473A (hostname: NAS87828E) | IP: 192.168.1.230 | 16GB RAM
 - Drives: WD Red Plus 12TB + 10TB | balance-alb trunking across 2x 2.5GbE
 - Passive 5GbE switch (QNAP QSW-1105-5T) between router and both NAS ports
+- **Media servers installed:**
+  - MinimServer (primary) — serving `\\NAS87828E\Music` to R-N800A via UPnP/DLNA. Confirmed working.
+  - Roon Server (installed, trial not yet activated) — 14-day trial pending Gill's activation at GDMARCHE. May replace MinimServer if A/B testing favors it. Both coexist during evaluation.
 
 ### Network
 - Spectrum SAX2V1R router (192.168.1.1)
@@ -393,13 +398,18 @@ Local FLAC Files (NAS)
   > spotify_missing_tracks.txt
 ```
 
-**Daily refresh (PowerShell 5.1, run from `C:\Users\gillo\The-Audiopheliac\`):**
+**Daily refresh (run from GDMARCHE at `C:\Users\gillo\The-Audiopheliac\`):**
 ```powershell
 python automation\music_indexer.py
 python automation\spotify_pull.py
 python automation\spotify_local_match.py
 python automation\spotify_gap_report.py
 ```
+
+**Indexer exclusion rules** (in `config/music_sources.json`):
+- `excluded_path_segments: ["_Archive"]` — skips any path containing `_Archive` as a folder segment. Rule is dormant (the `_Archive\Suno_Bounces\` folder under `\\NAS87828E\Music` was emptied when WAVs moved to `First Tracks\`). Retain the rule; revisit after Roon evaluation determines final folder architecture.
+
+**Note:** The indexer must run from GDMARCHE (Windows host) because it scans `\\NAS87828E\Music` via UNC. Cannot run from Cowork sandbox.
 
 ---
 
@@ -513,7 +523,10 @@ Create the `lyrics/` and `prompts/` subdirectories under `Suno/` if they do not 
 | Clean up D:\The Audiopheliac\The-Audiopheliac\ stale files after Robocopy is running | Monitor — extras retained (QSync layer); review after several nightly runs |
 | Remove remaining VALOR worktree: GitHub Clones\The-Audiopheliac\tender-wright-900476 | Complete |
 | Canva brand kit kAHGkHrcJYU: update with Nashville Midnight palette | Open |
-| Suno first album project: concept, prompts, production | In Progress |
+| Suno "First Tracks" album: production, mastering, library organization | In Progress |
+| Re-run music_indexer.py from GDMARCHE (Rafa) to pick up First Tracks rename | Pending — index currently stale (0 tracks after sandbox misfire) |
+| Roon Server 14-day trial: activate from GDMARCHE, A/B test vs MinimServer | Pending Gill activation |
+| Signal map update (MusicCast/MinimServer confirmation) | Pending Gill playback test |
 
 ---
 
@@ -636,16 +649,18 @@ Exit with /produce or /studio. See Suno Production Environment > Integration Not
 
 ## CROSS-SURFACE ARCHITECTURE
 
-**Lane discipline: Cowork > Rafa (CLI) > Paperclip (governance + audit). No bypasses.**
+**Lane discipline: Cowork executes directly; Rafa for localhost/deploy only; Paperclip for governance. No relay through Chat.**
 
-Studio Assistant (claude.ai) is a research and validation sidebar (see "Companion project" under IDENTITY AND ROLE). Paperclip is the orchestration, governance, and audit layer (see PAPERCLIP SURFACE).
+Cowork does the work. Rafa is invoked only when the task requires localhost access (paperclip API), Windows-native PowerShell 5.1, or Cloudflare deployments. If a larger task bundles Rafa-dependent steps with Cowork-capable steps, Rafa may handle the full series to avoid context-switching overhead. Studio Assistant (Chat) is not in the workflow chain.
 
 | Surface | Persona/Tool | Role |
 |---|---|---|
-| Cowork | Audiopheliac (this CLAUDE.md governs behavior) | Primary development surface. File ops, docs, git staging, session state, Slack canvas management, MCP operations (Slack, GitHub, Ableton Knowledge). Bridges to paperclip via Rafa (Cowork cannot reach localhost). |
-| CLI | **Rafa** | Code execution, deployment, Cloudflare Pages publish, Python automation, scripts. Bridges to paperclip API (`http://localhost:3100/api`) on Cowork's behalf. Reports back to Cowork for Slack and disk-state updates. Never writes to Slack canvases directly. |
-| Chat | **Studio Assistant** (claude.ai project) | Complex research, reasoning, technical validation. Not a primary development surface. Cannot reach paperclip directly. |
+| Cowork | Audiopheliac (this CLAUDE.md governs behavior) | Primary development surface. File ops, docs, Python automation, git staging and commit, session state, Slack canvas management, MCP operations (Slack, GitHub, Ableton Knowledge). Delegates to Rafa only for localhost, PS5.1, or deploy. |
+| CLI | **Rafa** | Localhost access (paperclip REST API at `http://localhost:3100`), Windows-native PowerShell 5.1, Cloudflare Pages deployments. Reports back to Cowork. Does not independently scope work. |
+| Chat | **Studio Assistant** (claude.ai project) | Optional sidebar. Research, copy iteration, exploratory prompts. **Not a workflow participant.** Does not relay work to Cowork or Rafa, does not review or gate deliverables. Gill uses it when convenient, not as a handoff point. |
 | Paperclip | **The Audiopheliac company** (agents pending, not yet created) | Orchestration, ticketed work, governance, immutable audit log, cost control, scheduled routines. Local instance at `http://localhost:3100`. Reachable only via Rafa from non-CLI surfaces. See PAPERCLIP SURFACE. |
+
+**Anti-pattern (do not repeat):** Relaying decisions, action items, or state through Chat to Cowork or vice versa. If information originates in a Chat session, Gill pastes it into the Cowork conversation directly. No "phone tag" between surfaces.
 
 ---
 
@@ -723,11 +738,11 @@ For any paperclip issue touched this session (skip entirely if Audiopheliac pape
 
 ## SESSION TRIGGER WORDS
 
-Universal trigger words to standardize SESSION-INIT, MID-SESSION SYNC, and SESSION-CLOSE across all surfaces (Cowork / Studio Assistant / Rafa / Paperclip agents). Honored by every surface that runs against this CLAUDE.md.
+Universal trigger words to standardize SESSION-INIT, MID-SESSION SYNC, and SESSION-CLOSE across production surfaces (Cowork / Rafa / Paperclip agents). Honored by every surface that runs against this CLAUDE.md. Studio Assistant may honor triggers if Gill uses it, but it is not a production surface.
 
 | Trigger | Surfaces | Maps to | Action |
 |---|---|---|---|
-| `audio:open` (or `open`) | Cowork, Studio Assistant, Rafa, Paperclip agents | SESSION-INIT PROTOCOL | Read CLAUDE.md + Slack canvas + on-disk state + paperclip inbox; output status block; ready to work |
+| `audio:open` (or `open`) | Cowork, Rafa, Paperclip agents | SESSION-INIT PROTOCOL | Read CLAUDE.md + Slack canvas + on-disk state + paperclip inbox; output status block; ready to work |
 | `audio:sync` (or `sync`) | Cowork, Rafa | MID-SESSION SYNC PROTOCOL | Post mid-session status to `#theaudiopheliac`; refresh any in-flight on-disk state |
 | `audio:close` (or `close`) | Cowork + Rafa (Cowork orchestrates) | SESSION-CLOSE PROTOCOL | Update docs; commit; update canvas; update paperclip; report |
 
@@ -754,7 +769,7 @@ Universal trigger words to standardize SESSION-INIT, MID-SESSION SYNC, and SESSI
 
 ## PAPERCLIP SURFACE
 
-Orchestration + governance + audit. Fourth permanent surface in the cross-platform architecture, alongside Studio Assistant (Chat), Cowork, and Rafa (CLI).
+Orchestration + governance + audit. Third production surface alongside Cowork and Rafa (CLI). Studio Assistant (Chat) is a sidebar, not a production surface.
 
 **What it is:** Open-source orchestration platform running locally. Models a "company" with org chart, agents, goals, tasks, heartbeats, budgets, governance, approvals, routines, plugins, secrets, and an immutable audit log. Every mutating action is recorded. Single deployment can run multiple companies with full data isolation.
 
@@ -782,20 +797,20 @@ Orchestration + governance + audit. Fourth permanent surface in the cross-platfo
 **Network reachability, critical constraint:**
 
 - **Cowork cannot reach `localhost:3100`.** Cowork sandbox is a Linux container without access to the host's network. All paperclip reads and writes go through Rafa.
-- **Studio Assistant (Chat) cannot reach paperclip**, same constraint.
+- **Studio Assistant (Chat) cannot reach paperclip** and is not in the production workflow regardless.
 - **Rafa (CLI) hits paperclip directly**, `Invoke-RestMethod -Uri 'http://localhost:3100/api/...'` works natively from PowerShell.
 - **Paperclip's own agents** call out to MCPs and tools per their adapter config, not bound by Cowork's sandbox.
 
 **Lane discipline:**
 
 ```
-Cowork  > designs work >  Rafa (CLI)  > executes work
-   |                            |
-   +---- reads/writes paperclip via Rafa REST bridge >  Paperclip (governance + audit)
-                                                                  |
-                                                                  v
-                                              Audiopheliac agent runs heartbeats,
-                                              picks up tickets, posts work products
+Cowork  > executes work directly; delegates to Rafa for localhost/deploy only
+   |                                          |
+   +---- paperclip reads/writes via Rafa ─────+──>  Paperclip (governance + audit)
+                                                           |
+                                                           v
+                                         Audiopheliac agent runs heartbeats,
+                                         picks up tickets, posts work products
 ```
 
 **SESSION-INIT integration (referenced from SESSION-INIT PROTOCOL):**
