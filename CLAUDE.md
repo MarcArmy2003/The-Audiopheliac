@@ -111,7 +111,7 @@ The D: drive is the second internal drive on GDMARCHE (original factory drive, s
 - **UNC equivalent:** `\\NAS87828E\Music\The Audiopheliac\` (M: maps to `\\NAS87828E\Music`, confirmed 2026-05-09).
 - **Note:** M: is a mapped drive. Verify mapping is live before scripts target it; fall back to the UNC above when off-mapping.
 - **Albums:**
-  - `First Tracks/` — Suno-generated music (WAV + MP3 side by side). First album by artist "The Audiopheliac." Spotify Local Files pointed here for MP3 indexing (WAVs not indexed by Spotify, format limitation).
+  - `First Tracks/` — Suno-generated music (WAV + MP3 side by side). Early experiments and first production efforts. Spotify Local Files pointed here for MP3 indexing (WAVs not indexed by Spotify, format limitation).
 
 ---
 
@@ -509,21 +509,21 @@ Create the `lyrics/` and `prompts/` subdirectories under `Suno/` if they do not 
 
 | Item | Status |
 |------|--------|
-| Merge vinyl wishlist PR to `main` | Pending |
+| Delete stale vinyl PR branch (claude/stage-vinyl-rename-N4MQf) — content already in CLAUDE.md | Pending confirmation |
 | DHCP reservation for GDMARCHE at 192.168.1.119 | Complete |
-| Realtek HD Audio driver fix on GDMARCHE (use Dell Service Tag at dell.com/support, not generic Realtek package) | Open |
+| Focusrite Scarlett Solo hardware issue (unit itself, not driver) | Known limitation |
 | WireGuard/Tailscale necessity for VALOR remote NAS access | Unresolved |
 | Qfiling recipes for 217A working folder and VALOR repo | Deferred |
 | Amazon PA-API access (monitor Associates for qualifying sales) | Monitoring |
 | Phase 2 authorization for Astro + Cloudflare Pages scaffold | Pending decisions (see Website State) |
-| Suno profile: bio, profile photo, background image | Open |
+| Suno profile: bio, profile photo, background image | Complete |
 | Suno My Taste profile: draft and save taste descriptor (2,000 char max) | Complete |
-| Ackypaleto (Suno): build out project with Kevin (Backlog on Suno) | Active |
+| Ackypaleto (Suno): collaborative project with Kevin | Backlog (not tracked here) |
 | Set up Robocopy job: C:\Users\gillo\The-Audiopheliac > D:\The Audiopheliac\The-Audiopheliac\ (nightly /MIR /XO) | Complete |
 | Clean up D:\The Audiopheliac\The-Audiopheliac\ stale files after Robocopy is running | Monitor — extras retained (QSync layer); review after several nightly runs |
 | Remove remaining VALOR worktree: GitHub Clones\The-Audiopheliac\tender-wright-900476 | Complete |
 | Canva brand kit kAHGkHrcJYU: update with Nashville Midnight palette | Open |
-| Suno "First Tracks" album: production, mastering, library organization | In Progress |
+| Suno "First Tracks": early experiments, library indexed | Active |
 | Re-run music_indexer.py from GDMARCHE (Rafa) to pick up First Tracks rename | Pending — index currently stale (0 tracks after sandbox misfire) |
 | Roon Server 14-day trial: activate from GDMARCHE, A/B test vs MinimServer | Pending Gill activation |
 | Signal map update (MusicCast/MinimServer confirmation) | Pending Gill playback test |
