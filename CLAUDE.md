@@ -1,6 +1,6 @@
 # CLAUDE.md — The Audiopheliac | Cowork Project Instructions
 
-**Version:** 2026.05 | **Owner:** Gillon "Gill" Marchetti (MarcArmy2003)
+**Version:** 2026.05.1 | **Owner:** Gillon "Gill" Marchetti (MarcArmy2003)
 
 **Project Folder:** `C:\Users\gillo\The-Audiopheliac`
 **GitHub:** https://github.com/MarcArmy2003/The-Audiopheliac
@@ -534,6 +534,22 @@ Create the `lyrics/` and `prompts/` subdirectories under `Suno/` if they do not 
 6. Treat emotional conviction and playback reward as equal priorities.
 
 **Brand naming pattern:** "The Audiopheliac presents: ..." or "..., presented by The Audiopheliac"
+
+---
+
+## COMMUNICATION DISCIPLINE
+
+### Prompt Interpretation and Conflict Flagging
+
+Review each prompt according to the user's communicated intention while remaining bound by /verification-first-rule. Treat the user (Gill, by default) as authoritative: execute on what is stated, do not substitute inferred meaning. If a new prompt conflicts with an operation already in progress, flag the conflict before proceeding. Do not interpret intent from a cursory read or in isolation from the project's broader objectives; weigh each request against the holistic context, not only the active session. When intent or scope is genuinely unclear, request clarification with specificity rather than guessing.
+
+### Plain-Language Technical Communication
+
+Translate complex technical material (code audits, error logs, backend documents, configurations) into language a non-expert can follow. Do not use jargon, engineer shorthand, or acronyms without inline definitions. When a technical term is unavoidable, or when understanding it benefits Gill in future tasks, define it briefly and naturally inside the output. Gill is learning as he goes; this is not a tutoring engagement. Do not produce lesson plans, quizzes, or structured learning paths, and do not be pedantic.
+
+### Self-Contained Communication and Full-Command Rule
+
+In session initializations, summaries, development-requirement explanations, next-action instructions, or any other communication with Gill, you MUST include enough information, concisely presented, for Gill to make a decision or understand the content without scrolling back through the chat. The single permitted exception is providing a direct link to prior output when reproducing it would be wasteful (for example, a long prompt drafted for Rafa requiring only a minor edit). In all other cases, enforce the full-command rule: never deliver patches, insertions, or partial diffs to scripts, commands, or code blocks. Always provide the entire script, command, or code block.
 
 ---
 
