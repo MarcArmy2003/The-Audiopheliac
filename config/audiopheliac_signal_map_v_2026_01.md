@@ -1,6 +1,7 @@
-# 🎛️ Audiopheliac System Map – v2026.01 (Full Home A/V + Network Topology)
+# 🎛️ Audiopheliac System Map – v2026.05 (Full Home A/V + Network Topology)
 **Curated by Gillon "Gill" Marchetti (MarcArmy2003)**  
-Version: 2026.01 | Updated: January 19, 2026  
+Version: 2026.05 | Updated: May 11, 2026  
+**Change (2026-05-11):** Focusrite Scarlett Solo 4th Gen failed (fried). M-Audio AIR Hub (AIRXHUB) promoted to primary monitoring/playback interface. Recording capability offline pending input-capable replacement.
 
 ---
 
@@ -16,9 +17,10 @@ Version: 2026.01 | Updated: January 19, 2026
      │       ├──► [Yamaha R-N800A Receiver]
      │       ├──► [NVIDIA Shield Pro]
      │       └──► [TP-Link TL-SG108E 5Gb Switch (Home Studio Subnet)]
-     │                 ├──► [Focusrite Scarlett Solo / DAW PC]
-     │                 ├──► [AIRHub USB DAC / Spark 40 / Casio Privia PX-870]
+     │                 ├──► [Dell Precision 7540 DAW PC → M-Audio AIR Hub (USB-C to USB-A on WD19DCS)]
+     │                 ├──► [AIR Hub powered USB-A hub: LP120, Spark 40, Casio Privia PX-870]
      │                 └──► [Schiit SYS + Schiit Mani 2 Signal Chain]
+     │                       (Focusrite Scarlett Solo 4th Gen — FAILED 2026-05-11, removed from chain)
      │
      ├──► [Samsung NU6950 TV (Wi-Fi 6)]
      ├──► [Amazon Echo]
@@ -92,26 +94,36 @@ Version: 2026.01 | Updated: January 19, 2026
      ├──── Input 1: Schiit Mani 2 (Turntable)
      ├──── Input 2: **Available for 1Mii RX #1** (not yet connected)
      │
-     ├──► [Focusrite Scarlett Solo (USB-C to DAW PC)]
-     ├──► [AIRHub USB DAC]
-     │        ├──► [Casio Privia PX-870 (USB-B to A)]
-     │        └──► [Positive Grid Spark 40 (USB-B to A)]
-     │
      ├──► [JBL LSR310S Subwoofer] (TRS balanced)
      │        └──► [Yamaha HS7 Monitors L/R] (TRS balanced out)
      │
      └──► [SVS SoundPath Wireless RX] (Optional alternate input)
 
 [Dell Precision 7540 Workstation]
-     ├──► [Focusrite Scarlett Solo]
+     │
+     └──► [M-Audio AIR Hub (AIRXHUB)] (USB-C device → USB-A on WD19DCS dock)
+              │  Primary monitoring/playback interface (24-bit/96kHz, output only)
+              ├──► Balanced 1/4" TRS L/R → Yamaha HS7 L/R (via JBL LSR310S TRS pass-through)
+              ├──► 1/4" Headphone Out (independent level) → Audio-Technica ATH-M50x
+              └──► Powered USB-A hub (3 ports, external PSU required):
+                       ├──► Audio-Technica AT-LP120XUSB (digital audio out)
+                       ├──► Positive Grid Spark 40
+                       └──► Casio Privia PX-870
+
+[Dell Precision 7540 Workstation]
      ├──► [QNAP NAS Access via 2.5GbE LAN] (NAS physically in Family Room)
      └──► [External SSD / Backup Drives]
+
+[FAILED — Removed from chain 2026-05-11]
+     Focusrite Scarlett Solo 4th Gen (S/N S1XJ7HX57AF107)
+     Status: Fried, no signal. Warranty attempt pending (receipt missing, assume lost).
 ```
 
 **Studio Highlights:**
-- Balanced TRS chain from sub → HS7 monitors.
-- Integrated USB-AIRHub handles Spark 40, Casio keyboard, and recording I/O.
-- Focusrite Scarlett Solo (4th Gen, 2025) for DAW input/output.
+- Balanced TRS chain from sub → HS7 monitors (unchanged).
+- M-Audio AIR Hub is the **primary monitoring/playback interface**, replacing the failed Focusrite Solo.
+- AIR Hub is **output only** (no ADC). Recording capability is offline until an input-capable interface is sourced.
+- AIR Hub's powered USB-A hub consolidates LP120, Spark 40, and Casio Privia into one host port on the WD19DCS dock.
 - Connected via TP-Link TL-SG108E switch to QNAP NAS for fast session storage.
 - **AT-LP120XUSB** with stock AT95E cartridge (AT-VM95SH Shibata on backorder).
 - **Schiit SYS Input 2** available for 1Mii RX #1 (Family Room wireless vinyl feed — not yet connected).
@@ -122,8 +134,10 @@ Version: 2026.01 | Updated: January 19, 2026
 | RCA | Analog | LP120 → Mani → SYS | Vinyl input chain |
 | RCA | Analog | 1Mii RX #1 → SYS Input 2 | Family Room wireless feed |
 | TRS | Balanced Analog | SYS → Sub → Monitors | Studio playback |
-| USB-C | Digital | Scarlett → Workstation | Audio interface |
-| USB-B/A | Digital | Spark, Casio → AIRHub | Instrument input |
+| USB-C → USB-A | Digital | AIR Hub → WD19DCS (workstation dock) | Primary monitoring/playback interface |
+| 1/4" TRS (balanced) | Analog | AIR Hub → JBL → HS7 L/R | DAW playback to monitors |
+| 1/4" TRS | Analog | AIR Hub Headphone Out → ATH-M50x | Independent headphone monitoring |
+| USB-A | Digital | LP120, Spark 40, Casio Privia → AIR Hub powered hub | Peripheral consolidation |
 | Ethernet | Cat6 | Workstation → NAS | Data & project storage |
 
 ---
@@ -218,7 +232,7 @@ Version: 2026.01 | Updated: January 19, 2026
 | Zone | Function | Core Hardware |
 |------|-----------|----------------|
 | Family Room | Cinema + Audiophile Stereo + **Wireless Hub** | Bose Lifestyle 650, Yamaha R-N800A, Polk ES60, SVS SB-1000 Pro, Rolls MB15b, 1Mii TX |
-| Home Office / Studio | Recording + Monitoring + **Wireless RX** | AT-LP120XUSB, Schiit Stack, Focusrite, HS7, JBL LSR310S, 1Mii RX #1 |
+| Home Office / Studio | Monitoring + **Wireless RX** (recording offline) | AT-LP120XUSB, Schiit Stack, M-Audio AIR Hub (primary), HS7, JBL LSR310S, 1Mii RX #1. Focusrite Solo failed 2026-05-11. |
 | Garage / Gym | Standalone Audio + **Wireless RX** | Bose 3·2·1 System, 1Mii RX #2, Amazon Echo |
 | Lanai | Smart Playback | Amazon Echo, Samsung UN65U7900FD, Singing Machine, SVS Bluetooth RX |
 | Network Core | Data Backbone | Spectrum Modem, Wi-Fi 6E Router, QNAP NAS, Switches |

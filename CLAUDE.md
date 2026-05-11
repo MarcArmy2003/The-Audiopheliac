@@ -161,7 +161,8 @@ The D: drive is the second internal drive on GDMARCHE (original factory drive, s
 - DHCP reservation at 192.168.1.119 confirmed (toggle set in Spectrum router admin 2026-05-05)
 
 ### Audio Interface
-- Focusrite Scarlett Solo Gen 4 (ASIO driver; simultaneous WDM + ASIO supported)
+- **Primary (2026-05-11):** M-Audio AIR Hub (AIRXHUB) — USB-C device to USB-A on WD19DCS dock; 24-bit/96kHz DAC; 2× balanced 1/4" TRS monitor outs; 1× 1/4" headphone (independent level); 3× powered USB-A hub (LP120, Spark 40, Casio Privia); M-Audio AIR Hub ASIO driver. **Output only — no ADC.** Recording capability offline until input-capable replacement is sourced.
+- **Failed:** Focusrite Scarlett Solo Gen 4 (S/N S1XJ7HX57AF107) — fried 2026-05-11, removed from chain. Warranty attempt pending without receipt; assume unrecoverable.
 
 ### Office Studio Monitors
 - Yamaha HS7 (pair) + JBL LSR310S subwoofer
@@ -241,10 +242,11 @@ GDMARCHE (Spotify / streaming)
 Rolls MX28 Mini-Mix VI
   > Yamaha HS7 monitors + JBL LSR310S subwoofer
 
-Headphone monitoring: Scarlett Solo headphone output preferred for all
-streaming and DAW listening. MX28 headphone output reserved for multi-source
-blended monitoring only. Direct Monitor switch stays off for all playback;
-on only for live zero-latency recording.
+Headphone monitoring: M-Audio AIR Hub 1/4" headphone output (independent
+level control) preferred for all streaming and DAW listening. MX28 headphone
+output reserved for multi-source blended monitoring only. Note: AIR Hub has
+no Direct Monitor switch and no inputs; live zero-latency recording is
+unavailable until a replacement interface with ADC is sourced.
 ```
 
 ### Lanai
@@ -307,7 +309,7 @@ C:\Users\gillo\The-Audiopheliac   (live repo — edit here)
 - **DAWs:** Ableton Live 12 Suite (default), Audacity (editing)
 - **AI Music:** Suno (Premier Annual) — see Platform Credentials and Suno Production Environment
 - **Default session:** 48 kHz / 24-bit unless specified otherwise
-- **Driver:** Focusrite ASIO (simultaneous WDM + ASIO supported)
+- **Driver:** M-Audio AIR Hub ASIO (current as of 2026-05-11). Focusrite ASIO retained on system but no longer in active use (Solo hardware failed).
 - **Ableton paths:**
   - Cache: `D:\Ableton Cache`
   - User Library: `D:\Ableton User Library`
@@ -511,7 +513,8 @@ Create the `lyrics/` and `prompts/` subdirectories under `Suno/` if they do not 
 |------|--------|
 | Delete stale vinyl PR branch (claude/stage-vinyl-rename-N4MQf) — content already in CLAUDE.md | Pending confirmation |
 | DHCP reservation for GDMARCHE at 192.168.1.119 | Complete |
-| Focusrite Scarlett Solo hardware issue (unit itself, not driver) | Known limitation |
+| Focusrite Scarlett Solo failed 2026-05-11 (fried, no signal); receipt missing — warranty likely unrecoverable | Open: attempt warranty claim, then dispose |
+| Source replacement audio interface with ADC (mic/instrument inputs) — recording offline | Open |
 | WireGuard/Tailscale necessity for VALOR remote NAS access | Unresolved |
 | Qfiling recipes for 217A working folder and VALOR repo | Deferred |
 | Amazon PA-API access (monitor Associates for qualifying sales) | Monitoring |
@@ -582,7 +585,7 @@ Apply in order for every technical question:
 ## GAIN STAGING PRINCIPLES
 
 - Digital domain controls (Spotify, Windows volume) stay at maximum to preserve resolution through the DAC.
-- Analog controls (Scarlett output, MX28 Line levels, HS7 gain) set once for healthy levels.
+- Analog controls (AIR Hub TRS output, MX28 Line levels, HS7 gain) set once for healthy levels.
 - MX28 Master is the sole daily volume control.
 - Boost-then-distribute: amplify once (Rolls MB15b), then split. Splitting before boosting causes weak signal across all zones.
 - Each gear addition must solve the root problem, not patch a symptom created by a prior purchase.
@@ -894,6 +897,8 @@ These do not duplicate each other. Each has its lane.
 ---
 
 ## HISTORY
+
+**2026-05-11:** Focusrite Scarlett Solo 4th Gen failed (fried; no signal). M-Audio AIR Hub (AIRXHUB) promoted from spare to primary monitoring/playback interface. AIR Hub is output only (24-bit/96kHz DAC, 2× balanced TRS, 1× independent-level headphone, 3× powered USB-A hub for LP120, Spark 40, Privia). Recording capability offline pending input-capable replacement. Solo receipt missing, warranty attempt planned but assumed lost. Inventory bumped to v2026.05; signal map header bumped to v2026.05. Updated: Audio Interface section, Office Studio headphone monitoring, Software/DAW driver, Open Action Items, Gain Staging Principles. **Not updated (flagged for verification):** Office Studio signal chain still shows MX28 as central hub; SVS SoundPath kit still flagged disconnected/stored while inventory has TX/RX active in Family Room → Lanai.
 
 **2026-05-06:** CLAUDE.md upgraded to adopt the universal session-trigger plus paperclip integration pattern (canonical model: VeteranIntel.org CLAUDE.md §§9, 19, 20, 21, 31, 32). Added: CROSS-SURFACE ARCHITECTURE, SESSION-INIT PROTOCOL, MID-SESSION SYNC PROTOCOL, SESSION-CLOSE PROTOCOL, SESSION TRIGGER WORDS, PAPERCLIP SURFACE, this HISTORY section. Local prefix: `audio:`. Paperclip company "The Audiopheliac" not yet created, flagged as next setup step. All existing project-specific content (signal chains, hardware, listening profile, Suno production environment, RAFA pre-authorization, etc.) preserved without modification.
 
