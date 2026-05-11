@@ -3,13 +3,13 @@
        alt="The Audiopheliac Primary Logo" width="300" />
 </p>
 
-# AV_Master_Inventory_v2026.05
+# AV_Master_Inventory_v2026.05.1
 
 **The Audiopheliac – Comprehensive AV, Studio & Network Inventory**  
 Author & Maintainer: *Gillon "Gill" Marchetti (MarcArmy2003)*  
-Version: v2026.05  
+Version: v2026.05.1  
 Date: May 11, 2026  
-Last change: Focusrite Solo failed; M-Audio AIR Hub promoted to primary monitoring interface.
+Last change: Reconciled stale state — added Rolls MX28 to Studio; promoted 1Mii TX/RX system to ACTIVE; moved 1Mii RX #2 from Garage to Lanai; retired SVS SoundPath TX/RX to reserve (removed from chains months ago); reaffirmed AIR Hub as primary monitoring interface.
 
 ---
 
@@ -37,8 +37,8 @@ Last change: Focusrite Solo failed; M-Audio AIR Hub promoted to primary monitori
 | Receiver               | [Yamaha R-N800A](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/docs/Processing_Hardware.md)               | YN8A23090154                      | Apr 2024      | $950              | Network stereo receiver with MusicCast, DAC, Wi-Fi, and AirPlay 2         |
 | NAS                    | [QNAP TS-473A](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/docs/QNAP_TS473A_Specs.md)                   | NAS87828E                         | Oct 2024      | $900              | 4-bay NAS; 16GB RAM; 22TB total (WD Red drives); in entertainment center  |
 | Signal Converter       | Rolls MB15b ProMatch 2-Way Stereo Converter                                                                            | TBD                               | Jan 16, 2026  | $55               | Consumer ↔ Pro level conversion; RCA ↔ XLR balanced; passive; Made in USA |
-| Wireless TX (1Mii)     | 1Mii RT5066R2 Wireless Audio Transmitter                                                                               | TBD                               | Jan 16, 2026  | $25               | 2.4GHz digital; ~20ms latency; 320ft range; RCA + 3.5mm I/O               |
-| Wireless TX (SVS)      | SVS SoundPath Wireless Audio Adapter TX                                                                                | TBD                               | Oct 2025      | $100              | Feeds Lanai RX; connected to Rolls MB15b to boost Yamaha pre-out signal   |
+| Wireless TX (1Mii)     | 1Mii RT5066R2 Wireless Audio Transmitter                                                                               | TBD                               | Jan 16, 2026  | $25               | **ACTIVE** — Yamaha PRE OUT → Rolls MB15b → 1Mii TX. Broadcasts to RX in Office Studio + RX on Lanai. 2.4GHz digital; ~20ms latency; 320ft range. |
+| Wireless TX (SVS)      | SVS SoundPath Wireless Audio Adapter TX                                                                                | TBD                               | Oct 2025      | $100              | **REMOVED FROM CHAIN** (taken offline months ago). Replaced by 1Mii TX. Stored as reserve.                |
 | Turntable              | Technics SL-1200MK2                                                                                                    | GE4CQ71315                        | Pre-owned     | $800              | Direct drive; Ortofon Blue cartridge installed                            |
 | Phono Preamp           | Pro-Ject Phono Box S2 Ultra                                                                                            | 25A001611                         | Oct 2025      | $266              | Silver finish; Made in Slovakia                                           |
 | Speakers               | Polk ES60 Towers (Pair)                                                                                                | ES60L-PO2020004 / ES60R-PO2020005 | Jul 2025      | $640              | Purchased new; excellent condition                                        |
@@ -70,20 +70,27 @@ Last change: Focusrite Solo failed; M-Audio AIR Hub promoted to primary monitori
 ```
 Technics SL-1200MK2 (Ortofon Blue) → Pro-Ject Phono Box S2 Ultra
      │
-     ├──► RCA Output 1 → Yamaha R-N800A Line In 1 (local playback)
-     │
-     └──► RCA Output 2 → Rolls MB15b → SVS SoundPath TX → Lanai RX
+     └──► Yamaha R-N800A Line In 1 (local playback)
 
 Samsung NU6950 (Optical 1) → Yamaha R-N800A
 Yamaha R-N800A (Sub Out) → SVS SB-1000 Pro
 Yamaha R-N800A (Speaker A) → Polk ES60 Towers
 Ethernet → QNAP TS-473A (MusicCast / DLNA / AirPlay 2)
+
+Yamaha R-N800A (Line Out / PRE OUT)
+     │
+     └──► Rolls MB15b (boost)
+              │
+              └──► 1Mii RT5066R2 TX → 2.4GHz wireless
+                       ├──► 1Mii RX (Office Studio) → Rolls MX28
+                       └──► 1Mii RX (Lanai) → Lanai playback
 ```
 
-**1Mii RT5066R2 System Status:**
-- **TX + 2× RX purchased** (Jan 16, 2026) — **NOT YET CONNECTED**
-- **Planned integration:** Multi-room wireless audio to Studio + Garage
-- **Connection method:** TBD (pending signal routing analysis)
+**1Mii RT5066R2 System Status (2026-05-11):**
+- **ACTIVE.** TX in Family Room sources Yamaha Line Out via Rolls MB15b boost.
+- RX #1 lives in Office Studio, feeds Rolls MX28 Mini-Mix VI as one of its inputs.
+- RX #2 lives on Lanai (NOT Garage, despite previous inventory placement) feeding Lanai playback.
+- Replaces the SVS SoundPath TX/RX chain, which was removed months ago.
 
 ---
 
@@ -93,8 +100,9 @@ Ethernet → QNAP TS-473A (MusicCast / DLNA / AirPlay 2)
 | -------------------- | --------------------------------------------------------------------------------------------------------------------------- | ---------------------- | ------------- | ----------------- | ------------------------------------------------------------ |
 | Turntable            | Audio-Technica AT-LP120XUSB                                                                                                 | 243402497              | Jan 2025      | $200              | Direct drive; stock AT95E cartridge (green); AT-VM95SH Shibata on backorder |
 | Audio Interface      | [Focusrite Scarlett Solo 4th Gen](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/docs/Processing_Hardware.md)   | S1XJ7HX57AF107         | Feb 2025      | $0                | **FAILED (2026-05-11)** — Unit fried; no signal. Warranty likely unrecoverable (receipt missing). Replacement TBD. |
-| Wireless RX          | 1Mii RT5066R2 Wireless Audio Receiver #1                                                                                    | TBD                    | Jan 16, 2026  | $23               | **NOT YET CONNECTED** — Planned for Family Room vinyl streaming via Schiit SYS Input 2 |
-| Audio Hub / Monitor I/F | M-Audio AIR Hub (AIRXHUB)                                                                                                | TBD                    | Apr 2024      | $80               | **ACTIVE — Primary monitoring/playback interface** (replaces Solo, monitoring only). USB-C device to USB-A host (WD19DCS). 24-bit/96kHz DAC; 2× balanced 1/4" TRS monitor outs; 1× 1/4" headphone w/ independent level; 3× USB-A powered hub (Privia, Spark 40, LP120). Output-only, no ADC. |
+| Wireless RX          | 1Mii RT5066R2 Wireless Audio Receiver #1                                                                                    | TBD                    | Jan 16, 2026  | $23               | **ACTIVE** — Receives Family Room wireless feed; routed to Rolls MX28 Mini-Mix VI as a line input. |
+| Audio Hub / Monitor I/F | M-Audio AIR Hub (AIRXHUB)                                                                                                | TBD                    | Apr 2024      | $80               | **ACTIVE — Primary monitoring/playback interface** (replaces Solo, monitoring only). USB-C device to USB-A host (WD19DCS). 24-bit/96kHz DAC; 2× balanced 1/4" TRS monitor outs; 1× 1/4" headphone w/ independent level; 3× USB-A powered hub (Privia, Spark 40, LP120). Output-only, no ADC. TRS L/R feeds Rolls MX28 as the DAW source input. |
+| Active Mixer         | Rolls MX28 Mini-Mix VI                                                                                                      | TBD                    | Pre-2026      | $50               | **ACTIVE — Central studio mixer.** Inputs: (1) AIR Hub TRS L/R (Dell Precision DAW/playback), (2) AT-LP120XUSB line out, (3) 1Mii RX #1 (Family Room wireless). Master → JBL LSR310S TRS in → Yamaha HS7 L/R. Used for mixing during recording sessions and grabbing loops. Center-negative PSU — use included power supply only. |
 | Phono Preamp         | Schiit Mani II                                                                                                              | CI182351284            | Jul 2025      | $213              | Confirmed DIP config default; input available                |
 | Passive Preamp       | Schiit SYS                                                                                                                  | SYS1902435             | Oct 2025      | $64               | Line controller; Input 1 = Mani II; Input 2 = **available for 1Mii RX #1** |
 | Subwoofer            | JBL LSR310S                                                                                                                 | DYA007-34294           | Oct 2025      | $260              | Operational, balanced TRS in/out verified                    |
@@ -112,19 +120,27 @@ Ethernet → QNAP TS-473A (MusicCast / DLNA / AirPlay 2)
 ### 🔊 Studio Monitoring Chain (Current Configuration)
 
 ```
-Dell Precision 7540 (DAW / playback)
+Source 1: Dell Precision 7540 (DAW / playback / streaming)
      │
      └──► M-Audio AIR Hub (USB-C → USB-A on WD19DCS)
-              ├──► Balanced 1/4" TRS L/R → Yamaha HS7 L/R (via JBL LSR310S TRS pass-through)
-              └──► 1/4" Headphone Out (independent level) → ATH-M50x
+              ├──► Balanced 1/4" TRS L/R ──► Rolls MX28 Mini-Mix VI (line input)
+              └──► 1/4" Headphone Out (independent level) ──► ATH-M50x (direct monitor)
 
-AT-LP120XUSB (AT95E stock) → Schiit Mani II → Schiit SYS (Input 1)
-Schiit SYS Input 2 → **Available for 1Mii RX #1** (not yet connected)
-Schiit SYS → JBL LSR310S (TRS balanced in)
-JBL LSR310S → Yamaha HS7 L/R (TRS balanced out)
+Source 2: Audio-Technica AT-LP120XUSB (line out)
+     │
+     └──► Rolls MX28 Mini-Mix VI (line input)
 
-AIR Hub Powered USB-A Hub:
-  • Audio-Technica AT-LP120XUSB (USB-A, digital audio out)
+Source 3: 1Mii RT5066R2 RX #1 (Family Room wireless feed)
+     │
+     └──► Rolls MX28 Mini-Mix VI (line input)
+
+Rolls MX28 Mini-Mix VI (Master Out, TRS balanced)
+     │
+     └──► JBL LSR310S (TRS balanced in)
+              └──► Yamaha HS7 L/R (TRS balanced out)
+
+AIR Hub Powered USB-A Hub (USB peripherals only, no audio routing):
+  • Audio-Technica AT-LP120XUSB (USB-A — host-side digital, separate from line-out audio path)
   • Positive Grid Spark 40 (USB-A)
   • Casio Privia PX-870WE (USB-A)
 ```
@@ -132,10 +148,11 @@ AIR Hub Powered USB-A Hub:
 **Interface Status (2026-05-11):**
 - Focusrite Scarlett Solo 4th Gen — **FAILED**, removed from active chain. Replacement TBD.
 - M-Audio AIR Hub — **PRIMARY** monitoring/playback path. Output only (no ADC).
+- Rolls MX28 Mini-Mix VI — **CENTRAL MIXER**, sums DAW + LP120 + 1Mii RX to monitor chain. Used for recording-session mixing and loop capture.
 - Recording capability is offline until a replacement interface with mic/instrument inputs is sourced.
 
-**Planned Integration:**
-- 1Mii RX #1 → Schiit SYS Input 2 (Family Room wireless vinyl feed)
+**Open verification (Schiit Mani II + Schiit SYS):**
+The Schiit Mani II phono preamp and Schiit SYS passive preamp remain listed in inventory. Their role in the current chain is unclear since LP120 now feeds MX28 (line out, internal phono preamp engaged) and the 1Mii RX feeds MX28 directly. The Schiit pair may be inactive in the studio, or may be retained for an alternate LP120 routing. Confirm before next inventory revision.
 
 ---
 
@@ -144,7 +161,6 @@ AIR Hub Powered USB-A Hub:
 | Device         | Make / Model              | Serial Number | Purchase Date | Est. Resale (USD) | Notes                                          |
 | -------------- | ------------------------- | ------------- | ------------- | ----------------- | ---------------------------------------------- |
 | TV             | Vizio 22" LED             | TBD           | Pre-owned     | $50               | Basic HD display                               |
-| Wireless RX    | 1Mii RT5066R2 Receiver #2 | TBD           | Jan 16, 2026  | $23               | **NOT YET CONNECTED** — Planned for wireless Family Room audio integration |
 | Smart Speaker  | Amazon Echo (4th Gen)     | A4205FQ13312  | May 2024      | $60               | Relocated from Lanai; Alexa voice control      |
 
 ### 🔊 Garage Signal Chain (Current Configuration)
@@ -153,8 +169,7 @@ AIR Hub Powered USB-A Hub:
 Amazon Echo (4th Gen) → Bluetooth / Wi-Fi Playback
 ```
 
-**Planned Integration:**
-- 1Mii RX #2 → Future wireless Family Room audio feed
+**Note (2026-05-11):** Prior inventory placed a second 1Mii RT5066R2 RX in the Garage. The unit actually lives on the Lanai (see Lanai section). No 1Mii RX in the Garage at this time.
 
 ---
 
@@ -169,7 +184,7 @@ Amazon Echo (4th Gen) → Bluetooth / Wi-Fi Playback
 | HDMI Splitter     | REI UHD-PRO102 4K HDMI Splitter (1 in 2 out)                      | TBD           | Dec 2024      | $35               | Auto downscaling; mirrors Chromecast to TV + Karaoke   |
 | Mini Upscaler     | Mini AV to HDMI Upscaler (1080p)                                  | TBD           | Dec 2024      | $20               | Upscales Bose video output back to Samsung HDMI 3      |
 | Media Streamer    | Google Chromecast (4K)                                            | TBD           | Pre-owned     | $30               | Primary streaming device                               |
-| Wireless RX       | SVS SoundPath Wireless RX                                         | TBD           | Oct 2025      | $100              | Receives Yamaha pre-out via SVS TX (Family Room)       |
+| Wireless RX       | 1Mii RT5066R2 Wireless Audio Receiver #2                          | TBD           | Jan 16, 2026  | $23               | **ACTIVE** — Receives Family Room wireless feed via 1Mii TX (Yamaha Line Out boosted by Rolls MB15b). Relocated from prior Garage placement. |
 | Smart Speaker     | Bose SoundTouch Genius                                            | TBD           | Pre-owned     | $60               | Portable; occasional use                               |
 
 ### 🔊 Lanai Signal Chain (per lanai_signal_config.py)
@@ -200,10 +215,11 @@ Amazon Echo (4th Gen) → Bluetooth / Wi-Fi Playback
      │
      └──► [Samsung HDMI 3]
 
-[SVS SoundPath Wireless RX]
+[1Mii RT5066R2 RX #2]
      │
-     └──► Connected to SVS TX (Family Room, fed by Rolls MB15b)
-          Provides wireless Yamaha pre-out audio to Lanai
+     └──► Receives 2.4GHz wireless from 1Mii TX (Family Room, Yamaha Line Out via Rolls MB15b boost)
+          Provides wireless Yamaha audio to Lanai playback.
+          Replaces former SVS SoundPath RX (removed from chain months ago; stored as reserve).
 ```
 
 ---
@@ -315,6 +331,8 @@ Amazon Echo (4th Gen) → Bluetooth / Wi-Fi Playback
 | ----------------------- | ---------------------------------- | -------------------- | ------------- | ----------------- | ----------------------------------------------- |
 | Mesh Router (Backup)    | Google Nest WiFi Router + 2 Points | 18E3C4R0B0414K59     | 2022          | $150              | Replaced by Spectrum Wi-Fi 6E; stored as backup |
 | Failed Audio Interface  | Focusrite Scarlett Solo 4th Gen    | S1XJ7HX57AF107       | Feb 2025      | $0                | **FAILED 2026-05-11.** Unit fried. Receipt not located; warranty likely unrecoverable. Retain pending warranty attempt, then dispose. |
+| Wireless TX (SVS, reserve)| SVS SoundPath Wireless Audio Adapter TX | TBD             | Oct 2025      | $100              | **OUT OF CHAIN** (Family Room) — taken offline months ago. Replaced by 1Mii TX. Held as reserve. |
+| Wireless RX (SVS, reserve)| SVS SoundPath Wireless RX        | TBD                  | Oct 2025      | $100              | **OUT OF CHAIN** (Lanai) — taken offline months ago. Replaced by 1Mii RX #2. Held as reserve. |
 | Broken Laptop           | Dell Latitude E6430                | 7PK8Y12              | 2013          | $0                | Non-functional; board-level repair required     |
 
 | Device           | Condition | Location | Next Action                              |
@@ -341,7 +359,8 @@ Amazon Echo (4th Gen) → Bluetooth / Wi-Fi Playback
 
 | Version      | Date           | Summary                                                                                                                                                                                                          |
 | ------------ | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **v2026.05** | May 11, 2026   | **CHANGES:** Focusrite Scarlett Solo 4th Gen marked **FAILED** (fried; no signal). Removed from active Studio chain; moved to Stored/Inactive. Receipt missing — warranty attempt planned but assumed lost. M-Audio AIR Hub (AIRXHUB) promoted from spare to **PRIMARY** monitoring/playback interface. Documented full AIR Hub spec: USB-C device to USB-A host (WD19DCS), 24-bit/96kHz DAC, 2× balanced 1/4" TRS monitor outs, 1× 1/4" headphone (independent level), 3× powered USB-A hub ports (LP120, Spark 40, Privia). AIR Hub is output-only (no ADC); recording capability offline until input-capable replacement is sourced. Updated Studio Monitoring Chain and Network Topology accordingly. |
+| **v2026.05.1** | May 11, 2026 | **STALENESS RECONCILIATION (per user verification):** (1) Added Rolls MX28 Mini-Mix VI to Home Office / Studio table — central studio mixer with three line inputs (AIR Hub TRS L/R, AT-LP120XUSB line out, 1Mii RX #1). (2) Rebuilt Studio Monitoring Chain to route AIR Hub + LP120 + 1Mii RX → MX28 → JBL LSR310S → HS7. (3) Promoted 1Mii RT5066R2 TX (Family Room) and both RXes to ACTIVE status. (4) Moved 1Mii RT5066R2 RX #2 from Garage table to Lanai table — actually lives on Lanai. (5) Retired SVS SoundPath TX and RX from active chains to Stored / Inactive — removed from signal chain months ago, replaced by 1Mii system. (6) Updated Family Room signal chain to show Yamaha Line Out → Rolls MB15b → 1Mii TX → RX in Office Studio + RX on Lanai. (7) Updated Lanai signal chain to replace SVS RX block with 1Mii RX block. (8) Removed obsolete "Planned Integration" footers for 1Mii (now actually integrated). **Open verification:** Schiit Mani II / Schiit SYS role in current Studio chain is unclear with LP120 feeding MX28 directly. |
+| v2026.05     | May 11, 2026   | **CHANGES:** Focusrite Scarlett Solo 4th Gen marked **FAILED** (fried; no signal). Removed from active Studio chain; moved to Stored/Inactive. Receipt missing — warranty attempt planned but assumed lost. M-Audio AIR Hub (AIRXHUB) promoted from spare to **PRIMARY** monitoring/playback interface. Documented full AIR Hub spec: USB-C device to USB-A host (WD19DCS), 24-bit/96kHz DAC, 2× balanced 1/4" TRS monitor outs, 1× 1/4" headphone (independent level), 3× powered USB-A hub ports (LP120, Spark 40, Privia). AIR Hub is output-only (no ADC); recording capability offline until input-capable replacement is sourced. Updated Studio Monitoring Chain and Network Topology accordingly. |
 | v2026.04     | Jan 19, 2026   | **CHANGES:** Confirmed Technics SL-1200MK2 in Family Room (Ortofon Blue). Moved AT-LP120XUSB to Studio (stock AT95E; AT-VM95SH Shibata on backorder, $219). Moved QNAP TS-473A to Family Room. Added Rolls MB15b, 1Mii RT5066R2 TX (Family Room), 1Mii RX #1 (Studio), 1Mii RX #2 (Garage). Moved Bose 3·2·1 to Lanai. Moved Amazon Echo to Garage. Added SVS SoundPath TX/RX routing (Family Room → Lanai). Added REI UHD-PRO102 HDMI splitter, J-Tech AE4KA, Mini AV upscaler to Lanai signal chain. Updated signal chains for all zones. Removed Blue Yeti mic, Rode boom arm, Zoom pedal (fabrications). **PENDING:** 1Mii connection method, AT-VM95SH delivery. |
 | v2026.03     | Jan 16, 2026   | Relocated AT-LP120XUSB to Family Room (Ortofon Blue). Updated Casio PX-870WE serial. Added TP-Link TL-SG105 switch, APC Back-UPS 1000, Spectrum router SAX2V1R. Added Victrola VTA-71 to Bedrooms. Validated Seagull SC-6W and Pro-Ject serials. Updated Yamaha R-N800A speaker config (Zone A only). **PENDING:** Technics SL-1200MK2 location. |
 | v2026.02     | Jan 16, 2026   | Added: MacBook Pro (2012 Kids' Unit), M-Audio Air\|HUB, JBL LSR310S, Yamaha HS7 verified SNs, Sansui ES-27X3A dual monitors, Dell Latitude 5340, HyperDrive Dock, LiftMaster MyQ Garage Opener. |
@@ -357,9 +376,10 @@ Amazon Echo (4th Gen) → Bluetooth / Wi-Fi Playback
 | AT-VM95SH Shibata Cartridge | **BACKORDERED** | Guitar Center fulfillment pending |
 | Rolls MB15b Serial | TBD | Capture rear or bottom label when accessible |
 | 1Mii RT5066R2 TX Serial | TBD | Capture unit label when accessible |
-| 1Mii RT5066R2 RX #1 Serial | TBD | Capture unit label when accessible |
-| 1Mii RT5066R2 RX #2 Serial | TBD | Capture unit label when accessible |
-| 1Mii Connection Method | TBD | Determine Yamaha Line Out routing (direct vs. Rolls passthrough) |
+| 1Mii RT5066R2 RX #1 Serial (Office Studio) | TBD | Capture unit label when accessible |
+| 1Mii RT5066R2 RX #2 Serial (Lanai) | TBD | Capture unit label when accessible |
+| Rolls MX28 Mini-Mix VI Serial | TBD | Capture rear/bottom label when accessible |
+| Schiit Mani II + Schiit SYS active role in Studio | TBD | Confirm whether LP120 still routes through Mani II / SYS or only direct to MX28 |
 | APC Back-UPS 1000 Serial | TBD | Capture rear label when accessible |
 | M-Audio AIR Hub Serial | TBD | Capture bottom label when accessible (active primary interface) |
 | Focusrite Scarlett Solo warranty claim | Pending | Contact Focusrite Support without receipt; document outcome |
