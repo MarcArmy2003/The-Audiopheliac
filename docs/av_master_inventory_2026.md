@@ -3,13 +3,13 @@
        alt="The Audiopheliac Primary Logo" width="300" />
 </p>
 
-# AV_Master_Inventory_v2026.01
+# AV_Master_Inventory_v2026.05
 
 **The Audiopheliac – Comprehensive AV, Studio & Network Inventory**  
 Author & Maintainer: *Gillon "Gill" Marchetti (MarcArmy2003)*  
-Version: v2026.01  
-Date: January 19, 2026  
-Merged from: AV_Master_Inventory (Verified intake Jan 19, 2026)
+Version: v2026.05  
+Date: May 11, 2026  
+Last change: Focusrite Solo failed; M-Audio AIR Hub promoted to primary monitoring interface.
 
 ---
 
@@ -92,9 +92,9 @@ Ethernet → QNAP TS-473A (MusicCast / DLNA / AirPlay 2)
 | Device               | Make / Model                                                                                                                | Serial Number          | Purchase Date | Est. Resale (USD) | Notes                                                        |
 | -------------------- | --------------------------------------------------------------------------------------------------------------------------- | ---------------------- | ------------- | ----------------- | ------------------------------------------------------------ |
 | Turntable            | Audio-Technica AT-LP120XUSB                                                                                                 | 243402497              | Jan 2025      | $200              | Direct drive; stock AT95E cartridge (green); AT-VM95SH Shibata on backorder |
-| Audio Interface      | [Focusrite Scarlett Solo 4th Gen](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/docs/Processing_Hardware.md)   | S1XJ7HX57AF107         | Feb 2025      | $110              | USB-C main interface                                         |
+| Audio Interface      | [Focusrite Scarlett Solo 4th Gen](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/docs/Processing_Hardware.md)   | S1XJ7HX57AF107         | Feb 2025      | $0                | **FAILED (2026-05-11)** — Unit fried; no signal. Warranty likely unrecoverable (receipt missing). Replacement TBD. |
 | Wireless RX          | 1Mii RT5066R2 Wireless Audio Receiver #1                                                                                    | TBD                    | Jan 16, 2026  | $23               | **NOT YET CONNECTED** — Planned for Family Room vinyl streaming via Schiit SYS Input 2 |
-| Audio Hub            | M-Audio Air\|HUB                                                                                                            | TBD                    | Apr 2024      | $80               | Backup USB DAC/monitor hub; stored as spare                  |
+| Audio Hub / Monitor I/F | M-Audio AIR Hub (AIRXHUB)                                                                                                | TBD                    | Apr 2024      | $80               | **ACTIVE — Primary monitoring/playback interface** (replaces Solo, monitoring only). USB-C device to USB-A host (WD19DCS). 24-bit/96kHz DAC; 2× balanced 1/4" TRS monitor outs; 1× 1/4" headphone w/ independent level; 3× USB-A powered hub (Privia, Spark 40, LP120). Output-only, no ADC. |
 | Phono Preamp         | Schiit Mani II                                                                                                              | CI182351284            | Jul 2025      | $213              | Confirmed DIP config default; input available                |
 | Passive Preamp       | Schiit SYS                                                                                                                  | SYS1902435             | Oct 2025      | $64               | Line controller; Input 1 = Mani II; Input 2 = **available for 1Mii RX #1** |
 | Subwoofer            | JBL LSR310S                                                                                                                 | DYA007-34294           | Oct 2025      | $260              | Operational, balanced TRS in/out verified                    |
@@ -112,11 +112,27 @@ Ethernet → QNAP TS-473A (MusicCast / DLNA / AirPlay 2)
 ### 🔊 Studio Monitoring Chain (Current Configuration)
 
 ```
+Dell Precision 7540 (DAW / playback)
+     │
+     └──► M-Audio AIR Hub (USB-C → USB-A on WD19DCS)
+              ├──► Balanced 1/4" TRS L/R → Yamaha HS7 L/R (via JBL LSR310S TRS pass-through)
+              └──► 1/4" Headphone Out (independent level) → ATH-M50x
+
 AT-LP120XUSB (AT95E stock) → Schiit Mani II → Schiit SYS (Input 1)
 Schiit SYS Input 2 → **Available for 1Mii RX #1** (not yet connected)
 Schiit SYS → JBL LSR310S (TRS balanced in)
 JBL LSR310S → Yamaha HS7 L/R (TRS balanced out)
+
+AIR Hub Powered USB-A Hub:
+  • Audio-Technica AT-LP120XUSB (USB-A, digital audio out)
+  • Positive Grid Spark 40 (USB-A)
+  • Casio Privia PX-870WE (USB-A)
 ```
+
+**Interface Status (2026-05-11):**
+- Focusrite Scarlett Solo 4th Gen — **FAILED**, removed from active chain. Replacement TBD.
+- M-Audio AIR Hub — **PRIMARY** monitoring/playback path. Output only (no ADC).
+- Recording capability is offline until a replacement interface with mic/instrument inputs is sourced.
 
 **Planned Integration:**
 - 1Mii RX #1 → Schiit SYS Input 2 (Family Room wireless vinyl feed)
@@ -251,7 +267,7 @@ Amazon Echo (4th Gen) → Bluetooth / Wi-Fi Playback
      │       ├──► [Yamaha R-N800A Receiver]
      │       ├──► [NVIDIA Shield Pro]
      │       └──► [TP-Link TL-SG108E Switch]
-     │                 ├──► [Focusrite Scarlett Solo / DAW PC]
+     │                 ├──► [Dell Precision 7540 DAW PC → M-Audio AIR Hub (USB)]
      │                 └──► [Home Studio Subnet Devices]
      │
      ├──► [Samsung NU6950 TV] (Wi-Fi 6)
@@ -298,11 +314,12 @@ Amazon Echo (4th Gen) → Bluetooth / Wi-Fi Playback
 | Device                  | Make / Model                       | Serial Number        | Purchase Date | Est. Resale (USD) | Notes                                           |
 | ----------------------- | ---------------------------------- | -------------------- | ------------- | ----------------- | ----------------------------------------------- |
 | Mesh Router (Backup)    | Google Nest WiFi Router + 2 Points | 18E3C4R0B0414K59     | 2022          | $150              | Replaced by Spectrum Wi-Fi 6E; stored as backup |
-| Audio Hub (Spare)       | M-Audio Air\|HUB                   | TBD                  | Apr 2024      | $80               | Backup USB DAC/monitor hub                      |
+| Failed Audio Interface  | Focusrite Scarlett Solo 4th Gen    | S1XJ7HX57AF107       | Feb 2025      | $0                | **FAILED 2026-05-11.** Unit fried. Receipt not located; warranty likely unrecoverable. Retain pending warranty attempt, then dispose. |
 | Broken Laptop           | Dell Latitude E6430                | 7PK8Y12              | 2013          | $0                | Non-functional; board-level repair required     |
 
 | Device           | Condition | Location | Next Action                              |
 | ---------------- | --------- | -------- | ---------------------------------------- |
+| Focusrite Scarlett Solo 4th Gen | Failed (fried, no signal) | Home Office / Studio (off chain) | Attempt warranty claim with Focusrite Support (receipt missing — likely declined). If denied, dispose. Replacement TBD. |
 | Dell Latitude E6430 | Non-functional | Stored   | Board-level inspection or parts salvage |
 
 ---
@@ -324,7 +341,8 @@ Amazon Echo (4th Gen) → Bluetooth / Wi-Fi Playback
 
 | Version      | Date           | Summary                                                                                                                                                                                                          |
 | ------------ | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **v2026.04** | Jan 19, 2026   | **CHANGES:** Confirmed Technics SL-1200MK2 in Family Room (Ortofon Blue). Moved AT-LP120XUSB to Studio (stock AT95E; AT-VM95SH Shibata on backorder, $219). Moved QNAP TS-473A to Family Room. Added Rolls MB15b, 1Mii RT5066R2 TX (Family Room), 1Mii RX #1 (Studio), 1Mii RX #2 (Garage). Moved Bose 3·2·1 to Lanai. Moved Amazon Echo to Garage. Added SVS SoundPath TX/RX routing (Family Room → Lanai). Added REI UHD-PRO102 HDMI splitter, J-Tech AE4KA, Mini AV upscaler to Lanai signal chain. Updated signal chains for all zones. Removed Blue Yeti mic, Rode boom arm, Zoom pedal (fabrications). **PENDING:** 1Mii connection method, AT-VM95SH delivery. |
+| **v2026.05** | May 11, 2026   | **CHANGES:** Focusrite Scarlett Solo 4th Gen marked **FAILED** (fried; no signal). Removed from active Studio chain; moved to Stored/Inactive. Receipt missing — warranty attempt planned but assumed lost. M-Audio AIR Hub (AIRXHUB) promoted from spare to **PRIMARY** monitoring/playback interface. Documented full AIR Hub spec: USB-C device to USB-A host (WD19DCS), 24-bit/96kHz DAC, 2× balanced 1/4" TRS monitor outs, 1× 1/4" headphone (independent level), 3× powered USB-A hub ports (LP120, Spark 40, Privia). AIR Hub is output-only (no ADC); recording capability offline until input-capable replacement is sourced. Updated Studio Monitoring Chain and Network Topology accordingly. |
+| v2026.04     | Jan 19, 2026   | **CHANGES:** Confirmed Technics SL-1200MK2 in Family Room (Ortofon Blue). Moved AT-LP120XUSB to Studio (stock AT95E; AT-VM95SH Shibata on backorder, $219). Moved QNAP TS-473A to Family Room. Added Rolls MB15b, 1Mii RT5066R2 TX (Family Room), 1Mii RX #1 (Studio), 1Mii RX #2 (Garage). Moved Bose 3·2·1 to Lanai. Moved Amazon Echo to Garage. Added SVS SoundPath TX/RX routing (Family Room → Lanai). Added REI UHD-PRO102 HDMI splitter, J-Tech AE4KA, Mini AV upscaler to Lanai signal chain. Updated signal chains for all zones. Removed Blue Yeti mic, Rode boom arm, Zoom pedal (fabrications). **PENDING:** 1Mii connection method, AT-VM95SH delivery. |
 | v2026.03     | Jan 16, 2026   | Relocated AT-LP120XUSB to Family Room (Ortofon Blue). Updated Casio PX-870WE serial. Added TP-Link TL-SG105 switch, APC Back-UPS 1000, Spectrum router SAX2V1R. Added Victrola VTA-71 to Bedrooms. Validated Seagull SC-6W and Pro-Ject serials. Updated Yamaha R-N800A speaker config (Zone A only). **PENDING:** Technics SL-1200MK2 location. |
 | v2026.02     | Jan 16, 2026   | Added: MacBook Pro (2012 Kids' Unit), M-Audio Air\|HUB, JBL LSR310S, Yamaha HS7 verified SNs, Sansui ES-27X3A dual monitors, Dell Latitude 5340, HyperDrive Dock, LiftMaster MyQ Garage Opener. |
 | v2026.01     | Jan 15, 2026   | Initial merge of v2025.12 with verified 2026 signal map.                                                                                                                                                         |
@@ -343,7 +361,9 @@ Amazon Echo (4th Gen) → Bluetooth / Wi-Fi Playback
 | 1Mii RT5066R2 RX #2 Serial | TBD | Capture unit label when accessible |
 | 1Mii Connection Method | TBD | Determine Yamaha Line Out routing (direct vs. Rolls passthrough) |
 | APC Back-UPS 1000 Serial | TBD | Capture rear label when accessible |
-| M-Audio Air\|HUB Serial | TBD | Capture if unit is accessible |
+| M-Audio AIR Hub Serial | TBD | Capture bottom label when accessible (active primary interface) |
+| Focusrite Scarlett Solo warranty claim | Pending | Contact Focusrite Support without receipt; document outcome |
+| Replacement audio interface (with ADC) | Pending sourcing | Research input-capable interfaces to restore recording capability |
 
 ---
 
