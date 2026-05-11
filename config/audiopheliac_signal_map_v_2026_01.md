@@ -1,12 +1,13 @@
-# 🎛️ Audiopheliac System Map – v2026.05.1 (Full Home A/V + Network Topology)
+# 🎛️ Audiopheliac System Map – v2026.05.2 (Full Home A/V + Network Topology)
 **Curated by Gillon "Gill" Marchetti (MarcArmy2003)**  
-Version: 2026.05.1 | Updated: May 11, 2026  
+Version: 2026.05.2 | Updated: May 11, 2026  
 **Changes (2026-05-11):**
 - Focusrite Scarlett Solo 4th Gen failed (fried). M-Audio AIR Hub (AIRXHUB) promoted to primary monitoring/playback interface. Recording offline pending input-capable replacement.
-- Rolls MX28 Mini-Mix VI documented as central Office Studio mixer with three line inputs (AIR Hub TRS, AT-LP120XUSB line out, 1Mii RX #1).
-- 1Mii RT5066R2 system reclassified ACTIVE: TX in Family Room (Yamaha Line Out via Rolls MB15b boost) feeding RX #1 (Office Studio → MX28) and RX #2 (Lanai → playback). RX #2 location corrected from Garage to Lanai.
+- Rolls MX28 Mini-Mix VI documented as central Office Studio mixer with three line inputs (AIR Hub TRS, AT-LP120XUSB via Schiit Mani II, 1Mii RX #1).
+- 1Mii RT5066R2 system reclassified ACTIVE: TX in Family Room (Yamaha Line Out via Rolls MB15b boost) feeding RX #1 (Office Studio → MX28) and RX #2 (Lanai → Schiit SYS). RX #2 location corrected from Garage to Lanai.
 - SVS SoundPath TX/RX retired to reserve (removed from chain months ago).
-- Schiit Mani II + Schiit SYS role in Studio chain flagged for verification (LP120 now goes line-out direct to MX28).
+- **Schiit Mani II** confirmed active in Office Studio as the phono preamp for AT-LP120XUSB. LP120 set to PHONO out; Mani II RCA out → Rolls MX28 Input B.
+- **Schiit SYS** relocated to Lanai. Now serves as a passive A/B switch between 1Mii RX #2 (Family Room wireless) and Singing Machine (karaoke), feeding the Bose 3·2·1 AUX IN.
 
 ---
 
@@ -99,9 +100,19 @@ Version: 2026.05.1 | Updated: May 11, 2026
 [Audio-Technica AT-LP120XUSB (stock AT95E)] ──► [Schiit Mani 2 Phono Preamp]
      │ (RCA analog)
      ▼
+[Audio-Technica AT-LP120XUSB] (PHONO out)
+     │
+     └──► [Schiit Mani II Phono Preamp] (RCA out, line level)
+              │
+              └──► [Rolls MX28 Mini-Mix VI Input B]
+
+[1Mii RT5066R2 RX #1] (Family Room wireless feed)
+     │
+     └──► [Rolls MX28 Mini-Mix VI Input C]
+
 [Rolls MX28 Mini-Mix VI] (Central studio mixer; active; 6-channel)
      ├──── Input A: AIR Hub TRS L/R (Dell Precision DAW / playback / streaming)
-     ├──── Input B: AT-LP120XUSB Line Out (built-in phono preamp engaged)
+     ├──── Input B: AT-LP120XUSB → Schiit Mani II
      ├──── Input C: 1Mii RT5066R2 RX #1 (Family Room wireless feed)
      │
      └──► Master Out (TRS balanced) → [JBL LSR310S Subwoofer] (TRS balanced in)
@@ -126,10 +137,9 @@ Version: 2026.05.1 | Updated: May 11, 2026
      Focusrite Scarlett Solo 4th Gen (S/N S1XJ7HX57AF107)
      Status: Fried, no signal. Warranty attempt pending (receipt missing, assume lost).
 
-[Schiit Mani II + Schiit SYS — role under verification]
-     Open question: with LP120 line-out feeding MX28 directly, the Schiit
-     pair's role in the active Studio chain is unclear. May be inactive,
-     or retained for an alternate LP120 routing. Confirm next pass.
+[Schiit pair — resolved 2026-05-11]
+     Mani II: ACTIVE in Office Studio as the LP120 phono preamp (LP120 PHONO out → Mani II → MX28 Input B).
+     SYS: relocated to Lanai as an A/B switch (see Lanai section).
 ```
 
 **Studio Highlights:**
@@ -139,13 +149,14 @@ Version: 2026.05.1 | Updated: May 11, 2026
 - AIR Hub's powered USB-A hub consolidates LP120, Spark 40, and Casio Privia into one host port on the WD19DCS dock.
 - Connected via TP-Link TL-SG108E switch to QNAP NAS for fast session storage.
 - **AT-LP120XUSB** with stock AT95E cartridge (AT-VM95SH Shibata on backorder).
-- **1Mii RX #1** routes the Family Room wireless feed into Rolls MX28 (active).
-- **Schiit Mani II + Schiit SYS** role in current chain pending verification (see chain note above).
+- **1Mii RX #1** routes the Family Room wireless feed into Rolls MX28 Input C (active).
+- **Schiit Mani II** is the phono preamp for AT-LP120XUSB (LP120 PHONO out → Mani II → MX28 Input B).
+- **Schiit SYS** is no longer in the Studio chain — relocated to the Lanai (see Lanai section).
 
 **Cabling Summary:**
 | Connection | Type | Direction | Purpose |
 |-------------|------|------------|----------|
-| RCA | Analog | LP120 Line Out → Rolls MX28 (Input B) | Turntable into central mixer |
+| RCA | Analog | LP120 PHONO Out → Schiit Mani II → Rolls MX28 (Input B) | Turntable phono preamp into central mixer |
 | RCA | Analog | 1Mii RX #1 → Rolls MX28 (Input C) | Family Room wireless feed into central mixer |
 | TRS | Balanced Analog | Rolls MX28 Master → JBL LSR310S → HS7 L/R | Studio playback to monitors |
 | USB-C → USB-A | Digital | AIR Hub → WD19DCS (workstation dock) | Primary monitoring/playback interface |
@@ -187,7 +198,15 @@ Version: 2026.05.1 | Updated: May 11, 2026
      │
      └──► RCA L/R → [Bose 3·2·1 TV AUDIO IN]
 
-[Singing Machine 3.5mm OUT]
+[1Mii RT5066R2 RX #2] (Family Room wireless audio)
+     │
+     └──► RCA L/R → [Schiit SYS Input 1]
+
+[Singing Machine ISM9033 3.5mm OUT] (karaoke)
+     │
+     └──► RCA L/R → [Schiit SYS Input 2]
+
+[Schiit SYS Output] (A/B passive switch — selects whole-house audio vs. karaoke)
      │
      └──► RCA L/R → [Bose 3·2·1 AUX IN]
 
@@ -198,9 +217,8 @@ Version: 2026.05.1 | Updated: May 11, 2026
      │
      └──► [Samsung HDMI 3]
 
-[1Mii RT5066R2 RX #2] ← 2.4GHz wireless from [1Mii TX] (Family Room, fed by Yamaha Line Out via Rolls MB15b boost)
-     └──► Provides wireless Yamaha audio to Lanai
-          (Replaces former SVS SoundPath RX — removed from chain months ago, held as reserve)
+[1Mii RT5066R2 RX #2] receives 2.4GHz wireless from [1Mii TX] (Family Room, fed by Yamaha Line Out via Rolls MB15b boost)
+     └──► Routed via Schiit SYS Input 1 (see switching block above)
 
 [Bose SoundTouch Genius] ← Portable Bluetooth speaker (occasional use)
 ```
@@ -209,8 +227,9 @@ Version: 2026.05.1 | Updated: May 11, 2026
 - **Bose 3·2·1** relocated from Garage; requires HDMI→RCA conversion via J-Tech AE4KA (aging system, no HDMI input).
 - **REI UHD-PRO102 splitter** mirrors Chromecast video to both Samsung TV and Singing Machine.
 - **Mini AV upscaler** returns Bose video output to Samsung HDMI 3 for DVD playback.
+- **Schiit SYS** (relocated from Office Studio) acts as a passive A/B switch in front of the Bose AUX IN: Input 1 = 1Mii whole-house audio, Input 2 = Singing Machine karaoke. Output = Bose 3·2·1 AUX IN.
 - **1Mii RT5066R2 RX #2** receives wireless Yamaha audio from Family Room (Yamaha Line Out → Rolls MB15b boost → 1Mii TX → RX #2). Replaces former SVS SoundPath RX.
-- **Amazon Echo relocated to Garage** — Lanai now uses 1Mii wireless + Bose SoundTouch for streaming.
+- **Amazon Echo relocated to Garage** — Lanai now uses 1Mii wireless (via SYS) + Bose SoundTouch for streaming.
 
 ---
 
@@ -247,9 +266,9 @@ Version: 2026.05.1 | Updated: May 11, 2026
 | Zone | Function | Core Hardware |
 |------|-----------|----------------|
 | Family Room | Cinema + Audiophile Stereo + **Wireless Hub** | Bose Lifestyle 650, Yamaha R-N800A, Polk ES60, SVS SB-1000 Pro, Rolls MB15b, 1Mii TX (active) |
-| Home Office / Studio | Monitoring + Central Mixing + **Wireless RX** (recording offline) | AT-LP120XUSB, Rolls MX28 Mini-Mix VI (central mixer), M-Audio AIR Hub (primary monitor I/F), HS7, JBL LSR310S, 1Mii RX #1 (active). Focusrite Solo failed 2026-05-11. Schiit Mani II + SYS pending verification. |
+| Home Office / Studio | Monitoring + Central Mixing + **Wireless RX** (recording offline) | AT-LP120XUSB, Schiit Mani II (phono preamp), Rolls MX28 Mini-Mix VI (central mixer), M-Audio AIR Hub (primary monitor I/F), HS7, JBL LSR310S, 1Mii RX #1. Focusrite Solo failed 2026-05-11. |
 | Garage / Gym | Standalone Audio | Amazon Echo (no wireless RX in this zone) |
-| Lanai | Smart Playback + **Wireless RX** | Samsung UN65U7900FD, Singing Machine, Bose 3·2·1, 1Mii RX #2 (active), Bose SoundTouch |
+| Lanai | Smart Playback + **Wireless RX** + A/B switching | Samsung UN65U7900FD, Singing Machine, Bose 3·2·1, 1Mii RX #2, Schiit SYS (1Mii vs. karaoke selector → Bose AUX), Bose SoundTouch |
 | Network Core | Data Backbone | Spectrum Modem, Wi-Fi 6E Router, QNAP NAS, Switches |
 
 ---

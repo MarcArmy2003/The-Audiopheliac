@@ -177,8 +177,9 @@ The D: drive is the second internal drive on GDMARCHE (original factory drive, s
 
 ### Mixer and Signal Processing
 - Rolls MX28 Mini-Mix VI (active mixer; center-negative power — use only included PSU) — Office Studio
+- Schiit Mani II phono preamp — Office Studio (preamp for AT-LP120XUSB; feeds MX28 Input B)
 - Rolls MB15b signal booster — Family Room distribution
-- Schiit SYS passive switcher — Lanai
+- Schiit SYS passive switcher — Lanai (switches between 1Mii RX #2 and Singing Machine output, feeds Bose 3·2·1 AUX IN)
 - Sprodio K2 stereo-to-mono converter (stored; left-channel PRE OUT attenuation issue resolved, no longer in active signal path)
 
 ### Wireless Distribution
@@ -230,17 +231,21 @@ Yamaha PRE OUT
 
 ### Office Studio
 ```
-AT-LP120XUSB
-  > Rolls MX28 Mini-Mix VI
+AT-LP120XUSB (phono out)
+  > Schiit Mani II (phono preamp)
+  > Rolls MX28 Mini-Mix VI (Input B)
 
-1Mii RX
-  > Rolls MX28 Mini-Mix VI
+1Mii RX #1 (Family Room wireless)
+  > Rolls MX28 Mini-Mix VI (Input C)
 
-GDMARCHE (Spotify / streaming)
-  > Rolls MX28 Mini-Mix VI
+GDMARCHE (Spotify / streaming / DAW)
+  > M-Audio AIR Hub (USB-C to USB-A on WD19DCS; 24-bit/96kHz, output only)
+  > balanced 1/4" TRS L/R
+  > Rolls MX28 Mini-Mix VI (Input A)
 
-Rolls MX28 Mini-Mix VI
-  > Yamaha HS7 monitors + JBL LSR310S subwoofer
+Rolls MX28 Mini-Mix VI (Master Out, TRS balanced)
+  > JBL LSR310S (TRS in)
+  > Yamaha HS7 monitors (TRS out)
 
 Headphone monitoring: M-Audio AIR Hub 1/4" headphone output (independent
 level control) preferred for all streaming and DAW listening. MX28 headphone

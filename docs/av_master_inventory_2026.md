@@ -3,13 +3,13 @@
        alt="The Audiopheliac Primary Logo" width="300" />
 </p>
 
-# AV_Master_Inventory_v2026.05.1
+# AV_Master_Inventory_v2026.05.2
 
 **The Audiopheliac – Comprehensive AV, Studio & Network Inventory**  
 Author & Maintainer: *Gillon "Gill" Marchetti (MarcArmy2003)*  
-Version: v2026.05.1  
+Version: v2026.05.2  
 Date: May 11, 2026  
-Last change: Reconciled stale state — added Rolls MX28 to Studio; promoted 1Mii TX/RX system to ACTIVE; moved 1Mii RX #2 from Garage to Lanai; retired SVS SoundPath TX/RX to reserve (removed from chains months ago); reaffirmed AIR Hub as primary monitoring interface.
+Last change: Reconciled Schiit pair — Mani II confirmed as Office Studio phono preamp for LP120 (PHONO out → Mani II → MX28 Input B); Schiit SYS relocated to Lanai as A/B switch between 1Mii RX #2 and Singing Machine, feeding Bose 3·2·1 AUX IN. Prior version v2026.05.1 added MX28, activated 1Mii system, retired SVS SoundPath to reserve.
 
 ---
 
@@ -103,8 +103,7 @@ Yamaha R-N800A (Line Out / PRE OUT)
 | Wireless RX          | 1Mii RT5066R2 Wireless Audio Receiver #1                                                                                    | TBD                    | Jan 16, 2026  | $23               | **ACTIVE** — Receives Family Room wireless feed; routed to Rolls MX28 Mini-Mix VI as a line input. |
 | Audio Hub / Monitor I/F | M-Audio AIR Hub (AIRXHUB)                                                                                                | TBD                    | Apr 2024      | $80               | **ACTIVE — Primary monitoring/playback interface** (replaces Solo, monitoring only). USB-C device to USB-A host (WD19DCS). 24-bit/96kHz DAC; 2× balanced 1/4" TRS monitor outs; 1× 1/4" headphone w/ independent level; 3× USB-A powered hub (Privia, Spark 40, LP120). Output-only, no ADC. TRS L/R feeds Rolls MX28 as the DAW source input. |
 | Active Mixer         | Rolls MX28 Mini-Mix VI                                                                                                      | TBD                    | Pre-2026      | $50               | **ACTIVE — Central studio mixer.** Inputs: (1) AIR Hub TRS L/R (Dell Precision DAW/playback), (2) AT-LP120XUSB line out, (3) 1Mii RX #1 (Family Room wireless). Master → JBL LSR310S TRS in → Yamaha HS7 L/R. Used for mixing during recording sessions and grabbing loops. Center-negative PSU — use included power supply only. |
-| Phono Preamp         | Schiit Mani II                                                                                                              | CI182351284            | Jul 2025      | $213              | Confirmed DIP config default; input available                |
-| Passive Preamp       | Schiit SYS                                                                                                                  | SYS1902435             | Oct 2025      | $64               | Line controller; Input 1 = Mani II; Input 2 = **available for 1Mii RX #1** |
+| Phono Preamp         | Schiit Mani II                                                                                                              | CI182351284            | Jul 2025      | $213              | **ACTIVE** — Phono preamp for AT-LP120XUSB (LP120 set to PHONO out). Mani II RCA out → Rolls MX28 Input B. |
 | Subwoofer            | JBL LSR310S                                                                                                                 | DYA007-34294           | Oct 2025      | $260              | Operational, balanced TRS in/out verified                    |
 | Studio Monitors      | Yamaha HS7 (Pair)                                                                                                           | Z719774TS / Z719774TR  | Mar 2023      | $450              | Operational; on Gator Frameworks stands                      |
 | Isolation Pads       | Auralex ProPAD 8"×13"                                                                                                       | H9135000000000         | Oct 2025      | $90               | Under HS7s                                                   |
@@ -126,9 +125,11 @@ Source 1: Dell Precision 7540 (DAW / playback / streaming)
               ├──► Balanced 1/4" TRS L/R ──► Rolls MX28 Mini-Mix VI (line input)
               └──► 1/4" Headphone Out (independent level) ──► ATH-M50x (direct monitor)
 
-Source 2: Audio-Technica AT-LP120XUSB (line out)
+Source 2: Audio-Technica AT-LP120XUSB (phono out)
      │
-     └──► Rolls MX28 Mini-Mix VI (line input)
+     └──► Schiit Mani II (phono preamp)
+              │
+              └──► Rolls MX28 Mini-Mix VI (line input)
 
 Source 3: 1Mii RT5066R2 RX #1 (Family Room wireless feed)
      │
@@ -151,8 +152,9 @@ AIR Hub Powered USB-A Hub (USB peripherals only, no audio routing):
 - Rolls MX28 Mini-Mix VI — **CENTRAL MIXER**, sums DAW + LP120 + 1Mii RX to monitor chain. Used for recording-session mixing and loop capture.
 - Recording capability is offline until a replacement interface with mic/instrument inputs is sourced.
 
-**Open verification (Schiit Mani II + Schiit SYS):**
-The Schiit Mani II phono preamp and Schiit SYS passive preamp remain listed in inventory. Their role in the current chain is unclear since LP120 now feeds MX28 (line out, internal phono preamp engaged) and the 1Mii RX feeds MX28 directly. The Schiit pair may be inactive in the studio, or may be retained for an alternate LP120 routing. Confirm before next inventory revision.
+**Schiit pair status (resolved 2026-05-11):**
+- **Schiit Mani II** stays in Office Studio as the phono preamp for AT-LP120XUSB. LP120 set to PHONO out → Mani II → MX28 Input B.
+- **Schiit SYS** relocated to Lanai. Now serves as a passive A/B switch between the 1Mii RX #2 (Family Room wireless) and the Singing Machine (karaoke), feeding the Bose 3·2·1 AUX IN.
 
 ---
 
@@ -180,6 +182,7 @@ Amazon Echo (4th Gen) → Bluetooth / Wi-Fi Playback
 | TV                | Samsung UN65U7900FD Crystal UHD 65"                               | TBD           | Dec 2024      | $400              | 4K outdoor display for pool area entertainment         |
 | AV System         | Bose 3·2·1 Series II                                              | TBD           | Pre-owned     | $150              | Relocated from Garage; legacy 2.1 home theater system  |
 | Karaoke Machine   | Singing Machine ISM9033                                           | TBD           | Dec 2024      | $150              | Portable karaoke with Bluetooth and mic inputs         |
+| Passive Switcher  | Schiit SYS                                                        | SYS1902435    | Oct 2025      | $64               | **ACTIVE on Lanai** (relocated from Office Studio). Switches between 1Mii RX #2 (Family Room wireless) and Singing Machine (karaoke), feeding Bose 3·2·1 AUX IN. |
 | HDMI Converter    | J-Tech AE4KA HDMI to RCA (PCM) Converter                          | TBD           | Dec 2024      | $40               | Converts HDMI ARC to RCA for Bose 3·2·1 compatibility  |
 | HDMI Splitter     | REI UHD-PRO102 4K HDMI Splitter (1 in 2 out)                      | TBD           | Dec 2024      | $35               | Auto downscaling; mirrors Chromecast to TV + Karaoke   |
 | Mini Upscaler     | Mini AV to HDMI Upscaler (1080p)                                  | TBD           | Dec 2024      | $20               | Upscales Bose video output back to Samsung HDMI 3      |
@@ -206,7 +209,16 @@ Amazon Echo (4th Gen) → Bluetooth / Wi-Fi Playback
 
 [Singing Machine 3.5mm OUT]
      │
+     └──► RCA L/R → [Schiit SYS Input 2]
+
+[1Mii RT5066R2 RX #2]
+     │
+     └──► RCA L/R → [Schiit SYS Input 1]
+
+[Schiit SYS Output]
+     │
      └──► RCA L/R → [Bose 3·2·1 AUX IN]
+          (A/B switch — selects 1Mii whole-house audio vs. karaoke depending on use)
 
 [Bose 3·2·1 VIDEO OUT (Yellow) + AUDIO OUT (R/W)]
      │
@@ -215,11 +227,9 @@ Amazon Echo (4th Gen) → Bluetooth / Wi-Fi Playback
      │
      └──► [Samsung HDMI 3]
 
-[1Mii RT5066R2 RX #2]
-     │
-     └──► Receives 2.4GHz wireless from 1Mii TX (Family Room, Yamaha Line Out via Rolls MB15b boost)
-          Provides wireless Yamaha audio to Lanai playback.
-          Replaces former SVS SoundPath RX (removed from chain months ago; stored as reserve).
+[1Mii RT5066R2 RX #2] receives 2.4GHz wireless from 1Mii TX (Family Room, Yamaha Line Out via Rolls MB15b boost).
+     Replaces former SVS SoundPath RX (removed from chain months ago; stored as reserve).
+     Output routed via Schiit SYS Input 1 (see above).
 ```
 
 ---
@@ -359,7 +369,8 @@ Amazon Echo (4th Gen) → Bluetooth / Wi-Fi Playback
 
 | Version      | Date           | Summary                                                                                                                                                                                                          |
 | ------------ | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **v2026.05.1** | May 11, 2026 | **STALENESS RECONCILIATION (per user verification):** (1) Added Rolls MX28 Mini-Mix VI to Home Office / Studio table — central studio mixer with three line inputs (AIR Hub TRS L/R, AT-LP120XUSB line out, 1Mii RX #1). (2) Rebuilt Studio Monitoring Chain to route AIR Hub + LP120 + 1Mii RX → MX28 → JBL LSR310S → HS7. (3) Promoted 1Mii RT5066R2 TX (Family Room) and both RXes to ACTIVE status. (4) Moved 1Mii RT5066R2 RX #2 from Garage table to Lanai table — actually lives on Lanai. (5) Retired SVS SoundPath TX and RX from active chains to Stored / Inactive — removed from signal chain months ago, replaced by 1Mii system. (6) Updated Family Room signal chain to show Yamaha Line Out → Rolls MB15b → 1Mii TX → RX in Office Studio + RX on Lanai. (7) Updated Lanai signal chain to replace SVS RX block with 1Mii RX block. (8) Removed obsolete "Planned Integration" footers for 1Mii (now actually integrated). **Open verification:** Schiit Mani II / Schiit SYS role in current Studio chain is unclear with LP120 feeding MX28 directly. |
+| **v2026.05.2** | May 11, 2026 | **SCHIIT RECONCILIATION (per user verification):** Schiit Mani II confirmed active in Office Studio as the phono preamp for AT-LP120XUSB; LP120 set to PHONO out, Mani II RCA out → Rolls MX28 Input B. Schiit SYS relocated to Lanai as a passive A/B switch between 1Mii RX #2 (Family Room wireless) and Singing Machine (karaoke), output feeding Bose 3·2·1 AUX IN. Inventory Office Studio table: SYS row removed (now on Lanai). Inventory Lanai table: SYS row added. Studio Monitoring Chain: LP120 path corrected to LP120 → Mani II → MX28. Lanai signal chain: SYS switching block inserted before Bose AUX IN. Open Items: removed Schiit Mani II + SYS verification entry (resolved). |
+| v2026.05.1 | May 11, 2026 | **STALENESS RECONCILIATION (per user verification):** (1) Added Rolls MX28 Mini-Mix VI to Home Office / Studio table — central studio mixer with three line inputs (AIR Hub TRS L/R, AT-LP120XUSB line out, 1Mii RX #1). (2) Rebuilt Studio Monitoring Chain to route AIR Hub + LP120 + 1Mii RX → MX28 → JBL LSR310S → HS7. (3) Promoted 1Mii RT5066R2 TX (Family Room) and both RXes to ACTIVE status. (4) Moved 1Mii RT5066R2 RX #2 from Garage table to Lanai table — actually lives on Lanai. (5) Retired SVS SoundPath TX and RX from active chains to Stored / Inactive — removed from signal chain months ago, replaced by 1Mii system. (6) Updated Family Room signal chain to show Yamaha Line Out → Rolls MB15b → 1Mii TX → RX in Office Studio + RX on Lanai. (7) Updated Lanai signal chain to replace SVS RX block with 1Mii RX block. (8) Removed obsolete "Planned Integration" footers for 1Mii (now actually integrated). **Open verification:** Schiit Mani II / Schiit SYS role in current Studio chain is unclear with LP120 feeding MX28 directly. |
 | v2026.05     | May 11, 2026   | **CHANGES:** Focusrite Scarlett Solo 4th Gen marked **FAILED** (fried; no signal). Removed from active Studio chain; moved to Stored/Inactive. Receipt missing — warranty attempt planned but assumed lost. M-Audio AIR Hub (AIRXHUB) promoted from spare to **PRIMARY** monitoring/playback interface. Documented full AIR Hub spec: USB-C device to USB-A host (WD19DCS), 24-bit/96kHz DAC, 2× balanced 1/4" TRS monitor outs, 1× 1/4" headphone (independent level), 3× powered USB-A hub ports (LP120, Spark 40, Privia). AIR Hub is output-only (no ADC); recording capability offline until input-capable replacement is sourced. Updated Studio Monitoring Chain and Network Topology accordingly. |
 | v2026.04     | Jan 19, 2026   | **CHANGES:** Confirmed Technics SL-1200MK2 in Family Room (Ortofon Blue). Moved AT-LP120XUSB to Studio (stock AT95E; AT-VM95SH Shibata on backorder, $219). Moved QNAP TS-473A to Family Room. Added Rolls MB15b, 1Mii RT5066R2 TX (Family Room), 1Mii RX #1 (Studio), 1Mii RX #2 (Garage). Moved Bose 3·2·1 to Lanai. Moved Amazon Echo to Garage. Added SVS SoundPath TX/RX routing (Family Room → Lanai). Added REI UHD-PRO102 HDMI splitter, J-Tech AE4KA, Mini AV upscaler to Lanai signal chain. Updated signal chains for all zones. Removed Blue Yeti mic, Rode boom arm, Zoom pedal (fabrications). **PENDING:** 1Mii connection method, AT-VM95SH delivery. |
 | v2026.03     | Jan 16, 2026   | Relocated AT-LP120XUSB to Family Room (Ortofon Blue). Updated Casio PX-870WE serial. Added TP-Link TL-SG105 switch, APC Back-UPS 1000, Spectrum router SAX2V1R. Added Victrola VTA-71 to Bedrooms. Validated Seagull SC-6W and Pro-Ject serials. Updated Yamaha R-N800A speaker config (Zone A only). **PENDING:** Technics SL-1200MK2 location. |
@@ -379,7 +390,6 @@ Amazon Echo (4th Gen) → Bluetooth / Wi-Fi Playback
 | 1Mii RT5066R2 RX #1 Serial (Office Studio) | TBD | Capture unit label when accessible |
 | 1Mii RT5066R2 RX #2 Serial (Lanai) | TBD | Capture unit label when accessible |
 | Rolls MX28 Mini-Mix VI Serial | TBD | Capture rear/bottom label when accessible |
-| Schiit Mani II + Schiit SYS active role in Studio | TBD | Confirm whether LP120 still routes through Mani II / SYS or only direct to MX28 |
 | APC Back-UPS 1000 Serial | TBD | Capture rear label when accessible |
 | M-Audio AIR Hub Serial | TBD | Capture bottom label when accessible (active primary interface) |
 | Focusrite Scarlett Solo warranty claim | Pending | Contact Focusrite Support without receipt; document outcome |
