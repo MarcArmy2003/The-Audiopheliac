@@ -17,7 +17,9 @@ At the start of any task-oriented session — any interaction where you will use
 
 ## IDENTITY AND ROLE
 
-The Audiopheliac is Gill Marchetti's personal music intelligence and home AV system. It spans signal chain engineering, studio production, vinyl collection management, Spotify/Discogs integration, Suno AI music production, and a public-facing web presence.
+The Audiopheliac is Gill Marchetti's lifestyle brand at the intersection of audio, technology, and AI. It is built around `theaudiopheliac.com` (domain registered through 2028-04-19) and spans: a public-facing website on Cloudflare Pages with locked brand voice guidelines and Nashville Midnight visual identity; a content production pipeline (blog posts, product testing and reviews, technical deep-dives); AI integrations including Suno AI music production with commercial-use rights; an Amazon affiliate revenue stream via the gear-discovery proxy (Amazon Associates store `veterananalyt-20`, PA-API access pending qualifying sales); a potential Amazon storefront of recommended equipment; a personal music intelligence and home AV system (signal-chain engineering, studio production, vinyl, Spotify/Discogs) that grounds the brand with hands-on authority; and downstream Suno-produced music releases under the Audiopheliac name.
+
+**Scope framing (non-negotiable, do not collapse):** The Audiopheliac is a lifestyle brand build with monetization paths active or in flight, including affiliate revenue, commercial-use music releases, product reviews, possible sponsorships, and a possible Amazon storefront. It may eventually fold under VAL (Veteran Analytics LLC) for tax and financial accounting purposes; the subject matter remains independent of VAL and is unrelated to veterans content. When Gill calls The Audiopheliac a "hobby," that phrasing distinguishes it from VAL as an existing legal business entity, NOT a signal that the project lacks commercial scope or governance demands. Plan, recommend, and architect accordingly. The hardware, signal chain, and studio components are the credibility foundation, not the brand itself.
 
 **Motto:** "Rock 'n' roll. Deal with it." — after Bret Easton Ellis, *The Rules of Attraction* (Gill's paraphrase; not verbatim — intentionally kept)
 **Persona:** Enthusiastic, witty, unflinchingly honest.
@@ -373,6 +375,10 @@ prompts/            Reusable AI workflows (future productization layer)
 docs/               System memory: changelog, lessons learned, spec, reference docs
   Instruction_Addendum_log.md
   av_master_inventory_2026.md
+  software/         Per-package configuration and troubleshooting profiles
+    README.md       Convention, index, and "when to create a profile" rules
+    _TEMPLATE.md    Reusable skeleton for new package profiles
+    Spotify.md      First profile (2026-05-11)
   (see full listing in docs/)
 
 .gitignore
@@ -388,6 +394,7 @@ CLAUDE.md           (this file — canonical, single source of truth)
 - If `data/` is deleted, the system must fully rebuild from source.
 - `Suno/` is reference and archive only. No executable scripts, no pipeline outputs.
 - CLAUDE.md lives only at the project root. Do not maintain copies in subdirectories.
+- `docs/software/` holds per-package configuration profiles. One file per package, named in PascalCase (e.g., `Spotify.md`, `AbletonLive12.md`). Profiles are created only when a package is actively in focus, not speculatively. Template at `docs/software/_TEMPLATE.md`; convention and index at `docs/software/README.md`.
 
 ---
 
@@ -643,6 +650,8 @@ Exit with /produce or /studio. See Suno Production Environment > Integration Not
 - **Confirm before any destructive operation:** shell commands, firmware flashes, file deletions, driver uninstalls.
 - **Mark firmware procedures with risk level:** [LOW], [MODERATE], or [HIGH].
 - **Search all sources before declaring information absent.** Premature conclusions about data unavailability are a known failure mode in this project.
+- **Flag software-profile updates proactively.** When working in or with any software application related to The Audiopheliac (Spotify, Ableton Live, Audacity, Suno, MinimServer, Roon, MusicCast Controller, Discogs CLI, NirSoft SoundVolumeView, M-Audio AIR Hub Control Panel, vendor utilities, etc.), or when changing the configuration of an existing application, Cowork must flag Gill that the corresponding profile at `docs/software/<Package>.md` should be updated. If no profile exists for the package yet, flag that one should be created from `docs/software/_TEMPLATE.md`. This applies to: setting changes, version upgrades, account or credential changes, signal-chain or pipeline integration changes, new automation that depends on the package, and any troubleshooting outcome worth durable capture. The flag is mandatory; Gill decides whether to act on it during the current session or queue it.
+- **Do not collapse Audiopheliac scope to solo/hobby framing.** The Audiopheliac is a lifestyle brand build with monetization paths active or in flight (see IDENTITY AND ROLE). When planning operations, governance, architecture, or paperclip use, reflect the full scope: content production, AI integrations, affiliate revenue, music releases, possible storefront, possible sponsorships. The hardware and signal chain are credibility foundation, not the project boundary.
 
 ---
 
@@ -902,6 +911,12 @@ These do not duplicate each other. Each has its lane.
 ---
 
 ## HISTORY
+
+**2026-05-11 (scope clarification, later):** Rewrote IDENTITY AND ROLE to lead with the lifestyle-brand framing. The prior statement described The Audiopheliac as a "personal music intelligence and home AV system" with the web presence as one of several components, which under-represented the actual project scope: `theaudiopheliac.com` (domain through 2028-04-19), public-facing website on Cloudflare Pages with brand voice guidelines and Nashville Midnight identity, content production pipeline (blog, product reviews, deep-dives), AI integrations including commercial-use Suno music releases, Amazon Associates affiliate stream via the gear-discovery proxy, potential Amazon storefront, and downstream music releases under the brand. The hardware/signal-chain/studio components are the credibility foundation, not the brand itself. The "hobby" framing Gill uses distinguishes Audiopheliac from VAL as an existing legal entity; it does NOT signal limited commercial scope. Added BEHAVIORAL RULE: "Do not collapse Audiopheliac scope to solo/hobby framing." Expanded `docs/Audiopheliac_Paperclip_Reference.md` §0.1 with a fifteen-item, five-lane paperclip use-case map (core ops, content production, music releases, revenue/commercial, compliance/governance/tax) replacing the prior five-item solo-scope list.
+
+**2026-05-11 (per-package software profile pattern, later):** Added the per-package software configuration profile pattern under `docs/software/`. Seeded with `docs/software/README.md` (convention + active-profiles index), `docs/software/_TEMPLATE.md` (reusable skeleton), and `docs/software/Spotify.md` (first profile, covering Premier / Lossless setup, bit-perfect chain through M-Audio AIR Hub, Local Files config against `M:\The Audiopheliac\`, Developer App registration, `Set-AIRHub-And-Launch-Spotify.ps1` wrapper, and full troubleshooting runbook). Added BEHAVIORAL RULE requiring Cowork to proactively flag profile updates whenever working in or changing the configuration of any in-scope software application. Folder tree and structure rules in PROJECT FOLDER STRUCTURE updated to reference `docs/software/` and its conventions.
+
+**2026-05-11 (Audiopheliac paperclip reference, later):** Copied the cross-project Paperclip reference from `C:\Users\gillo\Veteran Analytics LLC\Paperclip_Reference.md` into the Audiopheliac repo at `docs/Audiopheliac_Paperclip_Reference.md` and revised it to be Audiopheliac-applicable: rewrote header to scope-down to The Audiopheliac alone with explicit disambiguation from the VAL parent file; added Section 0 with current state of the paperclip company (id `821ef660-0041-4ef6-a911-adb1ba038e15`, prefix `THE`, brand color `#7a1f2b`, Operator not yet hired, baseline issue THE-1 closed 2026-05-08), use-case ranking, prefix-change decision (recommend `THE` → `AUD` migration playbook), and a reading-map index. Bulk of the document retained verbatim (5,666 lines) as platform-mechanics reference. Flagged gaps: solo-Operator hire flow, concrete data-pipeline routine specs, Audiopheliac issue templates, plugin recommendations, backup/restore cadence, prefix-migration verification recipe — to be pulled from https://docs.paperclip.ing/ in follow-up sessions.
 
 **2026-05-11:** Focusrite Scarlett Solo 4th Gen failed (fried; no signal). M-Audio AIR Hub (AIRXHUB) promoted from spare to primary monitoring/playback interface. AIR Hub is output only (24-bit/96kHz DAC, 2× balanced TRS, 1× independent-level headphone, 3× powered USB-A hub for LP120, Spark 40, Privia). Recording capability offline pending input-capable replacement. Solo receipt missing, warranty attempt planned but assumed lost. Inventory bumped to v2026.05; signal map header bumped to v2026.05. Updated: Audio Interface section, Office Studio headphone monitoring, Software/DAW driver, Open Action Items, Gain Staging Principles. **Not updated (flagged for verification):** Office Studio signal chain still shows MX28 as central hub; SVS SoundPath kit still flagged disconnected/stored while inventory has TX/RX active in Family Room → Lanai.
 
