@@ -1,0 +1,215 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const profileUrl = 'https://open.spotify.com/user/gdmarche';
+
+const playlists = [
+  { title: 'The Audiopheliac Presents: The Sunny Day Mix', kind: 'Daypart · Late morning to afternoon', accent: 'v2' },
+  { title: 'My Friend Made You This Mixtape', kind: 'Personal · Gift mix register', accent: 'v3' },
+  { title: 'Hip-Hop for Old Heads', kind: 'Genre · Recognizable canon, no novelty', accent: 'v4' },
+  { title: 'Acoustic Covers', kind: 'Mood · Body, no studio polish', accent: 'v5' },
+  { title: 'Reference Tracks', kind: 'System · Audition rotation for the room', accent: 'v6' },
+  { title: 'Friday Night Side Hustle', kind: 'Daypart · After-hours pull', accent: 'v7' },
+  { title: 'The Arc of R.E.M. (1983–2011)', kind: 'Artist arc · Full discography curve', accent: 'v1' },
+  { title: 'The Velvet Underground: An Introduction', kind: 'Artist intro · Familiarity-positive entry', accent: 'v2' },
+  { title: 'Top 50 Greatest Hip-Hop Tracks Ever', kind: 'Canon · Recognized, replayable', accent: 'v3' },
+];
+
+const topArtists = [
+  { name: 'Ella Langley', tag: 'Country-rock crossover' },
+  { name: 'Morgan Wallen', tag: 'Modern country emotional efficiency' },
+  { name: 'David Bowie', tag: 'Canonical rock identity anchor' },
+  { name: 'HARDY', tag: 'Country with rock spine' },
+  { name: 'Zach Bryan', tag: 'Lived-in modern country' },
+];
+---
+<BaseLayout title="Spotify" description="The Audiopheliac on Spotify — public playlists, listening profile, programmed sets sequenced like a record, not a feed.">
+
+  <section class="page-head">
+    <p class="eyebrow">Streaming · Programmed not generated</p>
+    <h1>On Spotify</h1>
+    <p class="lede">
+      Public playlists sequenced like a record from start to finish. No algorithm-driven shuffle, no "for you" recommendations stack. The Audiopheliac is the editorial filter; the playback is your call.
+    </p>
+    <div class="cta-row">
+      <a class="cta" href={profileUrl} target="_blank" rel="noopener">Open the profile on Spotify ↗</a>
+      <a class="cta cta--ghost" href="/music">Originals on Suno</a>
+    </div>
+  </section>
+
+  <section class="identity">
+    <div class="identity-card">
+      <div class="identity-mark" aria-hidden="true"></div>
+      <div class="identity-body">
+        <p class="identity-eyebrow">Profile</p>
+        <h2>The Audiopheliac</h2>
+        <p class="identity-meta">
+          <span><strong>16</strong> public playlists</span>
+          <span><strong>3</strong> followers</span>
+          <span><strong>58</strong> following</span>
+        </p>
+        <p class="identity-handle"><code>open.spotify.com/user/gdmarche</code></p>
+        <p class="identity-note">Display name updated 2026-05-12. Prior handle: <code>MarcArmy2003</code>. Underlying account slug <code>gdmarche</code> is immutable and remains in the profile URL.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <header class="block-head">
+      <h2>Public playlists</h2>
+      <p class="block-sub">Programmed front-to-back. The naming convention is "The Audiopheliac presents..." for branded sets; named directly for personal or thematic collections.</p>
+    </header>
+    <div class="pl-grid">
+      {playlists.map(p => (
+        <a class={`pl-card pl-card--${p.accent}`} href={profileUrl} target="_blank" rel="noopener">
+          <div class="pl-art" aria-hidden="true"></div>
+          <div class="pl-meta">
+            <p class="pl-eyebrow">The Audiopheliac presents</p>
+            <h3 class="pl-title">{p.title}</h3>
+            <p class="pl-kind">{p.kind}</p>
+          </div>
+        </a>
+      ))}
+    </div>
+    <p class="block-foot">Seven more public playlists live on the profile. The set rotates as new programs are produced.</p>
+  </section>
+
+  <section class="block">
+    <header class="block-head">
+      <h2>Top artists this month</h2>
+      <p class="block-sub">Sourced from the live Spotify profile — the operator's listening, not a recommendation feed.</p>
+    </header>
+    <div class="artist-row">
+      {topArtists.map(a => (
+        <div class="artist">
+          <div class="artist-disc" aria-hidden="true"></div>
+          <div class="artist-text">
+            <h3>{a.name}</h3>
+            <p>{a.tag}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="block block--narrow">
+    <header class="block-head">
+      <h2>Listening posture</h2>
+    </header>
+    <div class="posture">
+      <p><strong>Familiarity-positive.</strong> Recognizable artists, quality deep cuts. Crate-digging happens on vinyl. On streaming, the goal is trusted expansion, not field research.</p>
+      <p><strong>Bass-conscious, emotionally literate.</strong> The playlists optimize for home hi-fi payoff: bass foundation, vocal body, long-session coherence. They reward a real system, not earbuds.</p>
+      <p><strong>Sequenced, not stacked.</strong> Each playlist has a warm-up, a peak, and a glide-out. The order matters. Shuffle is for casual rooms; these are programmed.</p>
+      <p><strong>Genre spine:</strong> country and country-adjacent, classic rock and hard rock, blues and blues-rock, selective hip-hop, selective crossover pop. Jazz and classical avoided by default — not forbidden, just not the lane.</p>
+    </div>
+  </section>
+
+  <section class="block block--narrow integration">
+    <header class="block-head">
+      <h2>How it connects</h2>
+    </header>
+    <p>The Spotify desktop client runs on the GDMARCHE workstation and streams to the Yamaha R-N800A in the Family Room via the receiver's native Spotify source. Audio quality is set to Very High (320 kbps). Local Files indexing points to <code>M:\The Audiopheliac\First Tracks\</code> so Suno bounces flow into the same listening surface as the rest of the library.</p>
+    <p>A Spotify Developer App (client ID <code>7b8b0cd38be7496b864a0380b8c2a16c</code>) is registered for the brand. It's in development mode today — five authorized users — and powers the local <code>spotify_pull.py</code> / <code>spotify_local_match.py</code> automation pipeline that reconciles the Spotify library against the local FLAC index on the NAS.</p>
+  </section>
+
+</BaseLayout>
+
+<style>
+  .page-head { max-width: var(--content-narrow); margin: 0 auto; padding: var(--sp-7) var(--sp-4) var(--sp-6); }
+  .page-head h1 { font-size: clamp(var(--fs-700), 7vw, var(--fs-900)); margin: var(--sp-2) 0 var(--sp-5); }
+  .eyebrow { font-family: var(--font-mono); font-size: var(--fs-100); letter-spacing: 0.22em; text-transform: uppercase; color: var(--spectrum-1); margin: 0; }
+  .lede { font-size: var(--fs-400); color: var(--paper); line-height: var(--lh-snug); margin: 0 0 var(--sp-5); }
+  .cta-row { display: flex; gap: var(--sp-3); flex-wrap: wrap; }
+
+  .identity { max-width: var(--content-narrow); margin: 0 auto; padding: 0 var(--sp-4) var(--sp-6); }
+  .identity-card {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: var(--sp-5);
+    background: var(--surface);
+    border: 1px solid var(--surface-edge);
+    border-radius: var(--r-lg);
+    padding: var(--sp-5);
+    align-items: center;
+  }
+  @media (max-width: 640px) { .identity-card { grid-template-columns: 1fr; } }
+  .identity-mark {
+    width: 180px; height: 180px; border-radius: 50%;
+    background:
+      conic-gradient(from 0deg,
+        var(--spectrum-1),
+        var(--spectrum-6),
+        var(--spectrum-2),
+        var(--spectrum-7),
+        var(--spectrum-3),
+        var(--spectrum-4),
+        var(--spectrum-5),
+        var(--spectrum-1));
+    position: relative;
+    overflow: hidden;
+  }
+  .identity-mark::before { content: ''; position: absolute; inset: 28px; border-radius: 50%; background: var(--ink); }
+  .identity-mark::after { content: ''; position: absolute; inset: 78px; border-radius: 50%; background: var(--spectrum-2); }
+  .identity-eyebrow { font-family: var(--font-mono); font-size: var(--fs-100); letter-spacing: 0.18em; text-transform: uppercase; color: var(--n-400); margin: 0; }
+  .identity-body h2 { font-size: var(--fs-700); margin: var(--sp-1) 0 var(--sp-3); }
+  .identity-meta { display: flex; gap: var(--sp-5); flex-wrap: wrap; margin: 0 0 var(--sp-3); color: var(--n-300); font-size: var(--fs-200); }
+  .identity-meta strong { color: var(--paper); font-weight: 600; }
+  .identity-handle { margin: 0 0 var(--sp-3); }
+  .identity-handle code { font-family: var(--font-mono); font-size: var(--fs-200); background: var(--ink); padding: 4px 10px; border-radius: var(--r-sm); color: var(--spectrum-1); }
+  .identity-note { font-size: var(--fs-100); color: var(--n-400); line-height: var(--lh-normal); margin: 0; }
+  .identity-note code { font-family: var(--font-mono); font-size: 0.85em; color: var(--n-200); }
+
+  .block { max-width: var(--content-max); margin: 0 auto; padding: var(--sp-6) var(--sp-4); }
+  .block--narrow { max-width: var(--content-narrow); }
+  .block-head { margin-bottom: var(--sp-5); }
+  .block-head h2 { font-size: var(--fs-600); margin: 0 0 var(--sp-2); }
+  .block-sub { color: var(--n-300); font-size: var(--fs-300); margin: 0; max-width: 64ch; }
+  .block-foot { color: var(--n-400); font-size: var(--fs-200); margin-top: var(--sp-4); }
+
+  .pl-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--sp-4); }
+  .pl-card {
+    border: 1px solid var(--surface-edge);
+    border-radius: var(--r-md);
+    overflow: hidden;
+    background: var(--surface);
+    text-decoration: none;
+    color: inherit;
+    border-bottom: 1px solid var(--surface-edge);
+    transition: transform 150ms var(--ease-standard), border-color 150ms var(--ease-standard);
+  }
+  .pl-card:hover { transform: translateY(-2px); border-color: var(--spectrum-1); }
+  .pl-art {
+    aspect-ratio: 1;
+    position: relative;
+    background: linear-gradient(135deg, var(--spectrum-5) 0%, var(--spectrum-4) 50%, var(--spectrum-3) 100%);
+  }
+  .pl-card--v2 .pl-art { background: linear-gradient(135deg, var(--spectrum-1), var(--spectrum-5)); }
+  .pl-card--v3 .pl-art { background: linear-gradient(135deg, var(--spectrum-2), var(--spectrum-7), var(--spectrum-4)); }
+  .pl-card--v4 .pl-art { background: linear-gradient(135deg, var(--spectrum-6), var(--spectrum-3)); }
+  .pl-card--v5 .pl-art { background: linear-gradient(135deg, var(--spectrum-3), var(--spectrum-2)); }
+  .pl-card--v6 .pl-art { background: linear-gradient(135deg, var(--spectrum-1), var(--spectrum-2)); }
+  .pl-card--v7 .pl-art { background: linear-gradient(135deg, var(--spectrum-4), var(--spectrum-1)); }
+  .pl-art::after { content: ''; position: absolute; inset: 30%; border-radius: 50%; background: var(--ink); }
+  .pl-art::before { content: ''; position: absolute; inset: 44%; border-radius: 50%; background: var(--spectrum-1); z-index: 1; }
+  .pl-meta { padding: var(--sp-4); }
+  .pl-eyebrow { font-family: var(--font-mono); font-size: var(--fs-100); letter-spacing: 0.14em; text-transform: uppercase; color: var(--n-400); margin: 0 0 4px; }
+  .pl-title { font-family: var(--font-display); font-size: var(--fs-400); margin: 0 0 var(--sp-2); line-height: var(--lh-tight); }
+  .pl-kind { color: var(--n-300); font-size: var(--fs-200); margin: 0; }
+
+  .artist-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--sp-4); }
+  .artist { display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-3); }
+  .artist-disc {
+    width: 100%; aspect-ratio: 1; border-radius: 50%;
+    background:
+      radial-gradient(circle at 35% 30%, var(--spectrum-1), transparent 55%),
+      linear-gradient(135deg, var(--spectrum-5), var(--spectrum-4) 60%, var(--ink));
+  }
+  .artist-text h3 { font-family: var(--font-display); font-size: var(--fs-400); margin: 0 0 var(--sp-1); letter-spacing: 0.02em; }
+  .artist-text p { color: var(--n-300); font-size: var(--fs-100); margin: 0; }
+
+  .posture p { color: var(--n-200); line-height: var(--lh-normal); margin: 0 0 var(--sp-4); }
+  .posture strong { color: var(--paper); font-weight: 500; }
+
+  .integration p { color: var(--n-200); line-height: var(--lh-normal); margin: 0 0 var(--sp-4); }
+  .integration code { font-family: var(--font-mono); font-size: 0.92em; background: var(--surface-2); padding: 1px 6px; border-radius: var(--r-sm); color: var(--spectrum-1); }
+</style>

@@ -1,9 +1,80 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
-<BaseLayout title="Dashboard">
-  <h1>Dashboard</h1>
-  <p>Phase 3 surface. Spotify-connected listening view, playlist generator,
-     saved-track analysis.</p>
-  <p><em>Not live yet.</em></p>
+<BaseLayout title="Dashboard" description="Private member surface — Roon control, Spotify-connect, transport, library browse. Currently local-only.">
+  <header class="page-head">
+    <p class="eyebrow">Dashboard · Members</p>
+    <h1>The Cockpit is private. For now.</h1>
+    <p class="lede">
+      The Audiopheliac Cockpit is a local Flask + browser UI on GDMARCHE. It runs
+      the Roon library, the family-room receiver, transport across zones, and the
+      Spotify-connect handshake. It's the control surface that ties the chain
+      together. It isn't on the public web yet — and may never be.
+    </p>
+  </header>
+
+  <section class="section">
+    <div class="section__head">
+      <div>
+        <p class="section__eyebrow">What's in there</p>
+        <h2>Cockpit v0.2 · 2026-05-11</h2>
+      </div>
+      <span class="tag tag--steel">Local only</span>
+    </div>
+    <div class="grid grid--3">
+      <div class="card">
+        <h3 class="cream">Library</h3>
+        <p>Roon-backed search and browse against 13,450 tracks. Album · artist · track views. Quick-add to the active zone.</p>
+      </div>
+      <div class="card">
+        <h3 class="cream">Zones</h3>
+        <p>Two zones (Family Room AirPlay 2, Studio AIR HUB ASIO). Per-zone volume, transport, group/ungroup. Source switching on the R-N800A via YXC.</p>
+      </div>
+      <div class="card">
+        <h3 class="cream">Receiver controls</h3>
+        <p>Power, volume, mute, source select, Net Radio presets. All via the unauthenticated YXC HTTP/JSON API at <code>http://192.168.1.191/YamahaExtendedControl/v1/</code>.</p>
+      </div>
+      <div class="card">
+        <h3 class="cream">Spotify</h3>
+        <p>Connect handshake against the developer app (<code>The Audiopheliac</code>). Local Files indexed against the same library Roon serves.</p>
+      </div>
+      <div class="card">
+        <h3 class="cream">Transport</h3>
+        <p>Play / pause / seek / next / previous. Now-playing surface. Per-track metadata sourced from Roon, with cover art passthrough.</p>
+      </div>
+      <div class="card">
+        <h3 class="cream">Diagnostics</h3>
+        <p>Health pings against Roon Server, R-N800A YXC, and AIR Hub. One pane of glass for "is the chain alive right now."</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section__head">
+      <div>
+        <p class="section__eyebrow">Access</p>
+        <h2>Why it's private.</h2>
+      </div>
+    </div>
+    <p class="lede">
+      The Cockpit talks directly to the home network — receiver IP, NAS, Roon
+      Server, AIR Hub. Exposing it on the public web means exposing those
+      endpoints, even with auth in front. We're not in a rush to do that. For
+      now the Cockpit lives on GDMARCHE only; when it does land on the web, it
+      lands behind OAuth on a sub-domain, not on the apex.
+    </p>
+    <p class="lede">
+      If you want a peek at what it looks like, watch the
+      <a href="/journal">journal</a> — when the Cockpit moves to public-readable
+      status, the post will land there first.
+    </p>
+  </section>
 </BaseLayout>
+
+<style>
+  .page-head { padding: var(--sp-6) 0 var(--sp-7); border-bottom: 1px solid var(--surface-edge); margin-bottom: var(--sp-7); }
+  .page-head h1 { font-size: clamp(var(--fs-700), 7vw, var(--fs-900)); margin: 0 0 var(--sp-5); max-width: 22ch; }
+  code { font-family: var(--font-mono); color: var(--spectrum-1); font-size: 0.88em; }
+  .card h3 { margin: 0 0 var(--sp-3); font-size: var(--fs-500); }
+  .card p  { color: var(--n-300); margin: 0; }
+</style>

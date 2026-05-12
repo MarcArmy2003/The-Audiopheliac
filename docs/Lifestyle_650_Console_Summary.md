@@ -144,7 +144,7 @@ Ethernet → QNAP TS-473A (MusicCast / DLNA / AirPlay 2)
 | Bose Lifestyle 650       | [Lifestyle 650 Console Summary](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/docs/Lifestyle_650_Console_Summary.md) |
 | Dell Precision 7540      | [Dell Precision 7540 Specs](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/docs/Dell_Precision_7540_Specs.md)         |
 | Instrument & Studio Gear | [Instrument Specs v2025.10.08](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/docs/instrument_specs_v_2025_10_08.md)  |
-| Signal Map               | [Signal Map v2026.01](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/config/audiopheliac_signal_map_v_2026_01.md)     |
+| Signal Map               | [Signal Map v2026.05](https://github.com/MarcArmy2003/The-Audiopheliac/blob/main/config/audiopheliac_signal_map_v_2026_05.md)     |
 
 ---
 

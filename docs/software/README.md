@@ -37,7 +37,7 @@ Add a row when a new profile lands. Update Last reviewed when you touch the prof
 ## What does NOT go here
 
 - Hardware specs (those live in `docs/av_master_inventory_2026.md` and per-device docs like `docs/Processing_Hardware.md`)
-- Signal-chain topology (lives in `config/audiopheliac_signal_map_v_2026_01.md`)
+- Signal-chain topology (lives in `config/audiopheliac_signal_map_v_2026_05.md`)
 - Project rules and operating constraints (live in CLAUDE.md)
 - Secrets, tokens, API keys (live in `config/*.env`, gitignored)
 - One-off troubleshooting notes not worth durable capture (drop those in Slack canvas or a daily log)

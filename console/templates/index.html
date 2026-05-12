@@ -3,126 +3,165 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Audiopheliac Cockpit</title>
+  <title>The Audiopheliac Cockpit</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Unica+One&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body data-yamaha-ip="{{ yamaha_ip }}">
+
   <header class="topbar">
-    <div class="mark">The Audiopheliac</div>
+    <img class="topbar-mark" src="{{ url_for('static', filename='audiopheliac-mark.jpg') }}" alt="" aria-hidden="true" />
+    <div class="brand-titles">
+      <div class="mark">The Audiopheliac</div>
+      <div class="brand-sub">Cockpit · v0.4</div>
+    </div>
     <div class="device" id="device-name">{{ device_name }}</div>
     <div class="topbar-state">
-      <span class="topbar-roon" id="topbar-roon">Roon: ...</span>
-      <span class="status-dot" id="status-dot" title="Yamaha connection"></span>
+      <span class="topbar-pill" id="topbar-roon">Roon · connecting...</span>
+      <span class="topbar-pill" id="topbar-yamaha"><span class="status-dot" id="status-dot"></span> R-N800A</span>
+      <button class="topbar-btn" id="btn-reset-layout" title="Restore all cards and reset card order">Reset layout</button>
     </div>
   </header>
 
-  <div class="hidden-cards-bar" id="hidden-cards-bar"></div>
+  <div class="hidden-bar-wrap">
+    <div class="hidden-cards-bar" id="hidden-cards-bar"></div>
+  </div>
 
-  <main class="grid">
+  <main class="grid" id="grid">
 
-    <section class="card power-card" data-card="power">
+    <section class="card card-now" data-card="now">
       <header class="card-head">
-        <h2>Power</h2>
-        <button class="card-hide" title="Hide card">&times;</button>
+        <span class="drag-handle" title="Drag to reposition">⋮⋮</span>
+        <h2>Now playing</h2>
+        <span class="card-meta" id="now-zone-label">no zone selected</span>
+        <button class="card-hide" title="Hide card" aria-label="Hide card">&times;</button>
       </header>
-      <div class="row">
-        <button class="btn-primary" id="btn-power-on">On</button>
-        <button class="btn-secondary" id="btn-power-off">Standby</button>
+      <div class="now-body">
+        <div class="now-art-wrap">
+          <img class="now-art" id="now-art" alt="" />
+          <div class="now-art-placeholder" aria-hidden="true"></div>
+        </div>
+        <div class="now-info">
+          <div class="now-track" id="now-track">—</div>
+          <div class="now-artist" id="now-artist"></div>
+          <div class="now-album" id="now-album"></div>
+          <div class="now-meta" id="now-meta"></div>
+          <div class="scrub">
+            <span id="now-elapsed">--:--</span>
+            <div class="scrub-bar"><div class="scrub-fill" id="now-scrub-fill"></div></div>
+            <span id="now-total">--:--</span>
+          </div>
+          <div class="transport">
+            <button class="tb" data-tx="previous" title="Previous">⏮</button>
+            <button class="tb tb-primary" data-tx="playpause" title="Play / Pause" id="btn-playpause">▶</button>
+            <button class="tb" data-tx="next" title="Next">⏭</button>
+            <div class="t-spacer"></div>
+            <span class="now-source" id="now-source"></span>
+          </div>
+        </div>
       </div>
-      <div class="muted" id="power-state">&nbsp;</div>
     </section>
 
-    <section class="card volume-card" data-card="volume">
+    <section class="card card-receiver" data-card="receiver">
       <header class="card-head">
-        <h2>Volume</h2>
-        <button class="card-hide" title="Hide card">&times;</button>
+        <span class="drag-handle" title="Drag to reposition">⋮⋮</span>
+        <h2>Receiver</h2>
+        <span class="card-meta" id="power-state">standby</span>
+        <button class="card-hide" title="Hide card" aria-label="Hide card">&times;</button>
       </header>
-      <div class="row">
-        <button class="btn-icon" id="btn-vol-down" title="Volume down">&#8722;</button>
-        <input type="range" id="vol-slider" min="0" max="161" value="60">
-        <button class="btn-icon" id="btn-vol-up" title="Volume up">+</button>
-      </div>
-      <div class="row vol-readout">
-        <span id="vol-pct">--%</span>
-        <button class="btn-secondary" id="btn-mute">Mute</button>
+      <div class="receiver-grid">
+        <div class="recv-power">
+          <button class="power-btn" id="btn-power-on" data-power="on">On</button>
+          <button class="power-btn" id="btn-power-off" data-power="standby">Standby</button>
+        </div>
+        <div class="recv-volume">
+          <div class="vol-row">
+            <button class="icon-btn" id="btn-vol-down" title="Volume down">−</button>
+            <input type="range" id="vol-slider" min="0" max="161" value="40">
+            <button class="icon-btn" id="btn-vol-up" title="Volume up">+</button>
+          </div>
+          <div class="vol-readout">
+            <span id="vol-pct">--%</span>
+            <button class="ghost-btn" id="btn-mute">Mute</button>
+          </div>
+        </div>
       </div>
     </section>
 
-    <section class="card input-card" data-card="input">
+    <section class="card card-input" data-card="input">
       <header class="card-head">
-        <h2>Yamaha Source</h2>
-        <button class="card-hide" title="Hide card">&times;</button>
+        <span class="drag-handle" title="Drag to reposition">⋮⋮</span>
+        <h2>Yamaha source</h2>
+        <span class="card-meta" id="input-meta">filtered</span>
+        <button class="card-hide" title="Hide card" aria-label="Hide card">&times;</button>
       </header>
       <div class="input-list" id="input-list">
         <span class="muted">loading sources...</span>
       </div>
+      <div class="input-foot muted">Filtered to your enabled sources (see <code>console/config.json</code> → <code>enabled_sources</code>).</div>
     </section>
 
-    <section class="card zone-card" data-card="zone">
+    <section class="card card-zone" data-card="zone">
       <header class="card-head">
-        <h2>Roon Zone</h2>
-        <button class="card-hide" title="Hide card">&times;</button>
+        <span class="drag-handle" title="Drag to reposition">⋮⋮</span>
+        <h2>Roon zones</h2>
+        <span class="card-meta" id="zone-meta">connecting...</span>
+        <button class="card-hide" title="Hide card" aria-label="Hide card">&times;</button>
       </header>
       <div class="zone-list" id="zone-list">
         <span class="muted">connecting to Roon...</span>
       </div>
     </section>
 
-    <section class="card now-card" data-card="now">
+    <section class="card card-library" data-card="library">
       <header class="card-head">
-        <h2>Now Playing</h2>
-        <button class="card-hide" title="Hide card">&times;</button>
-      </header>
-      <div class="now-art-wrap">
-        <img class="now-art" id="now-art" alt="" />
-      </div>
-      <div class="now-meta">
-        <div class="now-track" id="now-track">&mdash;</div>
-        <div class="now-artist" id="now-artist"></div>
-        <div class="now-album" id="now-album"></div>
-      </div>
-      <div class="row transport">
-        <button class="btn-icon" data-tx="previous" title="Previous">&#9198;</button>
-        <button class="btn-icon" data-tx="playpause" title="Play / Pause">&#9654;</button>
-        <button class="btn-icon" data-tx="next"     title="Next">&#9197;</button>
-      </div>
-      <div class="muted" id="now-source">&nbsp;</div>
-    </section>
-
-    <section class="card preset-card" data-card="preset">
-      <header class="card-head">
-        <h2>Net Radio Presets</h2>
-        <button class="card-hide" title="Hide card">&times;</button>
-      </header>
-      <div class="preset-list" id="preset-list">
-        <span class="muted">loading presets...</span>
-      </div>
-    </section>
-
-    <section class="card library-card" data-card="library">
-      <header class="card-head">
+        <span class="drag-handle" title="Drag to reposition">⋮⋮</span>
         <h2>Library</h2>
-        <button class="card-hide" title="Hide card">&times;</button>
+        <span class="card-meta" id="library-crumb">—</span>
+        <button class="card-hide" title="Hide card" aria-label="Hide card">&times;</button>
       </header>
-      <div class="row library-search">
-        <input type="search" id="library-q" placeholder="Search Roon library (artists, albums, tracks)..." />
-        <button class="btn-secondary" id="library-search-btn">Search</button>
-      </div>
-      <div class="library-header">
-        <button class="btn-secondary" id="library-back" title="Back">&larr; Back</button>
-        <button class="btn-secondary" id="library-home" title="Home">Home</button>
-        <span class="library-crumb" id="library-crumb">&mdash;</span>
+      <div class="library-controls">
+        <div class="library-search">
+          <input type="search" id="library-q" placeholder="Search artist, album, track..." />
+          <button class="primary-btn" id="library-search-btn">Search</button>
+        </div>
+        <div class="library-nav">
+          <button class="ghost-btn" id="library-back">← Back</button>
+          <button class="ghost-btn" id="library-home">Home</button>
+        </div>
       </div>
       <div class="library-list" id="library-list">
-        <span class="muted">authorize the Cockpit in Roon to begin</span>
+        <span class="muted">connect Roon to begin</span>
+      </div>
+    </section>
+
+    <section class="card card-preset" data-card="preset">
+      <header class="card-head">
+        <span class="drag-handle" title="Drag to reposition">⋮⋮</span>
+        <h2>Net Radio</h2>
+        <span class="card-meta" id="preset-meta">presets + suggestions</span>
+        <button class="card-hide" title="Hide card" aria-label="Hide card">&times;</button>
+      </header>
+      <div class="preset-section">
+        <div class="preset-section-head">Saved presets (R-N800A)</div>
+        <div class="preset-list" id="preset-list">
+          <span class="muted">loading presets...</span>
+        </div>
+      </div>
+      <div class="preset-section">
+        <div class="preset-section-head">Suggested stations</div>
+        <div class="suggest-list" id="suggest-list">
+          <span class="muted">loading suggestions...</span>
+        </div>
+        <div class="preset-foot muted">Yamaha presets are saved on the receiver via the MusicCast app; the Cockpit can't add them directly. Use the names below to find each station in MusicCast → Net Radio → vTuner search, then save to a preset slot.</div>
       </div>
     </section>
 
   </main>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.3/Sortable.min.js"></script>
   <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>

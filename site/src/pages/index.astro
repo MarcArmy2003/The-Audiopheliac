@@ -2,31 +2,265 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 <BaseLayout title="Home">
+
+  <!-- HERO -->
   <section class="hero">
-    <h1>Where signal flow meets soul.</h1>
-    <p class="tagline">
-      A personal audio project. Signal-first engineering, emotion-literate curation,
-      home hi-fi listening as a philosophy.
+    <p class="hero__eyebrow">Audio · Technology · AI</p>
+    <h1 class="hero__title">
+      Where every cable,<br />
+      waveform, and decibel<br />
+      <span class="hero__title--accent">earns its keep.</span>
+    </h1>
+    <p class="hero__lede">
+      A lifestyle brand built on the credibility of an actual signal chain. Studio
+      monitoring, vinyl rotations across four listening zones, AI-assisted releases on
+      Suno, and gear reviews from rigs we run nightly.
     </p>
-    <a href="/about" class="cta cta--hero">Enter the system</a>
+    <div class="hero__cta">
+      <a href="/studio" class="cta cta--hero">Step into the studio</a>
+      <a href="/journal" class="cta cta--ghost">Read the journal</a>
+    </div>
+    <p class="hero__motto">"Rock 'n' roll. Deal with it."</p>
   </section>
+
+  <!-- VALUE-PROP GRID -->
+  <section class="section section--props">
+    <div class="section__head">
+      <div>
+        <p class="section__eyebrow">What you'll find here</p>
+        <h2>Five lanes, one signal chain.</h2>
+      </div>
+    </div>
+    <div class="grid grid--3">
+      <a class="card prop" href="/studio">
+        <span class="tag tag--bronze">Signal chain</span>
+        <h3>Studio</h3>
+        <p>Four listening zones. Yamaha HS7s and a JBL LSR310S sub anchor the office. Technics SL-1200MK2 and a Yamaha R-N800A run the family room.</p>
+        <span class="card__more">See the chain →</span>
+      </a>
+      <a class="card prop" href="/music">
+        <span class="tag tag--bronze">AI music</span>
+        <h3>Music</h3>
+        <p>Suno Premier (10,000 credits/month, commercial use). First Tracks album live, Local Files indexed in Spotify, masters bound for streaming.</p>
+        <span class="card__more">Hear the releases →</span>
+      </a>
+      <a class="card prop" href="/gear">
+        <span class="tag tag--bronze">Reviews</span>
+        <h3>Gear</h3>
+        <p>Reviews and recommendations from gear we actually run. Backed by the Audiopheliac Gear Proxy and an Amazon Associates store.</p>
+        <span class="card__more">Browse gear →</span>
+      </a>
+      <a class="card prop" href="/vinyl">
+        <span class="tag tag--bronze">Collection</span>
+        <h3>Vinyl</h3>
+        <p>A curated, growing collection. Median Discogs pricing tracked. Recent additions from Zach Bryan, Shaboozey, Gavin Adcock, Red Clay Strays.</p>
+        <span class="card__more">See what's on the platter →</span>
+      </a>
+      <a class="card prop" href="/journal">
+        <span class="tag tag--bronze">Notes</span>
+        <h3>Journal</h3>
+        <p>Field notes on signal flow, palette decisions, mid-flight gear failures, and what we learned in the studio this week.</p>
+        <span class="card__more">Read the entries →</span>
+      </a>
+      <a class="card prop card--gated" href="/dashboard">
+        <span class="tag tag--steel">Members</span>
+        <h3>Dashboard</h3>
+        <p>Roon control surface, library browse, transport, zone routing, Spotify-connect. Local Cockpit v0.2 — private surface.</p>
+        <span class="card__more">Sign in →</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- FEATURED JOURNAL -->
+  <section class="section">
+    <div class="section__head">
+      <div>
+        <p class="section__eyebrow">From the journal</p>
+        <h2>What changed this week.</h2>
+      </div>
+      <a href="/journal" class="cta cta--ghost">All entries</a>
+    </div>
+    <div class="grid grid--2">
+      <article class="card post">
+        <p class="post__date">2026-05-11</p>
+        <h3><a href="/journal#roon-pivot">The Roon pivot.</a></h3>
+        <p>Yamaha Extended Control could turn the receiver on. It could not run a library. Roon Server moved to Docker on the QNAP and 13,450 tracks lit up across two zones.</p>
+        <p class="post__meta"><span class="tag">Infra</span> <span class="tag tag--steel">Library</span></p>
+      </article>
+      <article class="card post">
+        <p class="post__date">2026-05-11</p>
+        <h3><a href="/journal#focusrite-died">The Focusrite died. The AIR Hub saved the day.</a></h3>
+        <p>Solo Gen 4 fried mid-session. M-Audio AIR Hub was already in the box, already drivered. Output-only is fine until an input-capable interface lands.</p>
+        <p class="post__meta"><span class="tag tag--bronze">Hardware</span></p>
+      </article>
+      <article class="card post">
+        <p class="post__date">2026-04-28</p>
+        <h3><a href="/journal#nashville-midnight">Nashville Midnight — a palette for late-night listening.</a></h3>
+        <p>Cream → bronze → steel → indigo → midnight. Derived from emotional lanes in the listening profile, not picked from a moodboard.</p>
+        <p class="post__meta"><span class="tag">Brand</span></p>
+      </article>
+      <article class="card post post--upcoming">
+        <p class="post__date muted">Coming soon</p>
+        <h3>Bit-perfect on Windows 11 without breaking Local Files.</h3>
+        <p>Spotify Premier lossless, M-Audio AIR Hub ASIO at 24/96, and how to keep Spotify's Local Files index from breaking when WAVs and MP3s share a folder.</p>
+        <p class="post__meta"><span class="tag tag--steel">Workflow</span></p>
+      </article>
+    </div>
+  </section>
+
+  <!-- LISTENING PROFILE -->
+  <section class="section">
+    <div class="section__head">
+      <div>
+        <p class="section__eyebrow">House sound</p>
+        <h2>What we play, on purpose.</h2>
+      </div>
+    </div>
+    <div class="profile">
+      <div>
+        <p class="lede">
+          Country and country-adjacent. Classic rock, hard rock, blues, blues-rock.
+          Selective hip-hop. Selective crossover pop. Tracks that reward home hi-fi
+          playback: structural bass, full low mids, clear lead vocals, muscular drums.
+        </p>
+        <p class="lede">
+          We don't program for crate-digging cool. We program for the room — long
+          sessions, controlled fatigue, sequencing that respects the energy curve.
+        </p>
+      </div>
+      <ul class="bare profile__list">
+        <li><span class="cream">●</span> Familiarity-positive — recognizable artists, hits, quality deep cuts.</li>
+        <li><span class="cream">●</span> Bass-conscious — structural, not club-oriented.</li>
+        <li><span class="cream">●</span> Vocal-forward — body and clarity over spectacle.</li>
+        <li><span class="cream">●</span> Sequenced — playlists run as programs, not stacks.</li>
+        <li><span class="cream">●</span> Brand-named — "<em>The Audiopheliac presents…</em>"</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- CTA STRIP -->
+  <section class="cta-strip">
+    <div class="cta-strip__inner">
+      <div>
+        <p class="section__eyebrow">Next time you press play</p>
+        <h2>Hear it on a rig that earns its keep.</h2>
+      </div>
+      <a href="/gear" class="cta cta--hero">Find your chain</a>
+    </div>
+  </section>
+
 </BaseLayout>
 
 <style>
+  /* ---------------- HERO ---------------- */
   .hero {
-    padding: var(--sp-9) 0;
-    text-align: center;
+    padding: var(--sp-10) 0 var(--sp-9);
+    text-align: left;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(232, 213, 163, 0.10), transparent 55%),
+      radial-gradient(circle at 80% 0%, rgba(184, 115, 51, 0.12), transparent 50%);
+    border-bottom: 1px solid var(--surface-edge);
+    margin: 0 calc(var(--sp-5) * -1) var(--sp-8);
+    padding-left: var(--sp-5);
+    padding-right: var(--sp-5);
   }
-  h1 {
-    font-size: var(--fs-900);
-    max-width: 20ch;
-    margin: 0 auto var(--sp-5);
+  .hero__eyebrow {
+    font-family: var(--font-mono);
+    font-size: var(--fs-100);
+    letter-spacing: 0.30em;
+    color: var(--spectrum-2);
+    text-transform: uppercase;
+    margin: 0 0 var(--sp-4);
   }
-  .tagline {
+  .hero__title {
+    font-size: clamp(var(--fs-800), 9vw, var(--fs-max));
+    line-height: 0.95;
+    margin: 0 0 var(--sp-5);
+    color: var(--paper);
+    letter-spacing: 0.01em;
+  }
+  .hero__title--accent {
+    background: var(--spectrum-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero__lede {
     font-size: var(--fs-400);
     color: var(--n-300);
-    max-width: 42rem;
-    margin: 0 auto var(--sp-6);
+    max-width: 46rem;
     line-height: var(--lh-normal);
+    margin: 0 0 var(--sp-6);
+  }
+  .hero__cta {
+    display: flex;
+    gap: var(--sp-4);
+    flex-wrap: wrap;
+    margin-bottom: var(--sp-7);
+  }
+  .hero__motto {
+    font-family: var(--font-display);
+    font-size: var(--fs-400);
+    color: var(--spectrum-2);
+    margin: 0;
+    letter-spacing: 0.04em;
+    opacity: 0.85;
+  }
+
+  /* ---------------- PROP CARDS ---------------- */
+  .prop { display: flex; flex-direction: column; gap: var(--sp-3); color: var(--paper); border-bottom: none; }
+  .prop h3 { margin: 0; font-size: var(--fs-500); color: var(--spectrum-1); }
+  .prop p  { color: var(--n-300); margin: 0; font-size: var(--fs-200); line-height: var(--lh-normal); }
+  .card__more { margin-top: auto; padding-top: var(--sp-4); color: var(--spectrum-2); font-family: var(--font-mono); font-size: var(--fs-100); letter-spacing: 0.18em; text-transform: uppercase; }
+  .card--gated { background: linear-gradient(160deg, var(--surface), var(--spectrum-5)); }
+
+  /* ---------------- POSTS ---------------- */
+  .post { color: var(--paper); border-bottom: none; }
+  .post h3 { margin: var(--sp-2) 0 var(--sp-3); font-size: var(--fs-500); }
+  .post h3 a { color: var(--paper); border-bottom: none; }
+  .post h3 a:hover { color: var(--spectrum-1); }
+  .post__date { color: var(--spectrum-2); font-family: var(--font-mono); font-size: var(--fs-100); letter-spacing: 0.14em; text-transform: uppercase; margin: 0; }
+  .post__meta { margin: var(--sp-4) 0 0; display: flex; gap: var(--sp-2); }
+  .post--upcoming { opacity: 0.75; }
+
+  /* ---------------- PROFILE ---------------- */
+  .profile {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: var(--sp-7);
+    align-items: start;
+  }
+  .profile__list li {
+    padding: var(--sp-2) 0;
+    border-bottom: 1px dashed var(--surface-edge);
+    font-size: var(--fs-300);
+    color: var(--n-200);
+  }
+  .profile__list li:last-child { border-bottom: 0; }
+
+  /* ---------------- CTA STRIP ---------------- */
+  .cta-strip {
+    margin: var(--sp-9) calc(var(--sp-5) * -1) 0;
+    padding: var(--sp-8) var(--sp-5);
+    background: var(--spectrum-gradient);
+    color: var(--ink);
+  }
+  .cta-strip__inner {
+    max-width: var(--content-max);
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--sp-6);
+    flex-wrap: wrap;
+  }
+  .cta-strip h2 { color: var(--ink); margin: var(--sp-2) 0 0; font-size: var(--fs-700); }
+  .cta-strip .section__eyebrow { color: var(--spectrum-5); }
+  .cta-strip .cta { background: var(--ink); color: var(--spectrum-1); }
+  .cta-strip .cta:hover { background: var(--spectrum-4); }
+
+  @media (max-width: 760px) {
+    .hero { padding-top: var(--sp-8); padding-bottom: var(--sp-7); }
+    .profile { grid-template-columns: 1fr; }
   }
 </style>

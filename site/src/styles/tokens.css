@@ -1,8 +1,10 @@
 /* ============================================================
-   The Audiopheliac — Design Tokens
-   Phase 2 brand layer. Nashville Midnight palette derived from
-   listening profile emotional lanes: late-night stage, bronze
-   spotlights, honky-tonk neon. Approved 2026-04-28.
+   The Audiopheliac — Design Tokens v3.0 (Full Spectrum)
+   Restored 2026-05-12. Replaces Nashville Midnight palette.
+   Spectrum sweeps Sunlamp Yellow > Spring Lime > Signal Green >
+   Cyan Pulse > Sapphire Run > Indigo Drift > Magenta Lift.
+   Variable names (--spectrum-1..6) preserved for site-wide compat.
+   Nashville Midnight archived at _dev/99_archive/nashville_midnight_sub_brand/
    ============================================================ */
 
 :root {
@@ -11,41 +13,65 @@
   --paper:      #F5F5F7;   /* body text on dark field */
   --hairline:   #FFFFFF;   /* pure white for outlines, rules */
 
-  /* --- Nashville Midnight palette (cream to midnight) ---- */
-  --spectrum-1: #E8D5A3;   /* neon cream    CTA primary */
-  --spectrum-2: #B87333;   /* stage bronze  accent */
-  --spectrum-3: #3D5A80;   /* steel blue    body accent */
-  --spectrum-4: #1B2340;   /* deep indigo   structural */
-  --spectrum-5: #1A1A2E;   /* midnight      deep field */
-  --spectrum-6: #D4B08C;   /* warm gold     CTA hover lift */
+  /* --- Full Spectrum palette (yellow > magenta) --------- */
+  --spectrum-1: #F8E91F;   /* Sunlamp Yellow      CTA primary */
+  --spectrum-2: #41D99A;   /* Signal Green        accent, success, spindle */
+  --spectrum-3: #0F82DF;   /* Sapphire Run        body accent, info */
+  --spectrum-4: #5E54D4;   /* Indigo Drift        deep secondary */
+  --spectrum-5: #C24CC8;   /* Magenta Lift        CTA hover, warm terminus */
+  --spectrum-6: #99E257;   /* Spring Lime         warm transition */
+  --spectrum-7: #0ABED3;   /* Cyan Pulse          body accent only, NEVER CTAs */
 
+  /* Aliases by name for new code */
+  --sunlamp:  var(--spectrum-1);
+  --signal:   var(--spectrum-2);
+  --sapphire: var(--spectrum-3);
+  --indigo:   var(--spectrum-4);
+  --magenta:  var(--spectrum-5);
+  --spring:   var(--spectrum-6);
+  --cyan:     var(--spectrum-7);
+
+  /* Full prismatic gradient — reserved for 1-2 hero moments only */
   --spectrum-gradient:
-    linear-gradient(135deg,
-      var(--spectrum-1) 0%,
-      var(--spectrum-2) 40%,
-      var(--spectrum-3) 75%,
-      var(--spectrum-4) 100%
+    linear-gradient(90deg,
+      #F8E91F 0%,
+      #99E257 16%,
+      #41D99A 32%,
+      #0ABED3 48%,
+      #0F82DF 64%,
+      #5E54D4 80%,
+      #C24CC8 100%
+    );
+
+  --spectrum-gradient-soft:
+    linear-gradient(160deg,
+      rgba(248, 233, 31, 0.06) 0%,
+      rgba(65, 217, 154, 0.08) 30%,
+      rgba(15, 130, 223, 0.10) 65%,
+      rgba(194, 76, 200, 0.14) 100%
     );
 
   /* --- Functional brand --------------------------------- */
-  --brand-hero:    var(--spectrum-1);              /* neon cream */
-  --brand-accent:  var(--spectrum-3);              /* steel blue, body accent only */
+  --brand-hero:    var(--spectrum-1);            /* Sunlamp Yellow */
+  --brand-accent:  var(--spectrum-3);            /* Sapphire Run, body accent */
+  --brand-bronze:  var(--spectrum-2);            /* renamed-but-kept: Signal Green, structural accent */
 
   /* --- CTA contract ------------------------------------- */
-  /* Solid neon cream is the default CTA on ink (~14.1:1).   */
+  /* Solid Sunlamp Yellow on ink (~17.5:1 AAA).             */
   --cta-bg:         var(--brand-hero);
   --cta-text:       var(--ink);
-  --cta-bg-hover:   var(--spectrum-6);              /* warm gold lift */
-  --cta-ring:       rgba(232, 213, 163, 0.45);     /* focus ring */
+  --cta-bg-hover:   var(--spectrum-5);            /* Magenta Lift */
+  --cta-text-hover: var(--paper);
+  --cta-ring:       rgba(248, 233, 31, 0.45);    /* yellow focus ring */
 
-  /* Gradient CTA is reserved for 1-2 hero moments only:    */
-  /*   landing page primary CTA                              */
-  /*   /dashboard Spotify-connect button                     */
+  /* Gradient CTA reserved for 1-2 hero moments only */
   --cta-bg-hero:    var(--spectrum-gradient);
   --cta-text-hero:  var(--ink);
 
-  /* --- Neutral UI ramp (derived from ink) --------------- */
-  --n-900: #0A0A0B;   /* = ink */
+  /* Teal CTAs FORBIDDEN: --cta-bg MUST NEVER equal var(--cyan). */
+
+  /* --- Neutral UI ramp (unchanged) ---------------------- */
+  --n-900: #0A0A0B;
   --n-800: #161618;
   --n-700: #232327;
   --n-600: #3A3A40;
@@ -54,29 +80,38 @@
   --n-300: #B8B8C0;
   --n-200: #D9D9DD;
   --n-100: #ECECEF;
-  --n-050: #F5F5F7;   /* = paper */
+  --n-050: #F5F5F7;
 
-  /* --- Typography --------------------------------------- */
+  /* --- Card / surface (unchanged) ----------------------- */
+  --surface:       #121218;
+  --surface-2:     #1A1A22;
+  --surface-3:     #22222C;
+  --surface-edge:  rgba(255, 255, 255, 0.06);
+  --surface-edge-strong: rgba(248, 233, 31, 0.30);   /* was bronze; now Sunlamp at same alpha */
+
+  /* --- Typography (unchanged) --------------------------- */
   --font-display: "Unica One", "Archivo Black", Impact, sans-serif;
   --font-body:    "Inter", -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono:    "JetBrains Mono", "Fira Code", Consolas, Menlo, monospace;
 
   /* Modular scale (1.250 major third, base 16px) */
-  --fs-100: 0.75rem;    /* 12 */
-  --fs-200: 0.875rem;   /* 14 */
-  --fs-300: 1rem;       /* 16 base */
-  --fs-400: 1.25rem;    /* 20 */
-  --fs-500: 1.5625rem;  /* 25 */
-  --fs-600: 1.953rem;   /* 31 */
-  --fs-700: 2.441rem;   /* 39 */
-  --fs-800: 3.052rem;   /* 49 */
-  --fs-900: 3.815rem;   /* 61 */
+  --fs-100: 0.75rem;
+  --fs-200: 0.875rem;
+  --fs-300: 1rem;
+  --fs-400: 1.25rem;
+  --fs-500: 1.5625rem;
+  --fs-600: 1.953rem;
+  --fs-700: 2.441rem;
+  --fs-800: 3.052rem;
+  --fs-900: 3.815rem;
+  --fs-max:  4.768rem;
 
   --lh-tight:  1.1;
   --lh-snug:   1.25;
   --lh-normal: 1.55;
   --lh-loose:  1.75;
 
-  /* --- Spacing (4px base) ------------------------------- */
+  /* --- Spacing (unchanged) ------------------------------ */
   --sp-1:  0.25rem;
   --sp-2:  0.5rem;
   --sp-3:  0.75rem;
@@ -86,18 +121,32 @@
   --sp-7:  3rem;
   --sp-8:  4rem;
   --sp-9:  6rem;
+  --sp-10: 8rem;
 
-  /* --- Radius ------------------------------------------- */
+  /* --- Radius (unchanged) ------------------------------- */
   --r-sm: 4px;
   --r-md: 8px;
   --r-lg: 14px;
   --r-xl: 22px;
+  --r-pill: 999px;
 
-  /* --- Motion ------------------------------------------- */
+  /* --- Motion (unchanged) ------------------------------- */
   --ease-standard: cubic-bezier(0.2, 0, 0.1, 1);
   --dur-fast:   120ms;
   --dur-medium: 220ms;
   --dur-slow:   380ms;
+
+  /* --- Shadow (unchanged) ------------------------------- */
+  --shadow-soft:
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 12px 32px rgba(0, 0, 0, 0.45);
+  --shadow-lift:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 18px 48px rgba(0, 0, 0, 0.55);
+
+  /* --- Layout (unchanged) ------------------------------- */
+  --content-max: 76rem;
+  --content-narrow: 52rem;
 }
 
 /* ============================================================
@@ -112,29 +161,53 @@ body {
 h1, h2, h3, h4 {
   font-family: var(--font-display);
   line-height: var(--lh-tight);
-  letter-spacing: 0.01em;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
 }
 
 /* ============================================================
    CTA component contract
    ============================================================ */
 .cta {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
   padding: var(--sp-3) var(--sp-5);
-  border-radius: var(--r-md);
+  border-radius: var(--r-pill);
   background: var(--cta-bg);
   color: var(--cta-text);
   font-family: var(--font-body);
   font-weight: 600;
+  font-size: var(--fs-300);
   text-decoration: none;
+  border: 1px solid var(--cta-bg);
+  cursor: pointer;
   transition: background var(--dur-fast) var(--ease-standard),
+              color var(--dur-fast) var(--ease-standard),
+              border-color var(--dur-fast) var(--ease-standard),
               transform var(--dur-fast) var(--ease-standard);
 }
-.cta:hover  { background: var(--cta-bg-hover); }
+.cta:hover  {
+  background: var(--cta-bg-hover);
+  color: var(--cta-text-hover);
+  border-color: var(--cta-bg-hover);
+}
 .cta:focus-visible { outline: 3px solid var(--cta-ring); outline-offset: 3px; }
 .cta:active { transform: translateY(1px); }
 
 .cta--hero {
   background: var(--cta-bg-hero);
   color: var(--cta-text-hero);
+}
+.cta--hero:hover { filter: brightness(1.06); background: var(--cta-bg-hero); }
+
+.cta--ghost {
+  background: transparent;
+  color: var(--paper);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+.cta--ghost:hover {
+  background: rgba(248, 233, 31, 0.06);
+  color: var(--spectrum-1);
+  border-color: var(--spectrum-1);
 }

@@ -1,8 +1,226 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+const recent = [
+  { artist: 'Zach Bryan',         title: 'American Heartbreak',                year: 2022, median: '$32', spin: 'A1: "Something in the Orange"' },
+  { artist: 'Zach Bryan',         title: 'The Great American Bar Scene',       year: 2024, median: '$28', spin: '"Pink Skies"' },
+  { artist: 'Shaboozey',          title: "Where I've Been, Isn't Where I'm Going", year: 2024, median: '$26', spin: '"A Bar Song (Tipsy)"' },
+  { artist: 'Gavin Adcock',       title: 'Own Worst Enemy',                    year: 2024, median: '$24', spin: 'A-side runner' },
+  { artist: 'The Red Clay Strays',title: 'Made by These Moments',              year: 2024, median: '$30', spin: '"Wondering Why"' },
+];
+
+const collection = [
+  { artist: 'Tom Petty',          title: 'Wildflowers',                        year: 1994, median: '$45' },
+  { artist: 'Wilco',              title: 'Yankee Hotel Foxtrot',               year: 2002, median: '$38' },
+  { artist: 'Fleetwood Mac',      title: 'Rumours',                            year: 1977, median: '$30' },
+  { artist: 'The Black Crowes',   title: 'Shake Your Money Maker',             year: 1990, median: '$28' },
+  { artist: 'Sturgill Simpson',   title: 'Metamodern Sounds in Country Music', year: 2014, median: '$32' },
+  { artist: 'Chris Stapleton',    title: 'Traveller',                          year: 2015, median: '$28' },
+  { artist: 'Jason Isbell',       title: 'Southeastern',                       year: 2013, median: '$30' },
+  { artist: 'Tyler Childers',     title: 'Purgatory',                          year: 2017, median: '$34' },
+];
 ---
-<BaseLayout title="Vinyl">
-  <h1>Vinyl</h1>
-  <p>Condition first. If it doesn't move you, it doesn't belong.</p>
-  <p><em>Catalog rendering coming in Phase 2.5.</em></p>
+<BaseLayout title="Vinyl" description="A curated, growing collection. Median Discogs pricing tracked. Spun on the SL-1200MK2 through a Pro-Ject Phono Box into a Yamaha R-N800A.">
+  <header class="page-head">
+    <p class="eyebrow">Vinyl</p>
+    <h1>Condition first. If it doesn't move you, it doesn't belong.</h1>
+    <p class="lede">
+      A curated, growing collection. Median Discogs pricing tracked monthly so we
+      know what each record costs to replace, not what it cost to buy. Spun on the
+      Technics SL-1200MK2 with an Ortofon 2M Blue → Pro-Ject Phono Box S2 Ultra →
+      Yamaha R-N800A → Polk ES60 (Speaker A).
+    </p>
+  </header>
+
+  <!-- COLLECTION SUMMARY -->
+  <section class="section">
+    <div class="kpis">
+      <div class="kpi">
+        <p class="kpi__label">Pieces tracked</p>
+        <p class="kpi__value">68</p>
+      </div>
+      <div class="kpi">
+        <p class="kpi__label">Median value (each)</p>
+        <p class="kpi__value">$30</p>
+      </div>
+      <div class="kpi">
+        <p class="kpi__label">Recent adds</p>
+        <p class="kpi__value">{recent.length}</p>
+      </div>
+      <div class="kpi">
+        <p class="kpi__label">Master spreadsheet</p>
+        <p class="kpi__value kpi__value--mono">v2026.03</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- RECENT ADDITIONS -->
+  <section class="section">
+    <div class="section__head">
+      <div>
+        <p class="section__eyebrow">Recent additions</p>
+        <h2>On the platter this month.</h2>
+      </div>
+      <span class="tag tag--bronze">2024 / 2026</span>
+    </div>
+    <div class="grid grid--2">
+      {recent.map(r => (
+        <article class="card vinyl-card">
+          <div class="vinyl-art" aria-hidden="true">
+            <div class="vinyl-art__disc"></div>
+            <div class="vinyl-art__label"></div>
+          </div>
+          <div class="vinyl-card__body">
+            <p class="vinyl-card__year">{r.year}</p>
+            <h3>{r.title}</h3>
+            <p class="vinyl-card__artist">{r.artist}</p>
+            <p class="vinyl-card__spin"><span class="muted">Now spinning:</span> {r.spin}</p>
+            <p class="vinyl-card__price"><span class="muted">Median:</span> {r.median}</p>
+          </div>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <!-- COLLECTION TABLE -->
+  <section class="section">
+    <div class="section__head">
+      <div>
+        <p class="section__eyebrow">From the shelf</p>
+        <h2>Selected catalog.</h2>
+      </div>
+      <a href="https://github.com/MarcArmy2003/The-Audiopheliac/tree/main/Vinyl" target="_blank" rel="noopener" class="cta cta--ghost">Full list →</a>
+    </div>
+    <div class="table-wrap">
+      <table class="vinyl-table">
+        <thead>
+          <tr>
+            <th>Artist</th>
+            <th>Title</th>
+            <th class="num">Year</th>
+            <th class="num">Median</th>
+          </tr>
+        </thead>
+        <tbody>
+          {collection.map(c => (
+            <tr>
+              <td>{c.artist}</td>
+              <td class="title">{c.title}</td>
+              <td class="num">{c.year}</td>
+              <td class="num bronze">{c.median}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- BUYING PHILOSOPHY -->
+  <section class="section">
+    <div class="section__head">
+      <div>
+        <p class="section__eyebrow">Buying philosophy</p>
+        <h2>How a record gets here.</h2>
+      </div>
+    </div>
+    <div class="grid grid--3">
+      <div class="card">
+        <h3 class="cream">House sound first</h3>
+        <p>Country, classic rock, hard rock, blues-rock, roots, soul, selective hip-hop and pop. If it doesn't reward the chain at home, it doesn't go on the shelf.</p>
+      </div>
+      <div class="card">
+        <h3 class="cream">Condition over rarity</h3>
+        <p>VG+ minimum on play, NM preferred on sleeve. Reissues are fine if the press is honest. Audiophile editions only when the pressing actually delivers, not because the sticker says so.</p>
+      </div>
+      <div class="card">
+        <h3 class="cream">Discogs-priced</h3>
+        <p>Median pricing tracked in a master spreadsheet, refreshed monthly. The number on the sleeve is what it costs to replace, not what we paid.</p>
+      </div>
+    </div>
+  </section>
 </BaseLayout>
+
+<style>
+  .page-head { padding: var(--sp-6) 0 var(--sp-7); border-bottom: 1px solid var(--surface-edge); margin-bottom: var(--sp-7); }
+  .page-head h1 { font-size: clamp(var(--fs-700), 7vw, var(--fs-900)); margin: 0 0 var(--sp-5); max-width: 22ch; }
+
+  .kpis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    gap: var(--sp-4);
+  }
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--surface-edge);
+    border-radius: var(--r-lg);
+    padding: var(--sp-5);
+  }
+  .kpi__label {
+    font-family: var(--font-mono);
+    font-size: var(--fs-100);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--spectrum-2);
+    margin: 0 0 var(--sp-2);
+  }
+  .kpi__value {
+    font-family: var(--font-display);
+    font-size: var(--fs-700);
+    color: var(--paper);
+    margin: 0;
+    letter-spacing: 0.02em;
+  }
+  .kpi__value--mono { font-family: var(--font-mono); font-size: var(--fs-500); color: var(--spectrum-1); }
+
+  .vinyl-card { display: grid; grid-template-columns: 110px 1fr; gap: var(--sp-5); align-items: center; }
+  .vinyl-art {
+    position: relative;
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle, var(--n-800) 22%, var(--n-900) 24%),
+      repeating-radial-gradient(circle, var(--n-700) 0 1px, var(--n-900) 1px 3px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  }
+  .vinyl-art::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: repeating-radial-gradient(circle, rgba(255,255,255,0.04) 0 1px, transparent 1px 4px);
+  }
+  .vinyl-art__label {
+    position: absolute;
+    inset: 36px;
+    border-radius: 50%;
+    background: var(--spectrum-2);
+  }
+  .vinyl-art__disc {
+    position: absolute;
+    inset: 50px;
+    border-radius: 50%;
+    background: var(--ink);
+    z-index: 2;
+  }
+  .vinyl-card__year { color: var(--spectrum-2); font-family: var(--font-mono); font-size: var(--fs-100); letter-spacing: 0.18em; margin: 0; }
+  .vinyl-card__body h3 { margin: var(--sp-1) 0 var(--sp-2); font-size: var(--fs-500); color: var(--paper); text-transform: none; letter-spacing: 0.01em; }
+  .vinyl-card__artist { color: var(--spectrum-1); margin: 0 0 var(--sp-3); font-family: var(--font-display); letter-spacing: 0.05em; text-transform: uppercase; font-size: var(--fs-200); }
+  .vinyl-card__spin, .vinyl-card__price { color: var(--n-300); margin: 0 0 var(--sp-2); font-size: var(--fs-200); }
+
+  .table-wrap { overflow-x: auto; border: 1px solid var(--surface-edge); border-radius: var(--r-lg); }
+  .vinyl-table { width: 100%; border-collapse: collapse; font-size: var(--fs-300); }
+  .vinyl-table th, .vinyl-table td { padding: var(--sp-3) var(--sp-4); text-align: left; border-bottom: 1px solid var(--surface-edge); }
+  .vinyl-table th { background: var(--surface); color: var(--spectrum-2); font-family: var(--font-mono); font-size: var(--fs-100); letter-spacing: 0.18em; text-transform: uppercase; }
+  .vinyl-table tbody tr:hover { background: rgba(184, 115, 51, 0.05); }
+  .vinyl-table td.title { color: var(--paper); }
+  .vinyl-table .num { text-align: right; font-family: var(--font-mono); }
+
+  .card h3 { margin: 0 0 var(--sp-3); font-size: var(--fs-500); }
+  .card p  { color: var(--n-300); margin: 0 0 var(--sp-3); }
+
+  @media (max-width: 500px) {
+    .vinyl-card { grid-template-columns: 1fr; }
+    .vinyl-art { margin: 0 auto; }
+  }
+</style>

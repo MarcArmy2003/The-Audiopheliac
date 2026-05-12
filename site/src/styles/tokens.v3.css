@@ -1,0 +1,127 @@
+/* The Audiopheliac — Design Tokens v3.0 (Full Spectrum)
+ * Restored 2026-05-11 (supersedes Nashville Midnight in v2.0).
+ * Derived from the canonical mark: a spectrogram cast onto a record.
+ * Spectrum sweeps Sunlamp Yellow → Spring Lime → Signal Green → Cyan Pulse →
+ * Sapphire Run → Indigo Drift → Magenta Lift. Near-black ink field. Paper for light.
+ * Nashville Midnight retained as historical reference only — see media/icons/Microgroove_Ritual.md
+ */
+
+:root {
+  /* Spectrum (the mark) — primary brand palette */
+  --spectrum-1: #F8E91F;  /* Sunlamp Yellow — CTA primary on ink */
+  --spectrum-2: #99E257;  /* Spring Lime — warm green transition */
+  --spectrum-3: #41D99A;  /* Signal Green — mid-spectrum body, success */
+  --spectrum-4: #0ABED3;  /* Cyan Pulse — body accent ONLY, forbidden on CTAs */
+  --spectrum-5: #0F82DF;  /* Sapphire Run — structural blue, info */
+  --spectrum-6: #5E54D4;  /* Indigo Drift — deep secondary */
+  --spectrum-7: #C24CC8;  /* Magenta Lift — CTA hover, warm terminus */
+
+  /* Aliases for direct token reference */
+  --sunlamp: var(--spectrum-1);
+  --spring: var(--spectrum-2);
+  --signal: var(--spectrum-3);
+  --cyan: var(--spectrum-4);
+  --sapphire: var(--spectrum-5);
+  --indigo: var(--spectrum-6);
+  --magenta: var(--spectrum-7);
+
+  /* Structural */
+  --ink: #0A0A0B;          /* near-black primary field, NOT pure #000 */
+  --ink-2: #121214;        /* card surfaces */
+  --ink-3: #1A1A1E;        /* nested surfaces, secondary elevation */
+  --paper: #F5F5F7;        /* body text on dark, light-mode primary field */
+  --hairline: #FFFFFF;     /* pure white — outline strokes only, never large fills */
+
+  /* Hairline at semantic alpha */
+  --line: rgba(255,255,255,0.08);
+  --line-2: rgba(255,255,255,0.14);
+  --line-3: rgba(255,255,255,0.22);
+
+  /* Paper at semantic alpha (body text dims) */
+  --paper-dim: rgba(245,245,247,0.7);
+  --paper-muted: rgba(245,245,247,0.46);
+  --paper-quiet: rgba(245,245,247,0.28);
+
+  /* Semantic */
+  --success: var(--signal);    /* in-spectrum confirmation */
+  --warning: var(--sunlamp);   /* in-spectrum attention */
+  --danger: #E24B6A;           /* desaturated magenta with red lean — distinct from primary magenta */
+  --info: var(--sapphire);     /* in-spectrum information */
+
+  /* CTA contract */
+  --cta-bg: var(--sunlamp);
+  --cta-fg: var(--ink);
+  --cta-bg-hover: var(--magenta);
+  --cta-fg-hover: var(--paper);
+  --cta-ring: rgba(248,233,31,0.45);
+
+  /* Forbidden */
+  /* --cta-bg MUST NEVER equal var(--cyan). Teal CTAs are a brand-separation hard rule. */
+
+  /* Typography */
+  --font-display: 'Unica One', 'Archivo Black', Impact, system-ui, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Modular scale, base 16px, ratio 1.250 (major third) */
+  --fs-base: 1rem;          /* 16px */
+  --fs-sm: 0.8rem;          /* 12.8px */
+  --fs-xs: 0.64rem;         /* 10.24px */
+  --fs-lg: 1.25rem;         /* 20px */
+  --fs-xl: 1.563rem;        /* 25px */
+  --fs-2xl: 1.953rem;       /* 31.25px */
+  --fs-3xl: 2.441rem;       /* 39.06px */
+  --fs-4xl: 3.052rem;       /* 48.83px */
+  --fs-5xl: 3.815rem;       /* 61.04px */
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+
+  /* Radii */
+  --radius-sm: 6px;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --radius-pill: 999px;
+
+  /* Motion */
+  --t-fast: 120ms;
+  --t-slow: 240ms;
+}
+
+/* Hero gradient — reserved for one or two moments per page */
+.spectrum-gradient {
+  background: linear-gradient(90deg,
+    var(--spectrum-1) 0%,
+    var(--spectrum-2) 16%,
+    var(--spectrum-3) 32%,
+    var(--spectrum-4) 48%,
+    var(--spectrum-5) 64%,
+    var(--spectrum-6) 80%,
+    var(--spectrum-7) 100%);
+}
+.spectrum-text {
+  background: linear-gradient(90deg,
+    var(--spectrum-1) 0%,
+    var(--spectrum-2) 16%,
+    var(--spectrum-3) 32%,
+    var(--spectrum-4) 48%,
+    var(--spectrum-5) 64%,
+    var(--spectrum-6) 80%,
+    var(--spectrum-7) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Reduced motion respect */
+@media (prefers-reduced-motion: reduce) {
+  :root { --t-fast: 0ms; --t-slow: 0ms; }
+  * { animation: none !important; transition: none !important; }
+}

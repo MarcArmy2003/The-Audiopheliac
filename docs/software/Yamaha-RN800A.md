@@ -12,7 +12,7 @@
 
 The Yamaha R-N800A network stereo receiver is the Family Room playback hub. Its YXC (Yamaha Extended Control) HTTP/JSON API on TCP/80 is the control surface The Audiopheliac Cockpit uses for receiver-side functions: power on/off, volume, mute, source select, transport (Spotify Connect / Net Radio), Net Radio preset recall. YXC is unauthenticated on the LAN; commands are GET requests with query-string parameters at the path `/YamahaExtendedControl/v1/...`. Roon-driven playback bypasses YXC entirely for transport (Roon controls the AirPlay 2 stream end-to-end) but YXC remains the right surface for non-Roon sources.
 
-Hardware spec: `docs/av_master_inventory_2026.md` (R-N800A entry). Receiver topology: `config/audiopheliac_signal_map_v_2026_01.md` (Family Room signal chain).
+Hardware spec: `docs/av_master_inventory_2026.md` (R-N800A entry). Receiver topology: `config/audiopheliac_signal_map_v_2026_05.md` (Family Room signal chain).
 
 ---
 

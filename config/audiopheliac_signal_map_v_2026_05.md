@@ -1,6 +1,12 @@
-# 🎛️ Audiopheliac System Map – v2026.05.2 (Full Home A/V + Network Topology)
+# 🎛️ Audiopheliac System Map – v2026.05.3 (Full Home A/V + Network Topology)
 **Curated by Gillon "Gill" Marchetti (MarcArmy2003)**  
-Version: 2026.05.2 | Updated: May 11, 2026  
+Version: 2026.05.3 | Updated: May 12, 2026  
+**Changes (2026-05-12):**
+- Filename bumped from `audiopheliac_signal_map_v_2026_01.md` to `audiopheliac_signal_map_v_2026_05.md`.
+- **Master Bedroom** added as a new zone (see §5b). Master Bedroom TV exposes Chromecast and AirPlay 2 on the same hardware at 192.168.1.154. Both protocols are Roon-addressable.
+- **Lanai TV Chromecast** at 192.168.1.239 added as the primary Lanai Roon endpoint. The Yamaha-PRE-OUT-via-1Mii path is retained as the secondary/legacy route (downstream of `Family Room — Yamaha`).
+- Roon zone naming locked. Seven outputs renamed: `Family Room — Yamaha` (AirPlay 2 to R-N800A 192.168.1.191), `Family Room — Bose` (AirPlay 2 192.168.1.102), `Family Room — Shield` (Chromecast 192.168.1.250), `Family Room — TV` (Chromecast 192.168.1.5), `Studio · AIR HUB` (ASIO via Roon Bridge on GDMARCHE), `Lanai - TV` (Chromecast 192.168.1.239, primary), `Master Bedroom` (Chromecast/AirPlay 2 192.168.1.154).
+
 **Changes (2026-05-11):**
 - Focusrite Scarlett Solo 4th Gen failed (fried). M-Audio AIR Hub (AIRXHUB) promoted to primary monitoring/playback interface. Recording offline pending input-capable replacement.
 - Rolls MX28 Mini-Mix VI documented as central Office Studio mixer with three line inputs (AIR Hub TRS, AT-LP120XUSB via Schiit Mani II, 1Mii RX #1).
@@ -181,6 +187,8 @@ Version: 2026.05.2 | Updated: May 11, 2026
 
 ## 🌴 5️⃣ Lanai / Outdoor – Smart Playback Zone
 
+**Primary Roon endpoint (2026-05-12):** `Lanai - TV` Chromecast at 192.168.1.239 (Samsung UN65U7900FD's built-in Chromecast). Roon casts directly to the TV; audio reaches the Bose 3·2·1 via the existing eARC → J-Tech AE4KA → TV AUDIO IN path documented below. The Yamaha-PRE-OUT → Rolls MB15b → 1Mii TX → 1Mii RX → Schiit SYS → Bose AUX route is retained as the secondary/legacy path for whole-house audio that is downstream of `Family Room — Yamaha`.
+
 ```
 [Google Chromecast 4K]
      │
@@ -233,6 +241,23 @@ Version: 2026.05.2 | Updated: May 11, 2026
 
 ---
 
+## 🛏️ 5b. Master Bedroom – Roon-Addressable Zone (added 2026-05-12)
+
+```
+[Roon Server (NAS Docker)]
+     │
+     ├──► Chromecast (LAN, 192.168.1.154) ──► [Master Bedroom TV speakers]
+     │
+     └──► AirPlay 2 (LAN, 192.168.1.154) ──► [Master Bedroom TV speakers]
+```
+
+**Notes:**
+- Master Bedroom TV exposes BOTH Chromecast and AirPlay 2 on the same hardware (192.168.1.154). Roon shows both transports; either is addressable.
+- No external preamp, mixer, or wireless distribution in this zone. TV onboard speakers are the only endpoint.
+- Cockpit `preferred_zones` includes `Master Bedroom` as a substring prefix to surface either protocol's zone in the UI.
+
+---
+
 ## 💡 6️⃣ Smart & IoT Devices
 
 | Device | Location | Connection | Status |
@@ -268,7 +293,8 @@ Version: 2026.05.2 | Updated: May 11, 2026
 | Family Room | Cinema + Audiophile Stereo + **Wireless Hub** | Bose Lifestyle 650, Yamaha R-N800A, Polk ES60, SVS SB-1000 Pro, Rolls MB15b, 1Mii TX (active) |
 | Home Office / Studio | Monitoring + Central Mixing + **Wireless RX** (recording offline) | AT-LP120XUSB, Schiit Mani II (phono preamp), Rolls MX28 Mini-Mix VI (central mixer), M-Audio AIR Hub (primary monitor I/F), HS7, JBL LSR310S, 1Mii RX #1. Focusrite Solo failed 2026-05-11. |
 | Garage / Gym | Standalone Audio | Amazon Echo (no wireless RX in this zone) |
-| Lanai | Smart Playback + **Wireless RX** + A/B switching | Samsung UN65U7900FD, Singing Machine, Bose 3·2·1, 1Mii RX #2, Schiit SYS (1Mii vs. karaoke selector → Bose AUX), Bose SoundTouch |
+| Lanai | Smart Playback + **Roon Chromecast (primary)** + **Wireless RX** (secondary) + A/B switching | Samsung UN65U7900FD (Chromecast 192.168.1.239), Singing Machine, Bose 3·2·1, 1Mii RX #2, Schiit SYS (1Mii vs. karaoke selector → Bose AUX), Bose SoundTouch |
+| Master Bedroom | Roon-Addressable Zone (added 2026-05-12) | Master Bedroom TV (Chromecast + AirPlay 2 at 192.168.1.154) |
 | Network Core | Data Backbone | Spectrum Modem, Wi-Fi 6E Router, QNAP NAS, Switches |
 
 ---

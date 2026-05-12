@@ -2,12 +2,150 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 <BaseLayout title="About">
-  <h1>About The Audiopheliac</h1>
-  <p>
-    A personal project documenting audio engineering, vinyl curation, and home hi-fi
-    across four listening zones. Not a commercial product. Not affiliated with
-    Veteran Analytics LLC or any of its work.
-  </p>
-  <p>Principles: <strong>Purity of Path. System Cohesion. Optimization Over Obsession.</strong></p>
-  <p><em>Full narrative coming in Phase 2.5.</em></p>
+  <header class="page-head">
+    <p class="eyebrow">About</p>
+    <h1>The Audiopheliac is a lifestyle brand built on a real signal chain.</h1>
+    <p class="lede">
+      A project at the intersection of audio, technology, and AI — wrapped around
+      <code>theaudiopheliac.com</code> and grounded in the hardware, software, and
+      listening discipline of someone who actually runs the rigs reviewed here.
+    </p>
+  </header>
+
+  <section class="section">
+    <div class="section__head">
+      <div>
+        <p class="section__eyebrow">What this is</p>
+        <h2>Five lanes, one brand.</h2>
+      </div>
+    </div>
+    <div class="grid grid--3">
+      <div class="card">
+        <h3 class="cream">Content</h3>
+        <p>Long-form posts, product testing, and technical deep-dives that read like field notes — because they are. No moodboards, no listicles, no recycled press release.</p>
+      </div>
+      <div class="card">
+        <h3 class="cream">AI integrations</h3>
+        <p>Suno Premier with commercial-use rights. Spotify Local Files indexed against the same library Roon serves. Ableton Live 12 Suite for the parts AI doesn't do.</p>
+      </div>
+      <div class="card">
+        <h3 class="cream">Affiliate revenue</h3>
+        <p>Amazon Associates store <code>veterananalyt-20</code>. Gear we run, with the receipts to back it. PA-API access pending qualifying sales; Best Buy Developer is the drop-in alternative.</p>
+      </div>
+      <div class="card">
+        <h3 class="cream">Music releases</h3>
+        <p>AI-assisted productions under <a href="https://suno.com/@audiopheliac" target="_blank" rel="noopener">@audiopheliac</a>, mastered for streaming, released under the Audiopheliac name with commercial rights.</p>
+      </div>
+      <div class="card">
+        <h3 class="cream">Storefront (planned)</h3>
+        <p>An Amazon storefront curating the rig — turntables, monitors, interfaces, cables, processing. Built around the actual <a href="/studio">signal chain</a>.</p>
+      </div>
+      <div class="card">
+        <h3 class="cream">Credibility foundation</h3>
+        <p>Yamaha HS7s + JBL LSR310S. Technics SL-1200MK2 with Ortofon Blue. Yamaha R-N800A and a Pro-Ject Phono Box. M-Audio AIR Hub. The hardware isn't the product — it's the receipt.</p>
+      </div>
+    </div>
+  </section>
+
+  <blockquote class="pull">
+    "Rock 'n' roll. Deal with it."
+    <cite>— Motto, after Bret Easton Ellis, <em>The Rules of Attraction</em></cite>
+  </blockquote>
+
+  <section class="section">
+    <div class="section__head">
+      <div>
+        <p class="section__eyebrow">Operating principles</p>
+        <h2>How we work the room.</h2>
+      </div>
+    </div>
+    <div class="grid grid--2">
+      <div class="card">
+        <h3>Physical layer first</h3>
+        <p>Cross-verify routing and physical connections before any software fix. Gain problems masquerade as routing problems. Routing problems masquerade as latency.</p>
+      </div>
+      <div class="card">
+        <h3>Gain staging before EQ</h3>
+        <p>Digital controls (Spotify, Windows) stay at max to preserve resolution through the DAC. Analog controls are set once for healthy levels. The MX28 master is the only daily knob.</p>
+      </div>
+      <div class="card">
+        <h3>Boost-then-distribute</h3>
+        <p>Amplify once at the Rolls MB15b, then split. Splitting before boosting causes weak signal in every zone downstream.</p>
+      </div>
+      <div class="card">
+        <h3>One assumption explicit</h3>
+        <p>If current state is unclear, ask one clarifying question — maximum one — and make the assumption explicit in the recommendation. Defaults: 48 kHz / 24-bit.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section__head">
+      <div>
+        <p class="section__eyebrow">House sound</p>
+        <h2>The listening profile.</h2>
+      </div>
+    </div>
+    <p class="lede">
+      Country and country-adjacent. Classic rock, hard rock, blues, blues-rock.
+      Selective hip-hop. Selective crossover pop. Jazz and classical are not avoided
+      out of principle — they're just not the house default. The tracks that land here
+      are the ones that reward a hi-fi rig: bass that grounds the room, full low mids,
+      lead vocals with body, drums you can feel.
+    </p>
+    <p class="lede">
+      We don't program for crate-digging credibility. We program for the room. Long
+      sessions, controlled fatigue, sequenced like a setlist.
+    </p>
+  </section>
+
+  <section class="section" id="contact">
+    <div class="section__head">
+      <div>
+        <p class="section__eyebrow">Get in touch</p>
+        <h2>Contact.</h2>
+      </div>
+    </div>
+    <div class="grid grid--2">
+      <div class="card">
+        <h3 class="cream">Editorial</h3>
+        <p>Reviews, technical posts, signal-chain questions, gear leads.</p>
+        <p><a href="https://github.com/MarcArmy2003/The-Audiopheliac/issues" target="_blank" rel="noopener">Open an issue on GitHub</a> — fastest path. Or <a href="mailto:gillon.marchetti@veterananalytics.com">email</a>.</p>
+      </div>
+      <div class="card">
+        <h3 class="cream">Affiliate / sponsorship</h3>
+        <p>Gear inquiries, review units, brand partnerships. Subject to <a href="/about#affiliate-policy">affiliate policy</a>.</p>
+        <p><a href="mailto:gillon.marchetti@veterananalytics.com">gillon.marchetti@veterananalytics.com</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="affiliate-policy">
+    <div class="section__head">
+      <div>
+        <p class="section__eyebrow">Affiliate policy</p>
+        <h2>Receipts before recommendations.</h2>
+      </div>
+    </div>
+    <p class="lede">
+      The Audiopheliac participates in the Amazon Associates Program under store ID
+      <code>veterananalyt-20</code>. Posts and gear pages include links that may pay a
+      small commission on qualifying purchases at no additional cost to the reader.
+      Editorial decisions are not made in exchange for those commissions.
+    </p>
+    <p class="lede">
+      Hardware reviewed on the site is hardware that ran — or runs — in the signal
+      chains documented on <a href="/studio">/studio</a>. Where a piece is on loan,
+      borrowed, or sponsored, it'll say so in plain sight at the top of the post. We
+      don't review what we don't run.
+    </p>
+  </section>
 </BaseLayout>
+
+<style>
+  .page-head { padding: var(--sp-6) 0 var(--sp-7); border-bottom: 1px solid var(--surface-edge); margin-bottom: var(--sp-7); }
+  .page-head h1 { font-size: clamp(var(--fs-700), 7vw, var(--fs-900)); margin: 0 0 var(--sp-5); max-width: 22ch; }
+  code { font-family: var(--font-mono); color: var(--spectrum-1); font-size: 0.92em; }
+  .card h3 { margin: 0 0 var(--sp-3); font-size: var(--fs-500); }
+  .card p { margin: 0 0 var(--sp-3); color: var(--n-300); }
+</style>

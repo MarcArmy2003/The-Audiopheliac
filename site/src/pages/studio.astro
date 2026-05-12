@@ -1,0 +1,278 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Studio" description="Four listening zones. One signal chain. The hardware behind The Audiopheliac.">
+  <header class="page-head">
+    <p class="eyebrow">Studio</p>
+    <h1>The signal chain is the receipt.</h1>
+    <p class="lede">
+      Four zones, three rooms, one workstation. Every recommendation on this site
+      runs through one of these chains nightly. If you want the philosophy, read
+      <a href="/about">/about</a>. If you want what's actually plugged in, you're already there.
+    </p>
+  </header>
+
+  <!-- ZONE: Office Studio -->
+  <section class="section zone">
+    <div class="section__head">
+      <div>
+        <p class="section__eyebrow">Zone 01 · Production</p>
+        <h2>Office Studio</h2>
+      </div>
+      <span class="tag tag--bronze">Primary</span>
+    </div>
+
+    <div class="chain">
+      <div class="chain-col">
+        <p class="chain-label">Sources</p>
+        <ul class="chain-list bare">
+          <li><strong>GDMARCHE</strong> · Spotify / streaming / Ableton</li>
+          <li><strong>AT-LP120XUSB</strong> · Schiit Mani II preamp</li>
+          <li><strong>1Mii RX #1</strong> · wireless from Family Room</li>
+        </ul>
+      </div>
+      <div class="chain-arrow">→</div>
+      <div class="chain-col">
+        <p class="chain-label">Interface · Mixer</p>
+        <ul class="chain-list bare">
+          <li><strong>M-Audio AIR Hub</strong> · 24/96 DAC, balanced TRS out, hub for LP120 / Spark / Privia</li>
+          <li><strong>Rolls MX28 Mini-Mix VI</strong> · Inputs A/B/C, the only daily volume knob</li>
+        </ul>
+      </div>
+      <div class="chain-arrow">→</div>
+      <div class="chain-col">
+        <p class="chain-label">Output</p>
+        <ul class="chain-list bare">
+          <li><strong>Yamaha HS7</strong> · stereo pair, near-field reference</li>
+          <li><strong>JBL LSR310S</strong> · 10" sub, structural low end</li>
+          <li><strong>AIR Hub HP out</strong> · independent monitoring for Spotify / DAW</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="chain-note">
+      <span class="tag tag--steel">Note · 2026-05-11</span>
+      Focusrite Scarlett Solo Gen 4 failed mid-session and is offline. AIR Hub
+      promoted from spare to primary. Output-only is fine until an input-capable
+      replacement lands; recording is paused, monitoring is not.
+    </p>
+  </section>
+
+  <!-- ZONE: Family Room -->
+  <section class="section zone">
+    <div class="section__head">
+      <div>
+        <p class="section__eyebrow">Zone 02 · Living</p>
+        <h2>Family Room</h2>
+      </div>
+      <span class="tag tag--bronze">Reference</span>
+    </div>
+
+    <div class="chain">
+      <div class="chain-col">
+        <p class="chain-label">Sources</p>
+        <ul class="chain-list bare">
+          <li><strong>Technics SL-1200MK2</strong> · Ortofon 2M Blue</li>
+          <li><strong>Samsung TV</strong> · Optical In 2</li>
+        </ul>
+      </div>
+      <div class="chain-arrow">→</div>
+      <div class="chain-col">
+        <p class="chain-label">Preamp · Receiver</p>
+        <ul class="chain-list bare">
+          <li><strong>Pro-Ject Phono Box S2 Ultra</strong></li>
+          <li><strong>Yamaha R-N800A</strong> · MusicCast, YXC API, AirPlay 2 (192.168.1.191)</li>
+        </ul>
+      </div>
+      <div class="chain-arrow">→</div>
+      <div class="chain-col">
+        <p class="chain-label">Output · Distribution</p>
+        <ul class="chain-list bare">
+          <li><strong>Polk ES60</strong> · Speaker A</li>
+          <li><strong>Rolls MB15b</strong> · boost</li>
+          <li><strong>1Mii TX</strong> · broadcasts to Studio RX and Lanai RX</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ZONE: Lanai -->
+  <section class="section zone">
+    <div class="section__head">
+      <div>
+        <p class="section__eyebrow">Zone 03 · Outside</p>
+        <h2>Lanai</h2>
+      </div>
+      <span class="tag tag--bronze">Distribution</span>
+    </div>
+
+    <div class="chain">
+      <div class="chain-col">
+        <p class="chain-label">Sources</p>
+        <ul class="chain-list bare">
+          <li><strong>1Mii RX</strong> · from Family Room boost</li>
+          <li><strong>Singing Machine</strong> · karaoke (Saturday rule)</li>
+          <li><strong>Samsung UN65U7900F</strong> · eARC via J-Tech</li>
+        </ul>
+      </div>
+      <div class="chain-arrow">→</div>
+      <div class="chain-col">
+        <p class="chain-label">Switcher · Extractor</p>
+        <ul class="chain-list bare">
+          <li><strong>Schiit SYS</strong> · passive switch between 1Mii and Singing Machine</li>
+          <li><strong>J-Tech JTECH-AE4KA</strong> · HDMI eARC → RCA</li>
+        </ul>
+      </div>
+      <div class="chain-arrow">→</div>
+      <div class="chain-col">
+        <p class="chain-label">Output</p>
+        <ul class="chain-list bare">
+          <li><strong>Bose 3·2·1 Series II</strong> · AUX + TV 1 inputs</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ROON / MEDIA SERVER -->
+  <section class="section">
+    <div class="section__head">
+      <div>
+        <p class="section__eyebrow">Library brain</p>
+        <h2>Roon + MinimServer.</h2>
+      </div>
+      <span class="tag tag--steel">Trial · expires 2026-05-25</span>
+    </div>
+    <div class="grid grid--2">
+      <div class="card">
+        <h3>Roon Server</h3>
+        <p>Docker on the QNAP TS-473A (<code>ghcr.io/roonlabs/roonserver:latest</code>). Library scanned: <strong>13,450 tracks</strong>. Two zones live — AirPlay 2 to the R-N800A and AIR HUB ASIO in the studio via Roon Bridge.</p>
+      </div>
+      <div class="card">
+        <h3>MinimServer (fallback)</h3>
+        <p>UPnP / DLNA to the R-N800A. Confirmed working; held as fallback if the Roon trial doesn't convert. Subscription decision pending 2026-05-25.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- WORKSTATION -->
+  <section class="section">
+    <div class="section__head">
+      <div>
+        <p class="section__eyebrow">Workstation</p>
+        <h2>Where it all runs.</h2>
+      </div>
+    </div>
+    <div class="spec-grid">
+      <div><span class="spec-key">Host</span> Dell Precision 7540 (<code>GDMARCHE</code>)</div>
+      <div><span class="spec-key">CPU</span> Intel Xeon E-2286M</div>
+      <div><span class="spec-key">RAM</span> 112 GB ECC</div>
+      <div><span class="spec-key">Boot</span> Samsung 990 PRO NVMe (C:)</div>
+      <div><span class="spec-key">Audio data</span> Original HDD (D:) — Ableton Cache + User Library</div>
+      <div><span class="spec-key">Network</span> 1 Gbps wired · Wi-Fi 5GHz · DHCP reserved 192.168.1.119</div>
+      <div><span class="spec-key">DAW</span> Ableton Live 12 Suite · Audacity</div>
+      <div><span class="spec-key">Driver</span> M-Audio AIR Hub ASIO</div>
+    </div>
+  </section>
+
+  <!-- NETWORK -->
+  <section class="section">
+    <div class="section__head">
+      <div>
+        <p class="section__eyebrow">Network · NAS</p>
+        <h2>The plumbing.</h2>
+      </div>
+    </div>
+    <div class="spec-grid">
+      <div><span class="spec-key">NAS</span> QNAP TS-473A (<code>NAS87828E</code>) · 16 GB RAM</div>
+      <div><span class="spec-key">Drives</span> WD Red Plus 12 TB + 10 TB</div>
+      <div><span class="spec-key">Trunking</span> balance-alb across 2× 2.5GbE</div>
+      <div><span class="spec-key">Switch</span> QNAP QSW-1105-5T (passive 5GbE)</div>
+      <div><span class="spec-key">Router</span> Spectrum SAX2V1R (192.168.1.1)</div>
+      <div><span class="spec-key">Music share</span> <code>\\NAS87828E\Music</code></div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-head { padding: var(--sp-6) 0 var(--sp-7); border-bottom: 1px solid var(--surface-edge); margin-bottom: var(--sp-7); }
+  .page-head h1 { font-size: clamp(var(--fs-700), 7vw, var(--fs-900)); margin: 0 0 var(--sp-5); max-width: 22ch; }
+
+  .zone { background: linear-gradient(180deg, transparent, rgba(65, 217, 154, 0.04) 60%, transparent); }
+
+  .chain {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr;
+    gap: var(--sp-4);
+    align-items: stretch;
+    margin-bottom: var(--sp-5);
+  }
+  .chain-col {
+    background: var(--surface);
+    border: 1px solid var(--surface-edge);
+    border-radius: var(--r-lg);
+    padding: var(--sp-5);
+  }
+  .chain-label {
+    font-family: var(--font-mono);
+    font-size: var(--fs-100);
+    letter-spacing: 0.18em;
+    color: var(--spectrum-2);
+    text-transform: uppercase;
+    margin: 0 0 var(--sp-3);
+  }
+  .chain-list li {
+    padding: var(--sp-2) 0;
+    border-bottom: 1px dashed var(--surface-edge);
+    color: var(--n-200);
+    font-size: var(--fs-300);
+  }
+  .chain-list li:last-child { border-bottom: 0; }
+  .chain-list strong { color: var(--paper); }
+
+  .chain-arrow {
+    align-self: center;
+    color: var(--spectrum-2);
+    font-size: var(--fs-700);
+    font-family: var(--font-display);
+  }
+
+  .chain-note {
+    background: rgba(15, 130, 223, 0.10);
+    border: 1px solid rgba(15, 130, 223, 0.30);
+    border-radius: var(--r-md);
+    padding: var(--sp-4);
+    color: var(--n-200);
+    font-size: var(--fs-200);
+  }
+  .chain-note .tag { margin-right: var(--sp-2); }
+
+  .spec-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+    gap: var(--sp-2) var(--sp-5);
+    border-top: 1px solid var(--surface-edge);
+    padding-top: var(--sp-5);
+  }
+  .spec-grid > div {
+    padding: var(--sp-3) 0;
+    border-bottom: 1px dashed var(--surface-edge);
+    color: var(--n-200);
+    font-size: var(--fs-300);
+  }
+  .spec-key {
+    display: inline-block;
+    min-width: 9rem;
+    font-family: var(--font-mono);
+    font-size: var(--fs-100);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--spectrum-2);
+    margin-right: var(--sp-3);
+  }
+  code { font-family: var(--font-mono); color: var(--spectrum-1); font-size: 0.92em; }
+
+  @media (max-width: 900px) {
+    .chain { grid-template-columns: 1fr; }
+    .chain-arrow { transform: rotate(90deg); justify-self: center; }
+  }
+</style>

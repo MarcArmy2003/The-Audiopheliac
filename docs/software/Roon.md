@@ -12,7 +12,7 @@
 
 Roon is the library, search, browse, and playback brain for The Audiopheliac. Roon Server runs as a Docker container on the QNAP TS-473A and indexes the local FLAC/MP3 library on `\\NAS87828E\Music`. Roon Remote (desktop app) on GDMARCHE is the operator UI. Roon Bridge runs as a Windows service on GDMARCHE to expose the M-Audio AIR Hub as a Roon endpoint zone for studio monitoring. The Yamaha R-N800A is enabled as an AirPlay 2 zone for Family Room playback. The Audiopheliac Cockpit (`console/`) authenticates as a Roon extension and drives library + playback through the Roon API; YXC stays in service for receiver-side controls (power, volume, source select, transport, Net Radio presets).
 
-Hardware references: `docs/av_master_inventory_2026.md` (NAS, GDMARCHE, R-N800A, AIR Hub). Topology: `config/audiopheliac_signal_map_v_2026_01.md` (local, gitignored).
+Hardware references: `docs/av_master_inventory_2026.md` (NAS, GDMARCHE, R-N800A, AIR Hub). Topology: `config/audiopheliac_signal_map_v_2026_05.md` (local, gitignored).
 
 ---
 
@@ -113,7 +113,32 @@ Compose file at `/share/Container/RoonServer/docker-compose.yml`:
 | Audio > AirPlay > Yamaha Receiver | Enabled, named "The Audiopheliac Library" | Family Room: Roon > AirPlay 2 > R-N800A > Polk ES60 |
 | Backups (recommended, not yet scheduled) | Weekly to `/RoonBackups` | Roon DB recovery; queue for after trial decision |
 
-Note: both zones currently share the name "The Audiopheliac Library." Rename one to disambiguate (suggested: AirPlay zone → "Family Room", AIR HUB ASIO zone → "Studio") in a future session.
+### Zone naming convention (locked 2026-05-12)
+
+Seven Roon outputs are enabled and named per the table below. The Cockpit's `preferred_zones` config filters the displayed zones to four room prefixes via substring match ("Family Room", "Studio", "Lanai", "Master Bedroom"), so any output prefixed with one of these strings appears in the Cockpit UI.
+
+| Zone name | Protocol | Endpoint / IP | Notes |
+|---|---|---|---|
+| Family Room — Yamaha | AirPlay 2 | 192.168.1.191 | Primary Family Room playback path via R-N800A → Polk ES60 |
+| Family Room — Bose | AirPlay 2 | 192.168.1.102 | Bose Lifestyle 650 console |
+| Family Room — Shield | Chromecast | 192.168.1.250 | NVIDIA Shield Pro |
+| Family Room — TV | Chromecast | 192.168.1.5 | Samsung NU6950 |
+| Studio · AIR HUB | ASIO (via Roon Bridge) | GDMARCHE | M-Audio AIR Hub, bit-perfect studio monitoring |
+| Lanai - TV | Chromecast | 192.168.1.239 | Primary Lanai endpoint (Samsung UN65U7900FD) |
+| Master Bedroom | Chromecast / AirPlay 2 | 192.168.1.154 | Same hardware exposes both protocols; either is addressable |
+
+The Cockpit's `console/config.json` pins the displayed set with:
+
+```json
+"preferred_zones": ["Family Room", "Studio", "Lanai", "Master Bedroom"]
+```
+
+`app.py` exposes this list at `GET /api/config` for the browser UI to filter the zone selector.
+
+### Out-of-Roon rooms
+
+- **Garage** — no Roon endpoint. Phone Bluetooth or Yamaha R-N800A Bluetooth only. The Bose SoundTouch Genius in the garage is not on the network as a Roon-addressable device.
+- **Lanai (secondary path)** — the legacy wireless route remains live as a downstream of `Family Room — Yamaha`: Yamaha PRE OUT → Rolls MB15b → 1Mii TX → Lanai 1Mii RX → Schiit SYS → Bose 3·2·1 AUX IN. Roon does not see this path; it is driven by whatever the Family Room Yamaha is playing. The Roon-primary Lanai endpoint is `Lanai - TV` (192.168.1.239) via Chromecast.
 
 ### Roon Bridge (GDMARCHE)
 
@@ -216,7 +241,6 @@ YXC (receiver) controls remain on the Yamaha YXC client (`console/yamaha.py`). T
 - **R-N800A AirPlay 2 sample rate cap:** AirPlay 2 caps at 44.1 kHz / 16-bit. Higher-res files in the library get resampled by Roon for the Family Room zone. Studio (AIR HUB ASIO) is not affected; native sample rates pass through.
 - **ASIO exclusivity on AIR Hub:** Only one app can hold the ASIO driver at a time. Concurrent use of Roon + Spotify (via launcher) + Ableton on the AIR Hub is not possible without switching some clients to WASAPI.
 - **Roon Server database on spinning HDD:** The TS-473A has no SSD slot for the Roon database. Performance on the 12TB WD Red is workable but not optimal. Roon's official guidance recommends SSD; a USB 3.0 SSD upgrade is the cheap fix if Roon is kept past trial. Search and library page loads will be sluggish until then.
-- **Two zones share the same display name** (both "The Audiopheliac Library"). Rename to disambiguate.
 - **Roon on this firmware does not expose Yamaha R-N800A tone control via YXC.** Tone (bass/treble) and Pure Direct stay receiver-side, controlled via the front panel or MusicCast Controller. See `docs/software/Yamaha-RN800A.md` §8.
 - **Trial expires 2026-05-25.** Subscription auto-renews at $149.88/yr unless cancelled at https://account.roon.app/account/manage-billing.
 
@@ -227,3 +251,4 @@ YXC (receiver) controls remain on the Yamaha YXC client (`console/yamaha.py`). T
 | Date | Profile version | Change |
 |---|---|---|
 | 2026-05-11 | 2026.05.1 | Initial profile. Roon Server deployed via Docker on QNAP TS-473A (replacing failed 2023 community QPKG). Library scan completed (13,450 tracks). Roon Bridge installed on GDMARCHE. Two zones enabled (AirPlay > R-N800A; AIR HUB ASIO via Bridge). Cockpit pivoted from YXC-only to Roon-backed library + playback; YXC retained for receiver controls. |
+| 2026-05-12 | 2026.05.2 | Zone naming convention locked. Seven Roon outputs renamed: `Family Room — Yamaha` / `— Bose` / `— Shield` / `— TV`, `Studio · AIR HUB`, `Lanai - TV`, `Master Bedroom`. Cockpit `preferred_zones` set to the four room prefixes (`Family Room`, `Studio`, `Lanai`, `Master Bedroom`). Master Bedroom newly identified as a Roon-addressable zone (Chromecast + AirPlay 2 at 192.168.1.154). Lanai gains a primary Roon endpoint at 192.168.1.239; legacy 1Mii wireless path retained as secondary. |

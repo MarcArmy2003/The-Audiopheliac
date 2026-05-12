@@ -1,55 +1,152 @@
 ---
 const links = [
-  { href: '/', label: 'Home' },
-  { href: '/about', label: 'About' },
-  { href: '/gear', label: 'Gear' },
-  { href: '/vinyl', label: 'Vinyl' },
+  { href: '/studio',  label: 'Studio' },
+  { href: '/music',   label: 'Music' },
+  { href: '/spotify', label: 'Spotify' },
+  { href: '/gear',    label: 'Gear' },
+  { href: '/vinyl',   label: 'Vinyl' },
+  { href: '/journal', label: 'Journal' },
+  { href: '/cockpit', label: 'Cockpit' },
+  { href: '/about',   label: 'About' },
   { href: '/dashboard', label: 'Dashboard' },
 ];
+const here = Astro.url.pathname.replace(/\/$/, '') || '/';
 ---
-<header>
+<header class="site-header">
   <nav>
-    <a href="/" class="brand">The Audiopheliac</a>
-    <ul>
-      {links.filter(l => l.href !== '/').map(l => (
-        <li><a href={l.href}>{l.label}</a></li>
+    <a href="/" class="brand" aria-label="The Audiopheliac home">
+      <img class="mark" src="/brand/audiopheliac-mark.jpg" alt="" width="34" height="34" aria-hidden="true" />
+      <span class="brand__text">The Audiopheliac</span>
+    </a>
+
+    <button class="menu-toggle" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+
+    <ul class="nav-list">
+      {links.map(l => (
+        <li>
+          <a
+            href={l.href}
+            class:list={[
+              'nav-link',
+              here === l.href || here.startsWith(l.href + '/') ? 'is-active' : ''
+            ]}
+          >{l.label}</a>
+        </li>
       ))}
     </ul>
   </nav>
 </header>
 
 <style>
-  header {
-    border-bottom: 1px solid var(--n-700);
-    padding: var(--sp-4) var(--sp-5);
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    border-bottom: 1px solid var(--surface-edge);
+    background: rgba(10, 10, 11, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: var(--sp-3) var(--sp-5);
   }
   nav {
-    max-width: 72rem;
+    max-width: var(--content-max);
     margin: 0 auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: var(--sp-4);
   }
   .brand {
-    font-family: var(--font-display);
-    font-size: var(--fs-500);
-    color: var(--paper);
-    letter-spacing: 0.02em;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-3);
     border-bottom: none;
+    color: var(--paper);
   }
-  ul {
+  .brand__text {
+    font-family: var(--font-display);
+    font-size: var(--fs-400);
+    letter-spacing: 0.04em;
+  }
+  .mark {
+    display: block;
+    border-radius: 50%;
+    object-fit: contain;
+  }
+
+  .nav-list {
     list-style: none;
     display: flex;
     gap: var(--sp-5);
     padding: 0;
     margin: 0;
   }
-  ul a {
+  .nav-link {
     color: var(--n-300);
     border-bottom: none;
-    font-size: var(--fs-200);
-    letter-spacing: 0.03em;
+    font-size: var(--fs-100);
+    letter-spacing: 0.18em;
     text-transform: uppercase;
+    padding: 6px 0;
+    border-bottom: 1px solid transparent;
+    transition: color var(--dur-fast) var(--ease-standard),
+                border-color var(--dur-fast) var(--ease-standard);
   }
-  ul a:hover { color: var(--paper); }
+  .nav-link:hover { color: var(--paper); border-bottom-color: var(--spectrum-2); }
+  .nav-link.is-active { color: var(--spectrum-1); border-bottom-color: var(--spectrum-1); }
+
+  .menu-toggle {
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    padding: 8px;
+  }
+  .menu-toggle span {
+    width: 22px;
+    height: 2px;
+    background: var(--paper);
+    transition: transform var(--dur-fast) var(--ease-standard);
+  }
+
+  @media (max-width: 880px) {
+    .menu-toggle { display: flex; }
+    .nav-list {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      left: 0;
+      background: var(--n-900);
+      border-bottom: 1px solid var(--surface-edge);
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+      padding: var(--sp-3) var(--sp-5);
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height var(--dur-medium) var(--ease-standard);
+    }
+    .nav-list.is-open { max-height: 500px; }
+    .nav-link {
+      display: block;
+      padding: var(--sp-3) 0;
+      border-bottom: 1px solid var(--surface-edge);
+    }
+  }
 </style>
+
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.querySelector('.menu-toggle');
+    const list = document.querySelector('.nav-list');
+    if (!btn || !list) return;
+    btn.addEventListener('click', () => {
+      const open = list.classList.toggle('is-open');
+      btn.setAttribute('aria-expanded', String(open));
+    });
+  });
+</script>

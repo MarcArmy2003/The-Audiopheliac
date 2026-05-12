@@ -3,5 +3,77 @@
   "yamaha_name": "Yamaha R-N800A (Family Room)",
   "roon_host": "192.168.1.230",
   "host": "127.0.0.1",
-  "port": 5000
+  "port": 5000,
+
+  "enabled_sources": [
+    "spotify",
+    "airplay",
+    "server",
+    "net_radio",
+    "bluetooth",
+    "optical1",
+    "phono",
+    "usb_dac"
+  ],
+
+  "preferred_zones": ["Family Room", "Studio", "Lanai", "Master Bedroom"],
+
+  "net_radio_suggestions": [
+    {
+      "name": "WMOT Roots Radio",
+      "city": "Murfreesboro TN",
+      "kind": "Americana / country roots",
+      "stream_url": "https://wmot.streamguys1.com/wmot-aac",
+      "vtuner_search": "WMOT"
+    },
+    {
+      "name": "WSM 650 AM",
+      "city": "Nashville TN",
+      "kind": "Classic country",
+      "stream_url": "https://stream.revma.ihrhls.com/zc1583/hls.m3u8",
+      "vtuner_search": "WSM 650"
+    },
+    {
+      "name": "KCRW Eclectic 24",
+      "city": "Santa Monica CA",
+      "kind": "Eclectic public radio",
+      "stream_url": "https://kcrw.streamguys1.com/kcrw_192k_mp3_e24",
+      "vtuner_search": "KCRW Eclectic"
+    },
+    {
+      "name": "KEXP Seattle",
+      "city": "Seattle WA",
+      "kind": "Alt rock / indie tastemaker",
+      "stream_url": "https://kexp-mp3-128.streamguys1.com/kexp128.mp3",
+      "vtuner_search": "KEXP"
+    },
+    {
+      "name": "Radio Paradise Main Mix",
+      "city": "Paradise CA",
+      "kind": "Audiophile-curated eclectic",
+      "stream_url": "https://stream.radioparadise.com/aac-320",
+      "vtuner_search": "Radio Paradise"
+    },
+    {
+      "name": "BBC Radio 6 Music",
+      "city": "London UK",
+      "kind": "Alt rock + classic alt",
+      "stream_url": "http://stream.live.vc.bbcmedia.co.uk/bbc_6music",
+      "vtuner_search": "BBC 6 Music"
+    },
+    {
+      "name": "SomaFM Boot Liquor",
+      "city": "San Francisco CA",
+      "kind": "Alt-country, outlaw, dive-bar",
+      "stream_url": "https://ice2.somafm.com/bootliquor-128-mp3",
+      "vtuner_search": "Boot Liquor"
+    },
+    {
+      "name": "WWOZ Jazz & Heritage",
+      "city": "New Orleans LA",
+      "kind": "Blues, jazz, NOLA R&B",
+      "stream_url": "https://wwoz-sc.streamguys1.com/wwoz-hi.mp3",
+      "vtuner_search": "WWOZ"
+    }
+  ]
 }

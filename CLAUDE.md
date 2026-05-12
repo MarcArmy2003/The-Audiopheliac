@@ -61,6 +61,43 @@ All tools listed in `permissions.allow` run without prompting Gill for approval.
 
 **Scope independence:** This repo is independent of VALOR scope. When Rafa is addressed directly for Audiopheliac tasks, that address is sufficient authorization — no VALOR scope-guard confirmation required. The canonical working tree is C:\Users\gillo\The-Audiopheliac. Do not apply VALOR identity, VALOR branch conventions, or VALOR pipeline rules here.
 
+### Operational routing — who runs what
+
+Cowork drafts; Rafa executes anything that touches the running stack on GDMARCHE; the Audiopheliac Operator paperclip agent (when hired) absorbs the recurring slice. The table below is the default routing for ops that come up frequently; treat it as the lane discipline for this project specifically.
+
+| Operation | Lane today | Lane once Operator agent exists |
+|---|---|---|
+| Edit `console/config.json` (preferred_zones, enabled_sources, net_radio_suggestions, IPs, etc.) | Rafa | Operator |
+| Cockpit Flask process lifecycle (start, stop, restart) | Rafa | Operator |
+| Run any of `automation/*.py` (music_indexer, spotify_pull, spotify_local_match, spotify_gap_report) | Rafa | Operator (and likely a recurring routine) |
+| Restart Roon Server container on QNAP (SSH + docker compose) | Rafa | Operator if granted SSH; otherwise stays with Rafa |
+| Edit `.gitignore`, `automation/`, `console/static/`, `console/templates/`, `console/*.py` | Cowork drafts → Rafa commits / restarts if process is affected | Operator drafts and commits when adapter has file tools |
+| Touch `site/` Astro source files | Cowork directly (hot reload picks up changes) | Cowork directly |
+| Astro `npm install`, `npm run build`, `npm audit`, `wrangler pages deploy` | Rafa | Operator if granted Node toolchain; otherwise Rafa |
+| Brand voice guidelines, design philosophy, brand docs under `docs/brand/`, mockups under `_dev/01_brand/` | Cowork directly | Cowork directly |
+| CLAUDE.md surgical edits | Cowork directly | Cowork directly |
+| Doc updates downstream of an ops change (e.g. signal map after a Roon rename, software profiles after a version bump) | Cowork drafts → Rafa applies in the same prompt that runs the ops change | Operator |
+| Git stage, commit, push to origin/main | Rafa | Operator (file paperclip approval gate for force pushes per PAPERCLIP SURFACE §approval gates) |
+| Slack canvas updates at session close | Cowork (Cowork has the Slack MCP) | Cowork remains |
+| Paperclip ticket reads / writes | Rafa (only surface with localhost reach) | Operator agents post directly; Cowork still drafts comments via Rafa bridge |
+| Canva brand kit operations | Cowork (Cowork has the Canva MCP) | Cowork remains |
+| YXC probes / direct calls to `http://192.168.1.191/YamahaExtendedControl/v1/` | Rafa | Operator |
+| Roon UI configuration (zone naming, output enabling, account settings) | Gill (Roon Remote desktop app, manual) | Gill — paperclip cannot drive the Roon Remote UI |
+| MusicCast app configuration (Net Radio preset save, source enable/disable, MusicCast Linking) | Gill (iOS app, manual) | Gill — same reason as Roon |
+
+**Lane discipline note:** anything that requires the Roon Remote app or the MusicCast iOS app stays with Gill regardless of which agent exists — those are walled-garden UIs with no API surface. Cowork's job there is to draft the walkthrough; Gill's job is to click through it. When the Operator exists, Cowork still drafts; Operator becomes the persistent record-keeper for which steps were done when.
+
+**Default Rafa prompt shape** for Cockpit / Roon / Yamaha ops tasks:
+
+1. State the working directory: `C:\Users\gillo\The-Audiopheliac`.
+2. State the shell: PowerShell 5.1.
+3. State the scope in numbered steps with concrete file paths and exact expected JSON edits or commands.
+4. Provide an Acceptance block — observable state that proves the task ran.
+5. Provide an Out-of-Scope block — what NOT to touch.
+6. Close with: post a brief note to Slack canvas `F0AU7FEMA7M` and surface tag `Rafa`.
+
+When the Audiopheliac Operator paperclip agent exists, the same prompt shape can be filed as a paperclip issue assigned to Operator. Operator picks it up, runs it, posts work products to the issue, transitions to `done`. Cowork drafts the issue body; Rafa files it via `POST /api/issues` until Cowork gains direct paperclip reach.
+
 ---
 
 ## WORKSPACE BINDINGS
@@ -258,6 +295,9 @@ unavailable until a replacement interface with ADC is sourced.
 
 ### Lanai
 ```
+Roon Lanai - TV Chromecast (192.168.1.239)
+  > Lanai TV speakers (primary Roon endpoint, 2026-05-12)
+
 1Mii RX
   > Schiit SYS Input 1
 
@@ -272,7 +312,16 @@ Samsung UN65U7900F (eARC)
   > Bose 3-2-1 Series II TV 1 Input
 ```
 
-Note: Samsung UN65U7900F has no optical out. J-Tech JTECH-AE4KA handles eARC audio extraction and feeds the Bose TV 1 input directly. Schiit SYS switches between whole-house audio (1Mii RX) and karaoke (Singing Machine), feeding the Bose AUX input. Bose source selection handles TV vs AUX natively on the unit.
+Note: Samsung UN65U7900F has no optical out. J-Tech JTECH-AE4KA handles eARC audio extraction and feeds the Bose TV 1 input directly. Schiit SYS switches between whole-house audio (1Mii RX) and karaoke (Singing Machine), feeding the Bose AUX input. Bose source selection handles TV vs AUX natively on the unit. The Roon Chromecast endpoint at 192.168.1.239 is the primary Lanai listening path as of 2026-05-12; the 1Mii wireless route is retained as the secondary/legacy path downstream of `Family Room — Yamaha`.
+
+### Master Bedroom
+```
+Roon Cast / AirPlay 2
+  > Master Bedroom TV (192.168.1.154)
+  > Master Bedroom TV speakers
+```
+
+Note: TV exposes Chromecast and AirPlay 2 on the same hardware (192.168.1.154). Both protocols appear as Roon zones; either is addressable. Added 2026-05-12 as part of the seven-zone Roon rename pass.
 
 ### Garage
 ```
@@ -320,11 +369,10 @@ C:\Users\gillo\The-Audiopheliac   (live repo — edit here)
 - **Ableton paths:**
   - Cache: `D:\Ableton Cache`
   - User Library: `D:\Ableton User Library`
-- **Spotify:** Microsoft Store install | username: `MarcArmy2003` | display name: The Audiopheliac
-  Profile URL: `https://open.spotify.com/user/marcarmy2003`
+- **Spotify:** Microsoft Store install | username: `gdmarche` (URL slug, immutable) | display name: The Audiopheliac (changed from `MarcArmy2003` 2026-05-12)
+  Profile URL: `https://open.spotify.com/user/gdmarche`
   App path: `C:\Users\gillo\AppData\Local\Packages\SpotifyAB.SpotifyMusic_zpdnekdrzrea0\LocalState\Spotify\`
   Network path: Streamed from GDMARCHE to Yamaha R-N800A
-  Note: `gdmarche-user` is the Microsoft Store app identifier, not the Spotify social username.
   Profile: `docs/software/Spotify.md`
 - **Roon (library + playback brain):** Server in Docker on NAS, Bridge as Windows service on GDMARCHE, Remote desktop app on GDMARCHE.
   - Server image: `ghcr.io/roonlabs/roonserver:latest` (production, 2.66 build 1658). Compose at `/share/Container/RoonServer/docker-compose.yml`.
@@ -449,23 +497,50 @@ python automation\spotify_gap_report.py
 ## WEBSITE STATE (CURRENT)
 
 - **Phase 1 complete:** Brand layer locked and pushed to origin/main.
-- **Phase 2 palette approved:** Nashville Midnight (2026-04-28). tokens.css updated.
-- **Stack target:** Astro + Cloudflare Pages (scaffold pending Phase 2 authorization)
-- **Canonical mark:** Vinyl turntable logo (shape retained from Phase 1; recolored to Nashville Midnight)
-- **Palette: Nashville Midnight** (derived from listening profile emotional lanes)
-  - Neon cream `#E8D5A3` (CTA primary, hero accent)
-  - Stage bronze `#B87333` (main accent, logo lines)
-  - Steel blue `#3D5A80` (body accent only; not CTAs)
-  - Deep indigo `#1B2340` (structural dark, logo fills)
-  - Midnight `#1A1A2E` (deep field)
-  - Warm gold `#D4B08C` (CTA hover lift)
+- **Phase 2 brand rework complete (2026-05-11 to 2026-05-12):** Palette restored from Nashville Midnight to Full Spectrum (prismatic). Dual voice register codified. Canonical mark locked as the existing raster. See `_dev/04_progress/session_close_2026_05_11_brand_rework.md` for the full deliverable index.
+- **Stack target:** Astro + Cloudflare Pages (Rafa's 7-page scaffold live at localhost:3000 as of 2026-05-12; pending palette port to Full Spectrum and `npm audit` resolution of 6 vulns from the Astro 6.3.1 upgrade)
+- **Canonical mark:** Original rainbow prismatic vinyl turntable raster at `assets/The_Audiopheliac_Primary_Logo_GPT.jpg`. Do NOT use the code-driven SVG approximation at `_dev/01_brand/canonical_mark_rebuild_v0.svg` — structural reference only. Faithful vector rebuild remains deferred to a dedicated vector-tool design session.
+- **Palette: Full Spectrum** (locked 2026-05-12, derived from the canonical mark's prismatic sweep)
+  - Sunlamp Yellow `#F8E91F` (CTA primary on ink, ~17.5:1 AAA)
+  - Spring Lime `#99E257` (warm green transition)
+  - Signal Green `#41D99A` (mid-spectrum, success state, spindle anchor)
+  - Cyan Pulse `#0ABED3` (body accent only; teal CTAs FORBIDDEN, VALOR separation)
+  - Sapphire Run `#0F82DF` (structural blue, info state)
+  - Indigo Drift `#5E54D4` (deep secondary)
+  - Magenta Lift `#C24CC8` (CTA hover, warm spectrum terminus)
   - Ink `#0A0A0B` | Paper `#F5F5F7` | Hairline `#FFFFFF` (unchanged)
-- **CTA contract:** Solid neon cream on ink (WCAG AAA ~14.1:1). Nashville gradient (cream > bronze > steel > indigo) reserved for one to two hero moments only. Teal CTAs remain forbidden (VALOR brand separation).
-- **Logo treatments:** (A) Monochrome bronze for favicons/small; (B) Duotone cream+indigo as primary mark; (C) Nashville gradient for hero moments; (D) Reversed indigo on paper for light contexts.
-- **Typography:** Unica One (display), Inter (body). Scale 1.250, base 16px. Tokens in `site/src/styles/tokens.css`.
-- **Brand voice guidelines:** v2.0 at `brand-voice-guidelines-v2.md` (voice content unchanged from v1.0; Nashville Midnight visual identity added as §7).
-- **Canva brand kit:** `kAHGkHrcJYU` (to be updated with Nashville Midnight palette)
-- **Phase 2 open decisions:** (1) Astro public-dir convention for brand files; (2) Tailwind vs vanilla CSS with tokens.css; (3) content approach (reuse `docs/*.md` at build time vs Astro content collections); (4) logo asset regeneration (PNG/SVG in new colorways); (5) favicon regeneration with Nashville Midnight palette
+- **CTA contract:** Solid Sunlamp Yellow on ink (WCAG AAA ~17.5:1). Hover to Magenta Lift. Spectrum gradient (90° linear, 7-stop) reserved for one to two hero moments only.
+- **Logo treatments:** Use the canonical raster at all sizes ≥32px. Below 32px, fall back to working PNG masters at `media/icons/audiopheliac_*.png`. No recoloring of the canonical.
+- **Typography:** Unica One (display), Inter (body). Scale 1.250, base 16px. Tokens at `site/src/styles/tokens.v3.css` (replaces `tokens.css` when Astro `global.css` import is swapped).
+- **Brand voice guidelines:** v3.0 at `brand-voice-guidelines-v3.md`. Adds §3 Voice Modes (manifesto + direct registers). §8 visual identity updated to Full Spectrum. Forbidden-vocabulary list includes "Nashville Midnight" as a primary-palette claim. v2.0 (`brand-voice-guidelines-v2.md`) retained on disk as historical reference.
+- **Canva brand kit:** `kAHGkHrcJYU`. Canonical mark uploaded as asset `MAHJda6fxms`. Brand kit reference poster lives at design `DAHJd6bWQgU` in the "The Audiopheliac" Canva folder (`FAHJd1gp6cg`). Brand kit color/font values still need manual paste into Canva UI — values pre-staged in `_dev/01_brand/canva_brand_kit_paste_sheet.md`.
+- **Nashville Midnight:** Archived as future classic-audiophile sub-brand. Index at `_dev/99_archive/nashville_midnight_sub_brand/README.md`. Do not use for The Audiopheliac primary.
+- **Phase 2 open decisions:** (1) Palette port — swap `@import './tokens.css'` to `@import './tokens.v3.css'` in `site/src/styles/global.css`; (2) hero gradient mapping rebuild (4-stop diagonal → 7-stop linear); (3) Cockpit UI port from Nashville Midnight to Full Spectrum (`console/static/style.css`); (4) `npm audit` resolution before Cloudflare deploy; (5) faithful vector rebuild of canonical mark in a dedicated design session.
+
+### Branding doc location index
+
+| Doc | Path |
+|---|---|
+| Brand voice guidelines | `brand-voice-guidelines-v3.md` |
+| Canonical mark design philosophy | `docs/brand/Canonical_Mark_Design_Philosophy.md` |
+| Frequency Cartography design philosophy | `docs/brand/Frequency_Cartography_Design_Philosophy.md` |
+| Brand kit reference card (PDF) | `docs/brand/Audiopheliac_Brand_Kit_Reference.pdf` |
+| Canva brand kit paste sheet | `docs/brand/Canva_Brand_Kit_Paste_Sheet.md` |
+| Site architecture spec | `docs/Audiopheliac_Site_Architecture.md` |
+| File format converter spec v3 | `docs/tools/file_format_converter_spec_v3.md` |
+| Full Spectrum custom theme | `outputs/themes/full-spectrum.md` |
+| Palette decision aid mockup | `_dev/01_brand/palette_decision_aid.html` |
+| Cockpit redesign mockup | `_dev/01_brand/cockpit_redesign_mockup.html` |
+| Homepage mockup (Full Spectrum) | `_dev/01_brand/audiopheliac_homepage_mockup.html` |
+| Brand discovery report | `outputs/audiopheliac_brand_discovery_report.md` |
+| Brand voice analysis (/market brand) | `outputs/BRAND-VOICE.md` |
+| Competitor / web qualitative scan | `outputs/WEB-SCAN.md` |
+| Brand rework paperclip-shaped plan | `_dev/03_decision-log/brand_rework_plan_v1.md` |
+| Session close summary | `_dev/04_progress/session_close_2026_05_11_brand_rework.md` |
+| Nashville Midnight archive index | `_dev/99_archive/nashville_midnight_sub_brand/README.md` |
+| Canonical mark structural approximation (SVG, do NOT use as asset) | `_dev/01_brand/canonical_mark_rebuild_v0.svg` |
+| Canva folder | https://www.canva.com/folder/FAHJd1gp6cg |
+| Canva brand kit reference poster | https://www.canva.com/d/jEnhAHTCul9LV1p |
 
 ---
 
@@ -556,15 +631,23 @@ Create the `lyrics/` and `prompts/` subdirectories under `Suno/` if they do not 
 | Set up Robocopy job: C:\Users\gillo\The-Audiopheliac > D:\The Audiopheliac\The-Audiopheliac\ (nightly /MIR /XO) | Complete |
 | Clean up D:\The Audiopheliac\The-Audiopheliac\ stale files after Robocopy is running | Monitor — extras retained (QSync layer); review after several nightly runs |
 | Remove remaining VALOR worktree: GitHub Clones\The-Audiopheliac\tender-wright-900476 | Complete |
-| Canva brand kit kAHGkHrcJYU: update with Nashville Midnight palette | Open |
+| Canva brand kit kAHGkHrcJYU: paste Full Spectrum palette + fonts into Canva UI (asset uploads complete, see `_dev/01_brand/canva_brand_kit_paste_sheet.md`) | Open — manual UI work |
 | Suno "First Tracks": early experiments, library indexed | Active |
 | Re-run music_indexer.py from GDMARCHE (Rafa) to pick up First Tracks rename | Pending — index currently stale (0 tracks after sandbox misfire) |
 | Roon Server: trial activated, Docker deploy on QNAP complete, library scanned (13,450 tracks), two zones live | Complete |
 | Roon subscription decision (auto-renews 2026-05-25 at $149.88/yr unless cancelled) | Pending |
 | Roon: schedule weekly DB backup to `/RoonBackups` once trial decision is made | Open |
 | Audiopheliac Cockpit v0.2 (console/) — YXC + Roon integrated, library + zones + transport functional | Complete |
-| Cockpit: rename one of the two "The Audiopheliac Library" zones to disambiguate (recommend AirPlay → "Family Room", AIR HUB ASIO → "Studio") | Open |
+| Cockpit: rename one of the two "The Audiopheliac Library" zones to disambiguate (recommend AirPlay → "Family Room", AIR HUB ASIO → "Studio") | Complete (2026-05-12) — superseded by the seven-zone rename pass (`Family Room — Yamaha` / `— Bose` / `— Shield` / `— TV`, `Studio · AIR HUB`, `Lanai - TV`, `Master Bedroom`); Cockpit `preferred_zones` locked to the four room prefixes |
+| Cockpit UI: port `console/static/style.css` from Nashville Midnight to Full Spectrum (mockup at `_dev/01_brand/cockpit_redesign_mockup.html`) | Complete (2026-05-12) — palette ported in-place; HTML layout restructure deferred |
 | Signal map update (MusicCast/MinimServer confirmation) | Pending Gill playback test |
+| DHCP reservation for Yamaha R-N800A at 192.168.1.191 (MAC 54:B7:BD:9F:AC:18) | Complete (2026-05-12) |
+| Astro site (`site/`) palette port: swap tokens.css to Full Spectrum, rebuild hero gradient mapping | Complete (2026-05-12) — tokens.css updated in place; spectrum-gradient now 7-stop linear |
+| `npm audit` on the Astro 6.3.1 upgrade — 6 vulns (5 moderate, 1 high) | Open — gate before Cloudflare deploy |
+| Faithful vector rebuild of canonical mark (Illustrator/Inkscape/Affinity) | Deferred to dedicated design session |
+| Replace concentric-ring placeholder marks in Rafa's Astro pages with the canonical raster | Complete (2026-05-12) — SiteHeader.astro now uses /brand/audiopheliac-mark.jpg |
+| GDMARCHE IP conflict: CLAUDE.md HARDWARE records 192.168.1.119 reserved 2026-05-05; `docs/GDMARCHE_HomeOffice_Connections_v2026_05.md` records 192.168.1.75 reservation pending | Open — verify which is current and reconcile |
+| Brand voice guidelines v3.0 + design philosophy + site architecture docs committed and pushed to origin/main | Open — pending Board commit |
 
 ---
 
@@ -934,6 +1017,12 @@ These do not duplicate each other. Each has its lane.
 ---
 
 ## HISTORY
+
+**2026-05-12 (Roon zone lock + Cockpit preferred_zones, late):** Locked the Roon zone naming convention after Gill renamed seven outputs in the Roon Remote UI: `Family Room — Yamaha` (AirPlay 2 to R-N800A at 192.168.1.191), `Family Room — Bose` (AirPlay 2 to Bose Lifestyle 650 at 192.168.1.102), `Family Room — Shield` (Chromecast to NVIDIA Shield Pro at 192.168.1.250), `Family Room — TV` (Chromecast to Samsung NU6950 at 192.168.1.5), `Studio · AIR HUB` (ASIO via Roon Bridge on GDMARCHE), `Lanai - TV` (Chromecast to Samsung UN65U7900FD at 192.168.1.239), and `Master Bedroom` (Chromecast + AirPlay 2 on the same hardware at 192.168.1.154). Cockpit `console/config.json` `preferred_zones` array set to the four room prefixes `["Family Room", "Studio", "Lanai", "Master Bedroom"]`; the browser UI filters the zone selector to outputs whose names start with one of these substrings. Rafa restarted the Flask process via the project venv pythonw against `console/launch.pyw` and verified `/api/config` returns the new array. **Master Bedroom** newly identified as a Roon-addressable zone — added as a new signal-chain block in CLAUDE.md and as §5b in the signal map. **Lanai** gains a primary Roon endpoint (`Lanai - TV` Chromecast at 192.168.1.239); the legacy Yamaha-PRE-OUT → Rolls MB15b → 1Mii TX → 1Mii RX → Schiit SYS → Bose 3·2·1 AUX path is retained as the secondary route downstream of `Family Room — Yamaha`. Signal map renamed `config/audiopheliac_signal_map_v_2026_01.md` → `config/audiopheliac_signal_map_v_2026_05.md` (version 2026.05.3); references updated across nine docs. `docs/software/Roon.md` gained a "Zone naming convention (locked 2026-05-12)" section and an "Out-of-Roon rooms" subsection covering the Garage (Bluetooth only) and the Lanai secondary path. Open action item for the prior two-zone disambiguation marked Complete — superseded by the seven-zone rename pass. Step 5 (Roon zone grouping) explicitly deferred to Gill in the Roon Remote UI. No git commit, no deploy.
+
+**2026-05-12 (site + Cockpit Full Spectrum port, evening):** Gill authorized "build the site, focus on getting the cockpit right and setting up the pages as they are now." Cowork executed in-place palette port (not a swap-to-tokens.v3.css; the existing tokens.css was rewritten so the codebase's `--spectrum-1..6` and other variable names point to Full Spectrum values, preserving all `--n-*`, `--surface-*`, `--fs-*`, `--sp-*`, `--r-*` tokens the existing pages depend on). Spectrum gradient rebuilt to 7-stop 90° linear. Body background gradient swapped from bronze/steel to yellow/magenta tints. `.tag--bronze` and `.tag--steel` recolored to in-spectrum equivalents. `SiteHeader.astro` placeholder concentric-ring SVG replaced with the canonical raster (copied to `site/public/brand/audiopheliac-mark.jpg`). Lingering hardcoded Nashville Midnight rgba values in `music.astro` and `studio.astro` patched in place. `journal.astro` retained its Nashville Midnight palette swatch grid because that swatch grid IS a journal post about the palette decision that got walked back — historical content, semantically correct. Cockpit UI: `console/static/style.css` palette block rewritten with legacy variable names (`--neon-cream`, `--stage-bronze`, etc.) repointed to Full Spectrum values (Sunlamp Yellow, Signal Green, Sapphire Run, Magenta Lift). Topbar restructured to include the canonical mark image (`console/static/audiopheliac-mark.jpg`) plus a "Cockpit" sub-label. HTML element IDs preserved so `console/static/app.js` JS wiring continues to work — the existing Cockpit HTML structure remains; the Full Spectrum mockup's two-column layout is deferred to a "revise later" pass. Lena's GDMARCHE Home Office Connections doc saved at `docs/GDMARCHE_HomeOffice_Connections_v2026_05.md`. IP conflict flagged: CLAUDE.md HARDWARE has 192.168.1.119 reserved 2026-05-05; new doc says 192.168.1.75 DHCP-pending. Reconciliation queued as an OPEN ACTION ITEM. No git commits, no deploys, nothing pushed.
+
+**2026-05-12 (brand rework lock-in, late evening through next day):** Overnight cross-surface session. Cowork ran the brand rework while Rafa simultaneously built an Astro 7-page site against the (now-stale) Nashville Midnight ticket. Outcomes locked by Board on wake-up: (1) Full Spectrum palette restored as primary, Nashville Midnight archived as future classic-audiophile sub-brand at `_dev/99_archive/nashville_midnight_sub_brand/README.md`. (2) Canonical mark is the existing raster at `assets/The_Audiopheliac_Primary_Logo_GPT.jpg` — code-driven SVG v0 demoted to "structural reference, do not use as asset." (3) Dual voice register (manifesto + direct) codified in `brand-voice-guidelines-v3.md`. (4) Audience sharpened: DIY-creative middle-class enthusiast ("average Joe Schmoe who wants to get creative with the gear they can afford"), explicitly NOT the credentialed-audiophile lane. (5) Converter feature reactivated from parked, spec v3 at `docs/tools/file_format_converter_spec_v3.md`. (6) Canva brand kit reference poster generated against brand kit `kAHGkHrcJYU` using uploaded canonical mark asset `MAHJda6fxms`; candidate 3 committed as design `DAHJd6bWQgU` with motto font reduced to 52px; design and asset moved into new Canva folder "The Audiopheliac" at `FAHJd1gp6cg`. (7) Yamaha R-N800A DHCP reservation completed (192.168.1.191, MAC 54:B7:BD:9F:AC:18) per Lena's MusicCast reference; new doc at `docs/Yamaha_RN800A_MusicCast_Reference.md` complements `docs/software/Yamaha-RN800A.md`. (8) Paperclip THE-3 closed by Rafa; THE-4 filed by Cowork as authoritative rework ticket; cross-surface conflict comment surfaces Rafa-vs-Cowork palette parallel-track issue. (9) Full deliverable index maintained in WEBSITE STATE > Branding doc location index above. No commits to origin/main this session — commit decisions deferred to Board.
 
 **2026-05-11 (Roon pivot + Cockpit v0.2, end of day):** Two-part substantial session. (1) Built the Audiopheliac Cockpit local control panel (`console/`) as a Python/Flask + browser UI on GDMARCHE, originally targeting YXC for both receiver controls AND library browse. After observing that YXC's library surface is firmware-thin (8-item page cap on `getListInfo`, no real metadata, no Spotify-class search) and that Roon Server was already installed but stopped on the NAS, pivoted the library + playback substrate from YXC + DLNA to Roon. (2) Activated the free Roon trial (expires 2026-05-25, paid $149.88/yr after); removed the failed 2023 community QPKG; deployed Roon Server as a Docker container on QNAP TS-473A via Container Station using Roon Labs' official image (`ghcr.io/roonlabs/roonserver:latest`), with one fix to the generator's compose file (`/dev/dri` device passthrough removed because the Ryzen V1500B exposes no iGPU). Library scanned cleanly (13,450 tracks). Installed Roon Bridge on GDMARCHE as a Windows service to expose the M-Audio AIR Hub as a Roon zone. Enabled two zones: AirPlay 2 to the R-N800A (Family Room) and AIR HUB ASIO via Bridge (Studio); both currently named "The Audiopheliac Library" (rename queued). Cockpit refactored to call Roon via `roonapi` (Python) for library/search/browse/transport while retaining YXC for receiver-side power/volume/mute/source/Net Radio presets. Tone card removed from the Cockpit on the strength of direct YXC probes confirming the R-N800A firmware does not expose `tone_control` or `setDirect`. Two new per-package profiles created: `docs/software/Roon.md` and `docs/software/Yamaha-RN800A.md`. Lane discipline applied: Cowork drafted the Docker compose YAML review, the recovery prompt after the first deploy failed on PATH discovery, and the second recovery after the `/dev/dri` failure; Rafa executed all NAS-side SSH/Docker work via PowerShell from GDMARCHE. Paperclip ticketing remains on hold (Audiopheliac Operator agent not yet created).
 

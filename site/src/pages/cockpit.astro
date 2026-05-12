@@ -1,0 +1,384 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Cockpit" description="The Audiopheliac Cockpit — local control panel for Gill's home AV system. Roon Server + Yamaha YXC, one zone of trust, no cloud.">
+
+  <section class="page-head">
+    <p class="eyebrow">Local control · No cloud · No login</p>
+    <h1>The Cockpit</h1>
+    <p class="lede">A control panel for one signal chain. Yamaha R-N800A via YXC, Roon Server on the QNAP, two zones, two preamps, two turntables, one operator. Runs on the home network. Not for sale, not for hire, just for here.</p>
+    <p class="muted">
+      The interface below is a faithful representation of the running Cockpit at <code>http://localhost:3100</code> on GDMARCHE. Source select, master volume, transport, Net Radio presets, full Roon library search, zone switching, queue editing. No accounts. No tracking. The signal stops at the house.
+    </p>
+  </section>
+
+  <section class="cockpit-shell">
+
+    <div class="cp-card cp-now">
+      <div class="cp-card-head">
+        <h2>Now playing</h2>
+        <span class="cp-meta">Zone: Family Room · AirPlay 2 → Yamaha R-N800A</span>
+      </div>
+      <div class="cp-now-grid">
+        <div class="cp-art" aria-hidden="true"></div>
+        <div class="cp-now-info">
+          <h3 class="cp-track">Starting Over</h3>
+          <p class="cp-artist">Chris Stapleton</p>
+          <p class="cp-album">Starting Over · 2020 · Mercury Nashville</p>
+          <div class="cp-now-meta">
+            <span>Format <strong>FLAC 24/96</strong></span>
+            <span>Bitrate <strong>2,304 kbps</strong></span>
+            <span>Signal path <strong>Lossless</strong></span>
+          </div>
+          <div class="cp-scrub">
+            <span>1:48</span>
+            <div class="cp-scrub-bar"><div class="cp-scrub-fill"></div></div>
+            <span>4:32</span>
+          </div>
+          <div class="cp-transport">
+            <button class="cp-tb" aria-label="Shuffle">↺</button>
+            <button class="cp-tb" aria-label="Previous">⏮</button>
+            <button class="cp-tb cp-tb-primary" aria-label="Pause">⏸</button>
+            <button class="cp-tb" aria-label="Next">⏭</button>
+            <button class="cp-tb" aria-label="Repeat">⟳</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cp-grid">
+
+      <div class="cp-col">
+        <div class="cp-card">
+          <div class="cp-card-head">
+            <h2>Roon zones</h2>
+            <span class="cp-meta">2 zones · 1 playing</span>
+          </div>
+          <div class="cp-zones">
+            <div class="cp-zone is-active">
+              <span class="cp-led"></span>
+              <div class="cp-zone-title">
+                <span class="cp-zone-name">Family Room</span>
+                <span class="cp-zone-out">AirPlay 2 → Yamaha R-N800A · 192.168.1.191</span>
+              </div>
+              <div class="cp-zone-vol"><input type="range" min="0" max="100" value="42" aria-label="Family Room volume"><span>42</span></div>
+            </div>
+            <div class="cp-zone">
+              <span class="cp-led"></span>
+              <div class="cp-zone-title">
+                <span class="cp-zone-name">Studio</span>
+                <span class="cp-zone-out">M-Audio AIR HUB ASIO · Roon Bridge · GDMARCHE</span>
+              </div>
+              <div class="cp-zone-vol"><input type="range" min="0" max="100" value="68" aria-label="Studio volume"><span>68</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cp-card">
+          <div class="cp-card-head">
+            <h2>Yamaha R-N800A</h2>
+            <span class="cp-meta">YXC 2.17 · firmware 1.13 build 2404</span>
+          </div>
+          <div class="cp-tile-row">
+            <div class="cp-tile">
+              <span class="cp-tile-label">Power</span>
+              <div class="cp-tile-body">
+                <button class="cp-power"><span class="cp-power-dot"></span> On</button>
+                <span class="cp-tile-note">7h 42m up</span>
+              </div>
+            </div>
+            <div class="cp-tile">
+              <span class="cp-tile-label">Mute</span>
+              <div class="cp-tile-body">
+                <span class="cp-tile-value">Off</span>
+                <button class="cp-toggle">Toggle</button>
+              </div>
+            </div>
+          </div>
+          <span class="cp-tile-label">Source</span>
+          <div class="cp-src-grid">
+            <button class="cp-src is-active">AirPlay</button>
+            <button class="cp-src">Net Radio</button>
+            <button class="cp-src">Optical 1</button>
+            <button class="cp-src">Optical 2</button>
+            <button class="cp-src">Line 1</button>
+            <button class="cp-src">Phono</button>
+            <button class="cp-src">Bluetooth</button>
+            <button class="cp-src">Spotify</button>
+          </div>
+          <div class="cp-master">
+            <label>Master</label>
+            <input type="range" min="0" max="100" value="42" aria-label="Master volume">
+            <span>42</span>
+          </div>
+          <span class="cp-tile-label">Net Radio presets</span>
+          <div class="cp-preset-grid">
+            <button class="cp-preset"><span>P1</span>KCRW Eclectic</button>
+            <button class="cp-preset"><span>P2</span>WSM 650 AM</button>
+            <button class="cp-preset"><span>P3</span>WMOT Roots</button>
+            <button class="cp-preset"><span>P4</span>KEXP Seattle</button>
+            <button class="cp-preset"><span>P5</span>BBC 6 Music</button>
+            <button class="cp-preset"><span>P6</span>Radio Paradise</button>
+            <button class="cp-preset"><span>P7</span>SomaFM Boot</button>
+            <button class="cp-preset"><span>P8</span>—</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="cp-col">
+        <div class="cp-card">
+          <div class="cp-card-head">
+            <h2>Roon library</h2>
+            <span class="cp-meta">13,450 tracks · 1,022 albums · 165 artists</span>
+          </div>
+          <input type="search" class="cp-search" placeholder="Search artist, album, or track..." />
+          <div class="cp-tabs">
+            <button class="cp-tab is-active">Recent</button>
+            <button class="cp-tab">Albums</button>
+            <button class="cp-tab">Artists</button>
+            <button class="cp-tab">Playlists</button>
+            <button class="cp-tab">Genres</button>
+          </div>
+          <div class="cp-lib">
+            <div class="cp-lib-item is-playing">
+              <div class="cp-thumb"></div>
+              <div class="cp-lib-text"><span class="cp-lib-main">Starting Over</span><span class="cp-lib-sub">Chris Stapleton · Starting Over</span></div>
+              <span class="cp-lib-kind">Playing</span>
+            </div>
+            <div class="cp-lib-item">
+              <div class="cp-thumb cp-thumb-2"></div>
+              <div class="cp-lib-text"><span class="cp-lib-main">Feathered Indians</span><span class="cp-lib-sub">Tyler Childers · Purgatory</span></div>
+              <span class="cp-lib-kind">Track</span>
+            </div>
+            <div class="cp-lib-item">
+              <div class="cp-thumb cp-thumb-3"></div>
+              <div class="cp-lib-text"><span class="cp-lib-main">Broken Window Serenade</span><span class="cp-lib-sub">Whiskey Myers · Mud</span></div>
+              <span class="cp-lib-kind">Track</span>
+            </div>
+            <div class="cp-lib-item">
+              <div class="cp-thumb cp-thumb-4"></div>
+              <div class="cp-lib-text"><span class="cp-lib-main">Sultans of Swing</span><span class="cp-lib-sub">Dire Straits · Dire Straits</span></div>
+              <span class="cp-lib-kind">Track</span>
+            </div>
+            <div class="cp-lib-item">
+              <div class="cp-thumb cp-thumb-5"></div>
+              <div class="cp-lib-text"><span class="cp-lib-main">Mannish Boy</span><span class="cp-lib-sub">Muddy Waters · Hard Again</span></div>
+              <span class="cp-lib-kind">Track</span>
+            </div>
+            <div class="cp-lib-item">
+              <div class="cp-thumb cp-thumb-6"></div>
+              <div class="cp-lib-text"><span class="cp-lib-main">Edge of Seventeen</span><span class="cp-lib-sub">Stevie Nicks · Bella Donna</span></div>
+              <span class="cp-lib-kind">Track</span>
+            </div>
+            <div class="cp-lib-item">
+              <div class="cp-thumb cp-thumb-7"></div>
+              <div class="cp-lib-text"><span class="cp-lib-main">Rita Is Gone</span><span class="cp-lib-sub">The Marcus King Band · Carolina Confessions</span></div>
+              <span class="cp-lib-kind">Track</span>
+            </div>
+            <div class="cp-lib-item">
+              <div class="cp-thumb"></div>
+              <div class="cp-lib-text"><span class="cp-lib-main">Neon Moon</span><span class="cp-lib-sub">Brooks &amp; Dunn · Brand New Man</span></div>
+              <span class="cp-lib-kind">Track</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="cp-card">
+          <div class="cp-card-head">
+            <h2>Up next</h2>
+            <span class="cp-meta">8 in queue · 33 min remaining</span>
+          </div>
+          <div class="cp-queue">
+            <div class="cp-q"><span class="cp-q-num">1</span><div class="cp-q-text"><span class="cp-q-main">Feathered Indians</span><span class="cp-q-sub">Tyler Childers</span></div><span class="cp-q-len">3:55</span></div>
+            <div class="cp-q"><span class="cp-q-num">2</span><div class="cp-q-text"><span class="cp-q-main">Sultans of Swing</span><span class="cp-q-sub">Dire Straits</span></div><span class="cp-q-len">5:50</span></div>
+            <div class="cp-q"><span class="cp-q-num">3</span><div class="cp-q-text"><span class="cp-q-main">Mannish Boy</span><span class="cp-q-sub">Muddy Waters</span></div><span class="cp-q-len">5:35</span></div>
+            <div class="cp-q"><span class="cp-q-num">4</span><div class="cp-q-text"><span class="cp-q-main">Broken Window Serenade</span><span class="cp-q-sub">Whiskey Myers</span></div><span class="cp-q-len">4:13</span></div>
+            <div class="cp-q"><span class="cp-q-num">5</span><div class="cp-q-text"><span class="cp-q-main">Edge of Seventeen</span><span class="cp-q-sub">Stevie Nicks</span></div><span class="cp-q-len">5:30</span></div>
+            <div class="cp-q"><span class="cp-q-num">6</span><div class="cp-q-text"><span class="cp-q-main">Rita Is Gone</span><span class="cp-q-sub">The Marcus King Band</span></div><span class="cp-q-len">4:47</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </section>
+
+  <section class="cockpit-foot">
+    <h2>Under the hood</h2>
+    <p>The Cockpit is a small Python/Flask app at <code>console/</code> in this repo. It talks to two real systems on the home network:</p>
+    <ul>
+      <li><strong>Roon Server</strong> running in Docker on the QNAP NAS — handles the library (13,450 tracks indexed), zone management, and transport for AirPlay and ASIO outputs.</li>
+      <li><strong>Yamaha R-N800A</strong> via the YXC HTTP/JSON API — handles receiver-side controls: power, master volume, mute, source select, Net Radio presets.</li>
+    </ul>
+    <p>The whole thing runs on <code>localhost:3100</code> on a single workstation. There is no remote access, no cloud sync, no telemetry. The Cockpit shortcut on the desktop opens it as its own browser window via <code>pythonw + Chrome --app</code>, which means it doesn't share state with the regular browser session.</p>
+    <p>The interface above is a styled snapshot of the live UI. If you're not on the home network, you can't operate it. That's the point.</p>
+  </section>
+
+</BaseLayout>
+
+<style>
+  .page-head { padding: var(--sp-7) 0 var(--sp-6); max-width: var(--content-narrow); margin: 0 auto; }
+  .page-head h1 { font-size: clamp(var(--fs-700), 7vw, var(--fs-900)); margin: var(--sp-2) 0 var(--sp-5); }
+  .eyebrow { font-family: var(--font-mono); font-size: var(--fs-100); letter-spacing: 0.22em; text-transform: uppercase; color: var(--spectrum-1); margin: 0; }
+  .lede { font-size: var(--fs-400); color: var(--paper); line-height: var(--lh-snug); margin: 0 0 var(--sp-5); }
+  .muted { color: var(--n-300); font-size: var(--fs-300); line-height: var(--lh-normal); margin: 0; }
+  .muted code, .cockpit-foot code { font-family: var(--font-mono); font-size: 0.92em; background: var(--surface-2); padding: 1px 6px; border-radius: var(--r-sm); color: var(--spectrum-1); }
+
+  .cockpit-shell {
+    max-width: var(--content-max);
+    margin: 0 auto;
+    padding: var(--sp-3) var(--sp-4) var(--sp-7);
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-5);
+  }
+  .cp-card {
+    background: var(--surface);
+    border: 1px solid var(--surface-edge);
+    border-radius: var(--r-lg);
+    padding: var(--sp-5);
+  }
+  .cp-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 0 var(--sp-4);
+    flex-wrap: wrap;
+    gap: var(--sp-2);
+  }
+  .cp-card-head h2 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--fs-300);
+    letter-spacing: 0.18em;
+    color: var(--paper);
+    text-transform: uppercase;
+  }
+  .cp-meta {
+    font-size: var(--fs-100);
+    font-family: var(--font-mono);
+    color: var(--n-300);
+    letter-spacing: 0.04em;
+  }
+
+  .cp-now-grid { display: grid; grid-template-columns: 220px 1fr; gap: var(--sp-6); align-items: center; }
+  @media (max-width: 720px) { .cp-now-grid { grid-template-columns: 1fr; } }
+  .cp-art {
+    width: 220px; height: 220px;
+    border-radius: var(--r-md);
+    background: linear-gradient(135deg, var(--spectrum-2) 0%, var(--spectrum-3) 50%, var(--spectrum-4) 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .cp-art::before { content: ''; position: absolute; inset: 24px; border-radius: 50%; background: radial-gradient(circle at center, var(--ink) 0%, var(--ink) 18%, transparent 19%); }
+  .cp-art::after { content: ''; position: absolute; inset: 88px; border-radius: 50%; background: var(--spectrum-1); }
+
+  .cp-now-info { display: flex; flex-direction: column; gap: 6px; }
+  .cp-track { font-family: var(--font-display); font-size: clamp(var(--fs-500), 4vw, var(--fs-700)); margin: 0; line-height: 1.05; color: var(--paper); letter-spacing: 0.02em; }
+  .cp-artist { color: var(--spectrum-1); font-size: var(--fs-400); font-weight: 500; margin: 0; }
+  .cp-album { color: var(--n-300); font-size: var(--fs-200); margin: 0; }
+  .cp-now-meta { margin-top: var(--sp-3); display: flex; flex-wrap: wrap; gap: var(--sp-5); font-size: var(--fs-100); color: var(--n-400); letter-spacing: 0.04em; text-transform: uppercase; }
+  .cp-now-meta strong { color: var(--n-200); font-weight: 500; margin-left: 6px; text-transform: none; letter-spacing: 0; font-size: var(--fs-200); }
+
+  .cp-scrub { margin-top: var(--sp-4); display: flex; align-items: center; gap: var(--sp-3); font-size: var(--fs-100); color: var(--n-400); font-variant-numeric: tabular-nums; }
+  .cp-scrub-bar { flex: 1; height: 4px; background: var(--surface-edge); border-radius: var(--r-pill); position: relative; overflow: hidden; }
+  .cp-scrub-fill { position: absolute; inset: 0 60% 0 0; background: linear-gradient(90deg, var(--spectrum-1) 0%, var(--spectrum-6) 100%); border-radius: var(--r-pill); }
+  .cp-scrub-fill::after { content: ''; position: absolute; right: -7px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; border-radius: 50%; background: var(--spectrum-1); border: 2px solid var(--ink); }
+
+  .cp-transport { display: flex; align-items: center; gap: 10px; margin-top: var(--sp-4); }
+  .cp-tb { width: 44px; height: 44px; border-radius: 50%; background: transparent; border: 1px solid rgba(255,255,255,0.14); color: var(--paper); font-size: 1rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all 120ms; }
+  .cp-tb:hover { border-color: var(--spectrum-1); color: var(--spectrum-1); }
+  .cp-tb-primary { background: var(--spectrum-1); color: var(--ink); border-color: var(--spectrum-1); width: 56px; height: 56px; font-size: 1.2rem; }
+  .cp-tb-primary:hover { background: var(--spectrum-5); border-color: var(--spectrum-5); color: var(--paper); }
+
+  .cp-grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: var(--sp-5); }
+  @media (max-width: 980px) { .cp-grid { grid-template-columns: 1fr; } }
+  .cp-col { display: flex; flex-direction: column; gap: var(--sp-5); }
+
+  .cp-zones { display: flex; flex-direction: column; gap: var(--sp-2); }
+  .cp-zone {
+    display: grid; grid-template-columns: auto 1fr auto; gap: var(--sp-3); align-items: center;
+    padding: var(--sp-3) var(--sp-4);
+    border: 1px solid var(--surface-edge); border-radius: var(--r-md);
+    background: var(--ink);
+    transition: border-color 120ms, background 120ms;
+  }
+  .cp-zone.is-active { border-color: var(--spectrum-2); background: linear-gradient(90deg, rgba(65,217,154,0.07) 0%, transparent 100%); }
+  .cp-led { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.14); }
+  .cp-zone.is-active .cp-led { background: var(--spectrum-2); box-shadow: 0 0 0 3px rgba(65,217,154,0.18); }
+  .cp-zone-title { display: flex; flex-direction: column; gap: 2px; }
+  .cp-zone-name { font-weight: 500; font-size: var(--fs-300); color: var(--paper); }
+  .cp-zone-out { font-size: var(--fs-100); color: var(--n-400); }
+  .cp-zone-vol { display: flex; align-items: center; gap: var(--sp-2); }
+  .cp-zone-vol input[type="range"] { width: 110px; accent-color: var(--spectrum-1); }
+  .cp-zone-vol span { font-variant-numeric: tabular-nums; font-size: var(--fs-200); color: var(--n-300); min-width: 28px; text-align: right; }
+
+  .cp-tile-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-3); margin-bottom: var(--sp-4); }
+  .cp-tile { border: 1px solid var(--surface-edge); border-radius: var(--r-md); padding: var(--sp-3) var(--sp-4); background: var(--ink); display: flex; flex-direction: column; gap: var(--sp-2); }
+  .cp-tile-label { font-size: var(--fs-100); font-family: var(--font-mono); color: var(--n-400); letter-spacing: 0.14em; text-transform: uppercase; display: block; margin-bottom: var(--sp-2); }
+  .cp-tile-body { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); }
+  .cp-tile-value { font-size: var(--fs-300); font-weight: 500; color: var(--paper); }
+  .cp-tile-note { font-size: var(--fs-200); color: var(--n-400); }
+  .cp-power { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; border-radius: var(--r-pill); border: 1px solid var(--spectrum-2); color: var(--spectrum-2); background: rgba(65,217,154,0.08); font-size: var(--fs-100); letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; font-family: inherit; }
+  .cp-power-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--spectrum-2); box-shadow: 0 0 0 3px rgba(65,217,154,0.18); }
+  .cp-toggle { background: transparent; border: 1px solid rgba(255,255,255,0.14); color: var(--n-300); padding: 4px 10px; border-radius: var(--r-pill); font-size: var(--fs-100); cursor: pointer; font-family: inherit; }
+
+  .cp-src-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 6px; margin-bottom: var(--sp-4); }
+  .cp-src { background: transparent; border: 1px solid var(--surface-edge); color: var(--n-300); border-radius: var(--r-md); padding: 8px 10px; font-size: var(--fs-200); cursor: pointer; font-family: inherit; transition: all 120ms; }
+  .cp-src:hover { border-color: var(--spectrum-1); color: var(--spectrum-1); }
+  .cp-src.is-active { background: var(--spectrum-1); border-color: var(--spectrum-1); color: var(--ink); font-weight: 600; }
+
+  .cp-master { display: flex; align-items: center; gap: var(--sp-3); margin-bottom: var(--sp-4); }
+  .cp-master label { font-size: var(--fs-100); font-family: var(--font-mono); color: var(--n-400); letter-spacing: 0.14em; text-transform: uppercase; min-width: 56px; }
+  .cp-master input[type="range"] { flex: 1; accent-color: var(--spectrum-1); }
+  .cp-master span { font-variant-numeric: tabular-nums; font-size: var(--fs-400); font-weight: 600; color: var(--spectrum-1); min-width: 36px; text-align: right; }
+
+  .cp-preset-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  @media (max-width: 520px) { .cp-preset-grid { grid-template-columns: repeat(2, 1fr); } }
+  .cp-preset { background: transparent; border: 1px solid var(--surface-edge); border-radius: var(--r-md); padding: 7px 6px; color: var(--n-300); text-align: center; cursor: pointer; font-size: var(--fs-100); font-family: inherit; line-height: 1.3; }
+  .cp-preset span { display: block; font-size: 0.7rem; color: var(--n-400); letter-spacing: 0.06em; margin-bottom: 2px; }
+  .cp-preset:hover { border-color: var(--spectrum-3); color: var(--spectrum-3); }
+
+  .cp-search { width: 100%; background: var(--ink); border: 1px solid var(--surface-edge); border-radius: var(--r-md); padding: 10px 14px; color: var(--paper); font-family: inherit; font-size: var(--fs-300); margin-bottom: var(--sp-3); }
+  .cp-search:focus { outline: none; border-color: var(--spectrum-1); }
+  .cp-search::placeholder { color: var(--n-400); }
+
+  .cp-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: var(--sp-3); border-bottom: 1px solid var(--surface-edge); }
+  .cp-tab { background: transparent; border: none; color: var(--n-400); padding: 8px 14px; font-size: var(--fs-200); font-family: inherit; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; letter-spacing: 0.04em; }
+  .cp-tab.is-active { color: var(--paper); border-bottom-color: var(--spectrum-1); }
+  .cp-tab:hover { color: var(--paper); }
+
+  .cp-lib { display: flex; flex-direction: column; gap: 5px; max-height: 320px; overflow-y: auto; }
+  .cp-lib-item { display: grid; grid-template-columns: 40px 1fr auto; gap: var(--sp-3); align-items: center; padding: 9px 10px; border-radius: var(--r-md); border: 1px solid transparent; background: var(--ink); cursor: pointer; transition: border-color 100ms; }
+  .cp-lib-item:hover { border-color: rgba(255,255,255,0.14); }
+  .cp-lib-item.is-playing { border-color: var(--spectrum-2); background: rgba(65,217,154,0.05); }
+  .cp-thumb { width: 40px; height: 40px; border-radius: 4px; background: linear-gradient(135deg, var(--spectrum-4) 0%, var(--spectrum-5) 100%); position: relative; overflow: hidden; }
+  .cp-thumb.cp-thumb-2 { background: linear-gradient(135deg, var(--spectrum-1) 0%, var(--spectrum-2) 100%); }
+  .cp-thumb.cp-thumb-3 { background: linear-gradient(135deg, var(--spectrum-7) 0%, var(--spectrum-3) 100%); }
+  .cp-thumb.cp-thumb-4 { background: linear-gradient(135deg, var(--spectrum-5) 0%, var(--spectrum-3) 100%); }
+  .cp-thumb.cp-thumb-5 { background: linear-gradient(135deg, var(--spectrum-6) 0%, var(--spectrum-7) 100%); }
+  .cp-thumb.cp-thumb-6 { background: linear-gradient(135deg, var(--spectrum-3) 0%, var(--spectrum-4) 100%); }
+  .cp-thumb.cp-thumb-7 { background: linear-gradient(135deg, var(--spectrum-5) 0%, var(--spectrum-1) 100%); }
+  .cp-thumb::after { content: ''; position: absolute; inset: 8px; border-radius: 50%; background: var(--ink); border: 2px solid rgba(0,0,0,0.4); }
+  .cp-lib-text { display: flex; flex-direction: column; min-width: 0; }
+  .cp-lib-main { font-weight: 500; font-size: var(--fs-200); color: var(--paper); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cp-lib-sub { font-size: var(--fs-100); color: var(--n-400); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .cp-lib-kind { font-size: 0.7rem; color: var(--n-400); letter-spacing: 0.08em; text-transform: uppercase; font-family: var(--font-mono); }
+  .cp-lib-item.is-playing .cp-lib-kind { color: var(--spectrum-2); }
+
+  .cp-queue { display: flex; flex-direction: column; gap: 5px; }
+  .cp-q { display: grid; grid-template-columns: 24px 1fr auto; gap: var(--sp-3); align-items: center; padding: 8px 12px; border-radius: var(--r-md); background: var(--ink); border: 1px solid transparent; }
+  .cp-q:hover { border-color: var(--surface-edge); }
+  .cp-q-num { font-variant-numeric: tabular-nums; font-size: var(--fs-100); color: var(--n-400); text-align: right; }
+  .cp-q-text { min-width: 0; }
+  .cp-q-main { font-size: var(--fs-200); color: var(--paper); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+  .cp-q-sub { font-size: var(--fs-100); color: var(--n-400); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; }
+  .cp-q-len { font-variant-numeric: tabular-nums; font-size: var(--fs-100); color: var(--n-400); }
+
+  .cockpit-foot { max-width: var(--content-narrow); margin: 0 auto; padding: var(--sp-7) var(--sp-4) var(--sp-9); border-top: 1px solid var(--surface-edge); }
+  .cockpit-foot h2 { font-size: var(--fs-600); margin: 0 0 var(--sp-5); }
+  .cockpit-foot p { color: var(--n-200); line-height: var(--lh-normal); margin: 0 0 var(--sp-4); }
+  .cockpit-foot ul { color: var(--n-200); line-height: var(--lh-normal); margin: 0 0 var(--sp-5); padding-left: var(--sp-5); }
+  .cockpit-foot li { margin-bottom: var(--sp-2); }
+  .cockpit-foot strong { color: var(--paper); }
+</style>

@@ -1,0 +1,212 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Journal" description="Field notes from a working signal chain. Gear failures, palette decisions, library architecture, and the things we learn at midnight.">
+  <header class="page-head">
+    <p class="eyebrow">Journal</p>
+    <h1>Field notes from the chain.</h1>
+    <p class="lede">
+      Not a content calendar. Not a SEO play. These are the working notes — what
+      changed, what broke, what we figured out — written when the iron was hot.
+      Posts trace back to the same rigs reviewed on <a href="/gear">/gear</a>.
+    </p>
+  </header>
+
+  <!-- POST: ROON PIVOT -->
+  <article class="post-full" id="roon-pivot">
+    <header class="post-full__head">
+      <div class="post-full__meta">
+        <span class="tag">Infra</span>
+        <span class="tag tag--steel">Library</span>
+        <time datetime="2026-05-11">2026-05-11</time>
+      </div>
+      <h2>The Roon pivot.</h2>
+      <p class="post-full__lede">
+        Yamaha Extended Control could turn the receiver on. It could not run a
+        library. So Roon Server moved to Docker on the QNAP and 13,450 tracks lit
+        up across two zones — in one evening.
+      </p>
+    </header>
+    <div class="post-full__body">
+      <p>
+        The Audiopheliac Cockpit started as a Flask app talking YXC for power,
+        volume, source, mute, and Net Radio presets. That part worked. The library
+        side did not. YXC's <code>getListInfo</code> caps at 8 items per page, has
+        no real metadata, no Spotify-class search, and on the R-N800A's current
+        firmware the tone control and Pure Direct toggle aren't even exposed by the
+        API. Direct probes confirmed it. The card got removed.
+      </p>
+      <p>
+        Pivot: Roon Server in Docker on the QNAP TS-473A (Ryzen V1500B, 16 GB RAM).
+        First attempt failed during deploy — the generator's compose file passed
+        <code>/dev/dri</code> for hardware video acceleration, and the V1500B has no
+        iGPU to expose. One line out of the compose, deploy succeeded, library
+        indexed 13,450 tracks clean.
+      </p>
+      <p>
+        Two zones now live: <strong>The Audiopheliac Library</strong> via AirPlay 2
+        to the R-N800A in the family room, and <strong>AIR HUB ASIO</strong> via
+        Roon Bridge running as a Windows service on GDMARCHE. Both still named
+        identically inside Roon — rename queued ("Family Room" and "Studio").
+      </p>
+      <p>
+        Cockpit refactored: <code>roonapi</code> in Python handles library, search,
+        browse, and transport. YXC keeps doing what it's good at — receiver-side
+        controls. Trial expires 2026-05-25; subscription decision pending. MinimServer
+        held as fallback in case the trial doesn't convert.
+      </p>
+      <p class="post-full__signoff">— Office Studio, 2026-05-11, ~2300</p>
+    </div>
+  </article>
+
+  <hr class="rule" />
+
+  <!-- POST: FOCUSRITE -->
+  <article class="post-full" id="focusrite-died">
+    <header class="post-full__head">
+      <div class="post-full__meta">
+        <span class="tag tag--bronze">Hardware</span>
+        <span class="tag">Workflow</span>
+        <time datetime="2026-05-11">2026-05-11</time>
+      </div>
+      <h2>The Focusrite died. The AIR Hub saved the day.</h2>
+      <p class="post-full__lede">
+        Scarlett Solo Gen 4 fried mid-session — no signal, no recovery. M-Audio
+        AIR Hub was already in the box, already drivered, already plugged into the
+        WD19DCS dock. Promotion was instant. The chain didn't break.
+      </p>
+    </header>
+    <div class="post-full__body">
+      <p>
+        The Focusrite (S/N S1XJ7HX57AF107) had been the studio's primary monitor
+        DAC and front-of-house interface. Today it stopped passing audio. Hard
+        failure — not a driver glitch, not a USB negotiation issue. Receipt is
+        missing, warranty attempt planned but treated as unrecoverable.
+      </p>
+      <p>
+        The AIR Hub (AIRXHUB) had been sitting on the desk as a powered USB hub.
+        It happens to also be a 24-bit / 96 kHz output-only DAC with two balanced
+        1/4" TRS monitor outs and an independent-level 1/4" headphone jack. Three
+        powered USB-A downstream ports — exactly enough for the LP120, the Spark
+        40, and the Casio Privia.
+      </p>
+      <p>
+        New chain: GDMARCHE → AIR Hub (USB-C to USB-A on the dock) → balanced TRS
+        → Rolls MX28 Input A → JBL LSR310S → Yamaha HS7s. Headphone monitoring
+        moved to the AIR Hub's independent HP out, freeing the MX28's headphone
+        bus for multi-source listening.
+      </p>
+      <p>
+        Tradeoff: <strong>no ADC.</strong> Recording is paused until an
+        input-capable replacement lands. Output-only is fine for the next stretch
+        — most of what's on the desk this month is mix work, Suno production, and
+        listening sessions, all of which are output-bound. The next interface
+        purchase has a short list: Apollo Solo, RME Babyface Pro FS, MOTU M2.
+      </p>
+      <p class="post-full__signoff">— Office Studio, 2026-05-11, mid-session</p>
+    </div>
+  </article>
+
+  <hr class="rule" />
+
+  <!-- POST: NASHVILLE MIDNIGHT -->
+  <article class="post-full" id="nashville-midnight">
+    <header class="post-full__head">
+      <div class="post-full__meta">
+        <span class="tag">Brand</span>
+        <span class="tag tag--steel">Design</span>
+        <time datetime="2026-04-28">2026-04-28</time>
+      </div>
+      <h2>Nashville Midnight — a palette for late-night listening.</h2>
+      <p class="post-full__lede">
+        Cream → bronze → steel → indigo → midnight. Derived from emotional lanes
+        in the listening profile, not picked from a moodboard. The palette had to
+        survive the room it's serving.
+      </p>
+    </header>
+    <div class="post-full__body">
+      <p>
+        The Phase 1 brand layer locked in monochrome — a vinyl turntable mark,
+        Unica One display, Inter body, scale 1.250 at base 16 px. That worked for
+        identity but it didn't tell anyone what the brand sounded like. Phase 2
+        needed a palette with a point of view.
+      </p>
+      <p>
+        Working method: pull the dominant emotional lanes out of the listening
+        profile (country, classic rock, hard rock, blues-rock, roots), then map
+        each lane to a color register. Late-night Texas-and-Nashville stages keep
+        showing up in the same colors — warm cream from the spots, bronze from the
+        rims and brass, steel blue from the stage wash, deep indigo as the room
+        falls dark, midnight as the field.
+      </p>
+      <div class="palette">
+        <div class="swatch" style="background:#E8D5A3"><span>Neon cream</span><code>#E8D5A3</code></div>
+        <div class="swatch" style="background:#B87333"><span>Stage bronze</span><code>#B87333</code></div>
+        <div class="swatch" style="background:#3D5A80"><span>Steel blue</span><code>#3D5A80</code></div>
+        <div class="swatch" style="background:#1B2340; color:#F5F5F7"><span>Deep indigo</span><code>#1B2340</code></div>
+        <div class="swatch" style="background:#1A1A2E; color:#F5F5F7"><span>Midnight</span><code>#1A1A2E</code></div>
+        <div class="swatch" style="background:#D4B08C"><span>Warm gold</span><code>#D4B08C</code></div>
+      </div>
+      <p>
+        CTA contract: solid neon cream on ink (≈ 14.1:1 contrast, WCAG AAA). The
+        Nashville gradient is reserved for one or two hero moments — landing-page
+        primary CTA and the /dashboard Spotify-connect button. Steel blue is body
+        accent only; it does not become a CTA color. Teal is permanently excluded
+        — that lane belongs to the VALOR brand and isn't ours to spend.
+      </p>
+      <p class="post-full__signoff">— Phase 2 brand layer, 2026-04-28</p>
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .page-head { padding: var(--sp-6) 0 var(--sp-7); border-bottom: 1px solid var(--surface-edge); margin-bottom: var(--sp-8); }
+  .page-head h1 { font-size: clamp(var(--fs-700), 7vw, var(--fs-900)); margin: 0 0 var(--sp-5); max-width: 22ch; }
+
+  .post-full { margin: 0 0 var(--sp-9); scroll-margin-top: 80px; }
+  .post-full__head { margin-bottom: var(--sp-6); }
+  .post-full__head h2 {
+    font-size: clamp(var(--fs-600), 5vw, var(--fs-800));
+    margin: var(--sp-4) 0 var(--sp-4);
+    max-width: 22ch;
+  }
+  .post-full__meta { display: flex; gap: var(--sp-3); align-items: center; flex-wrap: wrap; }
+  .post-full__meta time {
+    font-family: var(--font-mono);
+    font-size: var(--fs-100);
+    letter-spacing: 0.18em;
+    color: var(--n-400);
+    text-transform: uppercase;
+  }
+  .post-full__lede {
+    font-size: var(--fs-400);
+    color: var(--n-200);
+    max-width: var(--content-narrow);
+    line-height: var(--lh-normal);
+  }
+
+  .post-full__body { max-width: var(--content-narrow); }
+  .post-full__body p { color: var(--n-200); margin: 0 0 var(--sp-5); font-size: var(--fs-300); line-height: var(--lh-loose); }
+  .post-full__signoff { color: var(--spectrum-2); font-family: var(--font-mono); font-size: var(--fs-100); letter-spacing: 0.16em; text-transform: uppercase; margin-top: var(--sp-6); }
+  code { font-family: var(--font-mono); color: var(--spectrum-1); font-size: 0.92em; }
+
+  .palette {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: var(--sp-3);
+    margin: var(--sp-6) 0;
+  }
+  .swatch {
+    aspect-ratio: 1.4 / 1;
+    border-radius: var(--r-lg);
+    padding: var(--sp-3);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    color: var(--ink);
+    border: 1px solid var(--surface-edge);
+    font-size: var(--fs-200);
+  }
+  .swatch span { font-family: var(--font-display); letter-spacing: 0.04em; }
+  .swatch code { color: inherit; opacity: 0.85; font-size: var(--fs-100); }
+</style>

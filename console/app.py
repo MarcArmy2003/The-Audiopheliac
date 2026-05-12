@@ -105,6 +105,19 @@ def index():
     )
 
 
+# ---------- client config ----------
+
+@app.route("/api/config")
+def client_config():
+    """Subset of config.json that the browser UI needs at startup."""
+    return _ok({
+        "enabled_sources": config.get("enabled_sources", []),
+        "preferred_zones": config.get("preferred_zones", []),
+        "net_radio_suggestions": config.get("net_radio_suggestions", []),
+        "device_name": config.get("yamaha_name"),
+    })
+
+
 # ---------- state ----------
 
 @app.route("/api/status")

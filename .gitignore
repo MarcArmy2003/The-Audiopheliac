@@ -96,6 +96,7 @@ data/**
 
 # Development working files (not tracked)
 _dev/
+_morning-preview/
 # External vendored libraries (kept on NAS, not in repo)
 docs/guitar-literacy/guitar/external/
 # Cross-project contamination guard (added after quarantine 2026-04-21)

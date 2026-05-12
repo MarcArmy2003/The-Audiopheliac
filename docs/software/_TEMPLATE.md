@@ -12,7 +12,7 @@
 
 ## 1. Overview
 
-One paragraph: what this package does in The Audiopheliac ecosystem, why it is installed, and which signal-chain or automation roles it serves. Cite related entries in `docs/av_master_inventory_2026.md` and `config/audiopheliac_signal_map_v_2026_01.md` by filename.
+One paragraph: what this package does in The Audiopheliac ecosystem, why it is installed, and which signal-chain or automation roles it serves. Cite related entries in `docs/av_master_inventory_2026.md` and `config/audiopheliac_signal_map_v_2026_05.md` by filename.
 
 ---
 
@@ -66,7 +66,7 @@ Where this package sits in the signal chain or data pipeline. ASCII chain notati
 
 For software-only packages (no audio chain involvement), document data flows instead (API calls, file IO, NAS paths).
 
-Cross-reference: hardware entries in `docs/av_master_inventory_2026.md`, topology in `config/audiopheliac_signal_map_v_2026_01.md`, project scripts under `automation/`.
+Cross-reference: hardware entries in `docs/av_master_inventory_2026.md`, topology in `config/audiopheliac_signal_map_v_2026_05.md`, project scripts under `automation/`.
 
 ---
 

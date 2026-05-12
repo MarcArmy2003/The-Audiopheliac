@@ -1,0 +1,106 @@
+---
+const year = new Date().getFullYear();
+---
+<footer class="site-footer">
+  <div class="footer-grid">
+    <section class="footer-brand">
+      <p class="brand">The Audiopheliac</p>
+      <p class="tagline">Where every cable, waveform, and decibel earns its keep.</p>
+      <p class="motto"><em>"Rock 'n' roll. Deal with it."</em></p>
+    </section>
+
+    <nav class="footer-nav" aria-label="Footer">
+      <p class="footer-heading">Explore</p>
+      <ul class="bare">
+        <li><a href="/studio">Studio</a></li>
+        <li><a href="/music">Music</a></li>
+        <li><a href="/gear">Gear</a></li>
+        <li><a href="/vinyl">Vinyl</a></li>
+        <li><a href="/journal">Journal</a></li>
+      </ul>
+    </nav>
+
+    <nav class="footer-nav" aria-label="Off-site">
+      <p class="footer-heading">Off-site</p>
+      <ul class="bare">
+        <li><a href="https://suno.com/@audiopheliac" rel="me noopener" target="_blank">Suno · @audiopheliac</a></li>
+        <li><a href="https://open.spotify.com/user/marcarmy2003" rel="me noopener" target="_blank">Spotify · marcarmy2003</a></li>
+        <li><a href="https://github.com/MarcArmy2003/The-Audiopheliac" rel="me noopener" target="_blank">GitHub</a></li>
+        <li><a href="/about#contact">Contact</a></li>
+      </ul>
+    </nav>
+
+    <section class="footer-disclosure">
+      <p class="footer-heading">Disclosure</p>
+      <p class="fine">
+        As an Amazon Associate (<code>veterananalyt-20</code>), The Audiopheliac earns
+        from qualifying purchases. Gear recommendations reflect hands-on use in the
+        signal chains documented on <a href="/studio">/studio</a>. We don't review what
+        we don't run.
+      </p>
+    </section>
+  </div>
+
+  <hr class="rule" />
+
+  <div class="footer-meta">
+    <p class="fine">© {year} The Audiopheliac · A Veteran Analytics LLC project</p>
+    <p class="fine">
+      <span class="dot bronze">●</span> Built locally on a Dell Precision 7540 ·
+      Astro on Cloudflare Pages
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    max-width: var(--content-max);
+    margin: var(--sp-9) auto 0;
+    padding: var(--sp-8) var(--sp-5) var(--sp-6);
+    border-top: 1px solid var(--surface-edge);
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr 1.4fr;
+    gap: var(--sp-7);
+  }
+  .footer-brand .brand {
+    font-family: var(--font-display);
+    font-size: var(--fs-500);
+    color: var(--spectrum-1);
+    margin: 0 0 var(--sp-2);
+    letter-spacing: 0.03em;
+  }
+  .tagline { color: var(--n-300); font-size: var(--fs-200); margin-bottom: var(--sp-3); }
+  .motto   { color: var(--spectrum-2); font-size: var(--fs-200); font-style: italic; }
+
+  .footer-heading {
+    font-family: var(--font-mono);
+    font-size: var(--fs-100);
+    letter-spacing: 0.20em;
+    color: var(--spectrum-2);
+    text-transform: uppercase;
+    margin: 0 0 var(--sp-3);
+  }
+  .footer-nav li { margin: 0 0 var(--sp-2); }
+  .footer-nav a  { color: var(--n-200); border-bottom: none; }
+  .footer-nav a:hover { color: var(--paper); }
+
+  .fine { color: var(--n-400); font-size: var(--fs-200); }
+  code { color: var(--spectrum-1); font-family: var(--font-mono); font-size: 0.92em; }
+  .dot { font-size: 0.8em; margin-right: 0.3em; }
+
+  .footer-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--sp-4);
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 880px) {
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 540px) {
+    .footer-grid { grid-template-columns: 1fr; }
+  }
+</style>

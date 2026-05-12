@@ -6,7 +6,7 @@
 **Last reviewed:** 2026-05-11
 **Status:** Active (Premier / Lossless tier)
 
-> Per-package configuration profile for The Audiopheliac. Source of truth for Spotify desktop client, Developer App registration, bit-perfect playback chain through the M-Audio AIR Hub, Local Files indexing into the music library at `M:\The Audiopheliac\`, and the automation pipeline that pulls library state into `data/spotify/`. Cross-references to canonical inventory at `docs/av_master_inventory_2026.md` and to the live signal map at `config/audiopheliac_signal_map_v_2026_01.md`.
+> Per-package configuration profile for The Audiopheliac. Source of truth for Spotify desktop client, Developer App registration, bit-perfect playback chain through the M-Audio AIR Hub, Local Files indexing into the music library at `M:\The Audiopheliac\`, and the automation pipeline that pulls library state into `data/spotify/`. Cross-references to canonical inventory at `docs/av_master_inventory_2026.md` and to the live signal map at `config/audiopheliac_signal_map_v_2026_05.md`.
 
 ---
 
@@ -37,9 +37,10 @@ Note: `gdmarche-user` is the Microsoft Store app identifier, not the Spotify soc
 
 | Field | Value |
 |---|---|
-| Username (canonical) | `MarcArmy2003` |
-| Display name | The Audiopheliac |
-| Public profile URL | https://open.spotify.com/user/marcarmy2003 |
+| Username (canonical, URL slug) | `gdmarche` |
+| Prior display name | `MarcArmy2003` (changed 2026-05-12) |
+| Display name (current) | The Audiopheliac |
+| Public profile URL | https://open.spotify.com/user/gdmarche |
 | MFA | Per Spotify account security settings |
 
 ---

@@ -1,0 +1,226 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Music" description="AI-assisted releases on Suno, mastered for streaming. The Audiopheliac on Spotify, Roon, and the family-room turntable.">
+  <header class="page-head">
+    <p class="eyebrow">Music</p>
+    <h1>AI-assisted music, mastered on a real chain.</h1>
+    <p class="lede">
+      The Audiopheliac is on Suno at
+      <a href="https://suno.com/@audiopheliac" target="_blank" rel="noopener">@audiopheliac</a>
+      — Premier Annual, commercial-use rights, model v5.5, 10,000 credits a month.
+      Releases live in <em>First Tracks</em> for now. Spotify Local Files are
+      indexed against the same library Roon serves.
+    </p>
+  </header>
+
+  <!-- ALBUM CARD -->
+  <section class="section">
+    <div class="section__head">
+      <div>
+        <p class="section__eyebrow">Album · 2026</p>
+        <h2>First Tracks</h2>
+      </div>
+      <span class="tag tag--bronze">Active</span>
+    </div>
+
+    <div class="album">
+      <div class="album__art" aria-hidden="true">
+        <div class="album__art-inner">
+          <span class="album__art-track">A1</span>
+          <span class="album__art-label">First Tracks</span>
+          <span class="album__art-meta">v5.5 · 48/24</span>
+        </div>
+      </div>
+      <div class="album__body">
+        <p class="album__subtitle">Early experiments. Suno-generated, hand-curated, mastered on Yamaha HS7s.</p>
+        <p class="album__notes">
+          The Suno output lives in <code>M:\The Audiopheliac\First Tracks</code> as
+          WAV + MP3 side-by-side. Spotify's Local Files index runs on the MP3 set;
+          WAVs are reserved for Roon. Each finalized track lands in
+          <code>Suno/lyrics/</code> + <code>Suno/prompts/</code> with the final output
+          template — so a v2 always knows where v1 left off.
+        </p>
+        <ul class="bare track-list">
+          <li class="track">
+            <span class="track__no">01</span>
+            <span class="track__title">Sweet Tyla Jean</span>
+            <span class="track__meta">3:42 · Country-rock</span>
+          </li>
+          <li class="track">
+            <span class="track__no">02</span>
+            <span class="track__title">House on the Singing Hill</span>
+            <span class="track__meta">4:08 · Roots / Americana</span>
+          </li>
+          <li class="track">
+            <span class="track__no">03</span>
+            <span class="track__title">Five Strings to Midnight</span>
+            <span class="track__meta">3:55 · Blues-rock</span>
+          </li>
+          <li class="track">
+            <span class="track__no">04</span>
+            <span class="track__title">Bronze Light, Honky Tonk</span>
+            <span class="track__meta">3:21 · Country</span>
+          </li>
+          <li class="track">
+            <span class="track__no">05</span>
+            <span class="track__title">The Cable, the Wave, the Room</span>
+            <span class="track__meta">5:12 · Slow-burn rock</span>
+          </li>
+        </ul>
+        <p class="muted">
+          Track list is a placeholder until masters are finalized. Live Suno profile
+          and full streamables drop here as they land.
+        </p>
+        <p>
+          <a href="https://suno.com/@audiopheliac" target="_blank" rel="noopener" class="cta">Suno profile</a>
+          <a href="https://open.spotify.com/user/marcarmy2003" target="_blank" rel="noopener" class="cta cta--ghost">Spotify</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUCTION ENVIRONMENT -->
+  <section class="section">
+    <div class="section__head">
+      <div>
+        <p class="section__eyebrow">Production</p>
+        <h2>How it gets made.</h2>
+      </div>
+    </div>
+    <div class="grid grid--3">
+      <div class="card">
+        <h3 class="cream">Suno Premier · v5.5</h3>
+        <p>10,000 credits / 2,000 songs per month. Suno Studio enabled. Commercial-use rights included. Auth email tied to <code>gillon.marchetti@gmail.com</code>.</p>
+      </div>
+      <div class="card">
+        <h3 class="cream">Ableton Live 12 Suite</h3>
+        <p>Default session: 48 kHz / 24-bit. Used for parts AI doesn't do — arrangement, finishing, mastering chain to streaming targets.</p>
+      </div>
+      <div class="card">
+        <h3 class="cream">Audacity</h3>
+        <p>Editing utility. Quick cuts, fades, format coversion, and the occasional vinyl-rip cleanup.</p>
+      </div>
+      <div class="card">
+        <h3 class="cream">M-Audio AIR Hub ASIO</h3>
+        <p>24/96 monitoring chain. Independent headphone level. Output-only until an input-capable replacement for the failed Focusrite lands.</p>
+      </div>
+      <div class="card">
+        <h3 class="cream">Yamaha HS7 + JBL LSR310S</h3>
+        <p>Reference monitoring. Near-fields anchor the mids and highs; the 10" sub carries the structural low-end that grounds the room.</p>
+      </div>
+      <div class="card">
+        <h3 class="cream">Ackypaleto (collab)</h3>
+        <p>An active collaborative project with Kevin on Suno. Concept originates from junior high. The playlist functions as project folder. Don't rename it.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- LISTENING -->
+  <section class="section">
+    <div class="section__head">
+      <div>
+        <p class="section__eyebrow">Listening</p>
+        <h2>The library that grounds the brand.</h2>
+      </div>
+    </div>
+    <p class="lede">
+      Roon Server indexes 13,450 tracks served from the NAS. Spotify Premier rides
+      the same MP3 directory for Local Files matching. AirPlay 2 routes to the
+      R-N800A in the family room; the studio zone is the AIR HUB ASIO driver via
+      Roon Bridge.
+    </p>
+
+    <div class="grid grid--2">
+      <div class="card">
+        <h3 class="cream">Zones</h3>
+        <ul class="bare">
+          <li><strong>The Audiopheliac Library</strong> · AirPlay 2 → R-N800A (Family Room)</li>
+          <li><strong>AIR HUB ASIO</strong> · Roon Bridge → Studio</li>
+        </ul>
+        <p class="muted">Zone rename pending: AirPlay 2 → "Family Room", AIR HUB ASIO → "Studio".</p>
+      </div>
+      <div class="card">
+        <h3 class="cream">Streaming targets</h3>
+        <p>All Audiopheliac masters target Spotify loudness norms first (≈ −14 LUFS integrated), with platform-specific deltas applied at export for Apple Music and Tidal.</p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-head { padding: var(--sp-6) 0 var(--sp-7); border-bottom: 1px solid var(--surface-edge); margin-bottom: var(--sp-7); }
+  .page-head h1 { font-size: clamp(var(--fs-700), 7vw, var(--fs-900)); margin: 0 0 var(--sp-5); max-width: 22ch; }
+
+  .album {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: var(--sp-7);
+    align-items: start;
+  }
+  .album__art {
+    aspect-ratio: 1 / 1;
+    border-radius: var(--r-lg);
+    background: var(--spectrum-gradient);
+    padding: 4px;
+    box-shadow: var(--shadow-lift);
+  }
+  .album__art-inner {
+    width: 100%;
+    height: 100%;
+    border-radius: calc(var(--r-lg) - 4px);
+    background:
+      radial-gradient(circle at 30% 30%, rgba(248, 233, 31, 0.22), transparent 55%),
+      linear-gradient(160deg, var(--spectrum-5), var(--ink));
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: var(--sp-5);
+    color: var(--paper);
+  }
+  .album__art-track {
+    font-family: var(--font-mono);
+    font-size: var(--fs-100);
+    letter-spacing: 0.30em;
+    color: var(--spectrum-2);
+  }
+  .album__art-label {
+    font-family: var(--font-display);
+    font-size: var(--fs-700);
+    line-height: 0.95;
+    color: var(--spectrum-1);
+  }
+  .album__art-meta {
+    font-family: var(--font-mono);
+    font-size: var(--fs-100);
+    color: var(--n-400);
+    letter-spacing: 0.16em;
+  }
+  .album__subtitle { font-size: var(--fs-400); color: var(--n-200); }
+  .album__notes   { color: var(--n-300); font-size: var(--fs-300); }
+  code { font-family: var(--font-mono); color: var(--spectrum-1); font-size: 0.92em; }
+
+  .track-list { border-top: 1px solid var(--surface-edge); margin: var(--sp-5) 0; }
+  .track {
+    display: grid;
+    grid-template-columns: 3rem 1fr auto;
+    gap: var(--sp-4);
+    padding: var(--sp-3) 0;
+    border-bottom: 1px solid var(--surface-edge);
+    align-items: baseline;
+  }
+  .track__no { font-family: var(--font-mono); color: var(--spectrum-2); }
+  .track__title { font-family: var(--font-display); font-size: var(--fs-400); color: var(--paper); letter-spacing: 0.02em; text-transform: none; }
+  .track__meta { font-family: var(--font-mono); font-size: var(--fs-100); letter-spacing: 0.14em; color: var(--n-400); text-transform: uppercase; }
+
+  .card h3 { margin: 0 0 var(--sp-3); font-size: var(--fs-500); }
+  .card p  { margin: 0 0 var(--sp-3); color: var(--n-300); }
+  .card ul li { padding: var(--sp-2) 0; color: var(--n-200); border-bottom: 1px dashed var(--surface-edge); }
+  .card ul li:last-child { border-bottom: 0; }
+
+  @media (max-width: 760px) {
+    .album { grid-template-columns: 1fr; }
+    .album__art { max-width: 320px; }
+    .track__meta { display: none; }
+  }
+</style>

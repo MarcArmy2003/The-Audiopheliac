@@ -1,12 +1,196 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+const featured = [
+  {
+    tag: 'Reference monitor',
+    title: 'Yamaha HS7',
+    bullet: 'Near-field accuracy, honest mids',
+    body: 'A pair of HS7s anchors the office studio. Honest enough to translate to the family room and back. Bass extension to ~43 Hz before the LSR310S sub picks up the structural low-end. They flatter nothing — that is the point.',
+    rating: 'A',
+    price: '$369 ea.',
+    href: 'https://www.amazon.com/dp/B00CFOL464?tag=veterananalyt-20',
+  },
+  {
+    tag: 'Studio sub',
+    title: 'JBL LSR310S',
+    bullet: '10-inch structural foundation',
+    body: 'The room\'s low-frequency contract. Plays nicely with the HS7 pair via the integrated crossover; XLF mode reserved for off-hours listening when the floor needs to move.',
+    rating: 'A',
+    price: '$499',
+    href: 'https://www.amazon.com/dp/B00DI93AC2?tag=veterananalyt-20',
+  },
+  {
+    tag: 'Network receiver',
+    title: 'Yamaha R-N800A',
+    bullet: 'MusicCast + YXC + AirPlay 2',
+    body: 'The family-room brain. Phono input feeds the SL-1200MK2 through the Pro-Ject Phono Box. AirPlay 2 endpoint for the Roon zone. YXC API lets the Cockpit run power, volume, source, and Net Radio presets remotely.',
+    rating: 'A−',
+    price: '$1,099',
+    href: 'https://www.amazon.com/dp/B0BVFC7TZK?tag=veterananalyt-20',
+  },
+  {
+    tag: 'Turntable',
+    title: 'Technics SL-1200MK2',
+    bullet: 'Iconic, direct-drive, durable',
+    body: 'Family-room rotation, Ortofon 2M Blue mounted. The cartridge is the seasoning — the MK2 is the cast iron. Holds pitch, holds setup, holds up.',
+    rating: 'A+',
+    price: 'Used market',
+    href: '#',
+  },
+  {
+    tag: 'Phono preamp',
+    title: 'Pro-Ject Phono Box S2 Ultra',
+    bullet: 'Quiet, neutral, small',
+    body: 'Sits between the SL-1200MK2 and the R-N800A. Outboard preamp matters when the receiver\'s built-in phono section has to share input headroom with everything else.',
+    rating: 'A',
+    price: '$399',
+    href: 'https://www.amazon.com/dp/B0782HKHFZ?tag=veterananalyt-20',
+  },
+  {
+    tag: 'Interface (current)',
+    title: 'M-Audio AIR Hub',
+    bullet: 'Output-only, 24/96, USB hub',
+    body: 'Promoted from spare to primary after the Focusrite Solo died. Independent headphone level is the killer feature for streaming + DAW monitoring. ADC absent — recording is paused until an input-capable replacement lands.',
+    rating: 'B+',
+    price: '$129',
+    href: 'https://www.amazon.com/dp/B07Q4CRPVB?tag=veterananalyt-20',
+  },
+  {
+    tag: 'Cartridge',
+    title: 'Ortofon 2M Blue',
+    bullet: 'Mid-tier, fuller body than Red',
+    body: 'A clear step up from the Ortofon Red without a step-change in price. Mounted on the SL-1200MK2 in the family room. Tracks well, leaves room to upgrade to the Bronze stylus on the same body.',
+    rating: 'A−',
+    price: '$249',
+    href: 'https://www.amazon.com/dp/B005JOXSDC?tag=veterananalyt-20',
+  },
+  {
+    tag: 'Headphones',
+    title: 'Audio-Technica ATH-M50x',
+    bullet: 'Closed-back, monitoring',
+    body: 'Primary monitoring headphone for the studio. Honest enough to mix on, comfortable for long sessions, easy to drive from the AIR Hub headphone out.',
+    rating: 'A',
+    price: '$169',
+    href: 'https://www.amazon.com/dp/B00HVLUR86?tag=veterananalyt-20',
+  },
+  {
+    tag: 'Mini mixer',
+    title: 'Rolls MX28 Mini-Mix VI',
+    bullet: '3-channel, balanced output',
+    body: 'The studio\'s master volume. Three sources blend in (DAW / streaming, phono, wireless from the family room). Master out to HS7s + LSR310S. Independent headphone bus when needed.',
+    rating: 'A',
+    price: '$199',
+    href: 'https://www.amazon.com/dp/B0002BG2EA?tag=veterananalyt-20',
+  },
+];
 ---
-<BaseLayout title="Gear">
-  <h1>Gear</h1>
-  <p>
-    Four zones. Every signal chain documented. From the Technics SL-1200MK2 in the Family Room
-    to the Yamaha HS7 monitors in the Studio, each device traces back to an authoritative
-    inventory entry.
-  </p>
-  <p><em>Zone pages and signal-chain renders coming in Phase 2.5.</em></p>
+<BaseLayout title="Gear" description="Reviews and recommendations from gear that actually runs in the chain. Backed by an Amazon Associates store and an in-house gear-discovery proxy.">
+  <header class="page-head">
+    <p class="eyebrow">Gear</p>
+    <h1>We don't review what we don't run.</h1>
+    <p class="lede">
+      Every piece below is in service in one of the chains on <a href="/studio">/studio</a>.
+      Links go through the Audiopheliac Gear Proxy where available, falling back to
+      Amazon Associates (store <code>veterananalyt-20</code>). PA-API access is
+      pending qualifying sales; Best Buy Developer is the drop-in alternative until
+      Amazon clears.
+    </p>
+  </header>
+
+  <section class="section">
+    <div class="section__head">
+      <div>
+        <p class="section__eyebrow">Reviewed · 2026</p>
+        <h2>What's in the chain.</h2>
+      </div>
+      <span class="tag tag--bronze">9 items</span>
+    </div>
+
+    <div class="grid grid--3 gear-grid">
+      {featured.map(g => (
+        <article class="card gear">
+          <header class="gear__head">
+            <span class="tag tag--bronze">{g.tag}</span>
+            <span class="gear__rating">{g.rating}</span>
+          </header>
+          <h3>{g.title}</h3>
+          <p class="gear__bullet">{g.bullet}</p>
+          <p class="gear__body">{g.body}</p>
+          <footer class="gear__foot">
+            <span class="gear__price">{g.price}</span>
+            <a href={g.href} target="_blank" rel="nofollow sponsored noopener" class="gear__link">View →</a>
+          </footer>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section__head">
+      <div>
+        <p class="section__eyebrow">Behind the scenes</p>
+        <h2>Audiopheliac Gear Proxy.</h2>
+      </div>
+      <span class="tag tag--steel">Node / Express · in dev</span>
+    </div>
+    <div class="grid grid--2">
+      <div class="card">
+        <h3 class="cream">What it is</h3>
+        <p>A small Node/Express service that signs PA-API requests, exposes a thin REST surface gated by <code>X-API-Key</code>, and serves product lookups, price refresh, and search to the rest of the site.</p>
+        <p class="muted">Hand-rolled SigV4 (no AWS SDK), 4 route handlers, 8/8 tests green.</p>
+      </div>
+      <div class="card">
+        <h3 class="cream">Status</h3>
+        <p>Blocked on Amazon PA-API access (requires qualifying Associates sales). The Best Buy Developer API is the drop-in interim — only <code>paapi.js</code> needs rewriting; the rest of the surface is provider-neutral.</p>
+        <p class="muted">Discogs collection sync planned next — token header, no OAuth needed.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section__head">
+      <div>
+        <p class="section__eyebrow">Disclosure</p>
+        <h2>How the money flows.</h2>
+      </div>
+    </div>
+    <p class="lede">
+      Affiliate links are marked <code>rel="nofollow sponsored"</code>. Qualifying
+      purchases through the Amazon Associates store (<code>veterananalyt-20</code>)
+      pay a small commission at no additional cost to the reader. Where a piece is
+      on loan, borrowed, or sponsored, the post says so at the top — no exceptions.
+      See <a href="/about#affiliate-policy">affiliate policy</a> for the full version.
+    </p>
+  </section>
 </BaseLayout>
+
+<style>
+  .page-head { padding: var(--sp-6) 0 var(--sp-7); border-bottom: 1px solid var(--surface-edge); margin-bottom: var(--sp-7); }
+  .page-head h1 { font-size: clamp(var(--fs-700), 7vw, var(--fs-900)); margin: 0 0 var(--sp-5); max-width: 22ch; }
+  code { font-family: var(--font-mono); color: var(--spectrum-1); font-size: 0.92em; }
+
+  .gear-grid { gap: var(--sp-5); }
+  .gear { display: flex; flex-direction: column; gap: var(--sp-3); }
+  .gear__head { display: flex; justify-content: space-between; align-items: center; }
+  .gear__rating {
+    font-family: var(--font-display);
+    font-size: var(--fs-500);
+    color: var(--spectrum-1);
+    letter-spacing: 0.05em;
+  }
+  .gear h3 { margin: 0; color: var(--paper); font-size: var(--fs-500); }
+  .gear__bullet { color: var(--n-300); margin: 0; font-style: italic; }
+  .gear__body { color: var(--n-200); margin: 0; font-size: var(--fs-200); line-height: var(--lh-normal); }
+  .gear__foot {
+    margin-top: auto;
+    padding-top: var(--sp-4);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--surface-edge);
+  }
+  .gear__price { font-family: var(--font-mono); color: var(--spectrum-2); font-size: var(--fs-200); letter-spacing: 0.10em; }
+  .gear__link  { color: var(--spectrum-1); font-family: var(--font-mono); font-size: var(--fs-100); letter-spacing: 0.18em; text-transform: uppercase; border-bottom: none; }
+  .gear__link:hover { color: var(--paper); }
+</style>
