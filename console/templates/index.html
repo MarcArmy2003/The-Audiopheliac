@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Audiopheliac Cockpit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Unica+One&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body data-yamaha-ip="{{ yamaha_ip }}">
+  <header class="topbar">
+    <div class="mark">The Audiopheliac</div>
+    <div class="device" id="device-name">{{ device_name }}</div>
+    <div class="topbar-state">
+      <span class="topbar-roon" id="topbar-roon">Roon: ...</span>
+      <span class="status-dot" id="status-dot" title="Yamaha connection"></span>
+    </div>
+  </header>
+
+  <div class="hidden-cards-bar" id="hidden-cards-bar"></div>
+
+  <main class="grid">
+
+    <section class="card power-card" data-card="power">
+      <header class="card-head">
+        <h2>Power</h2>
+        <button class="card-hide" title="Hide card">&times;</button>
+      </header>
+      <div class="row">
+        <button class="btn-primary" id="btn-power-on">On</button>
+        <button class="btn-secondary" id="btn-power-off">Standby</button>
+      </div>
+      <div class="muted" id="power-state">&nbsp;</div>
+    </section>
+
+    <section class="card volume-card" data-card="volume">
+      <header class="card-head">
+        <h2>Volume</h2>
+        <button class="card-hide" title="Hide card">&times;</button>
+      </header>
+      <div class="row">
+        <button class="btn-icon" id="btn-vol-down" title="Volume down">&#8722;</button>
+        <input type="range" id="vol-slider" min="0" max="161" value="60">
+        <button class="btn-icon" id="btn-vol-up" title="Volume up">+</button>
+      </div>
+      <div class="row vol-readout">
+        <span id="vol-pct">--%</span>
+        <button class="btn-secondary" id="btn-mute">Mute</button>
+      </div>
+    </section>
+
+    <section class="card input-card" data-card="input">
+      <header class="card-head">
+        <h2>Yamaha Source</h2>
+        <button class="card-hide" title="Hide card">&times;</button>
+      </header>
+      <div class="input-list" id="input-list">
+        <span class="muted">loading sources...</span>
+      </div>
+    </section>
+
+    <section class="card zone-card" data-card="zone">
+      <header class="card-head">
+        <h2>Roon Zone</h2>
+        <button class="card-hide" title="Hide card">&times;</button>
+      </header>
+      <div class="zone-list" id="zone-list">
+        <span class="muted">connecting to Roon...</span>
+      </div>
+    </section>
+
+    <section class="card now-card" data-card="now">
+      <header class="card-head">
+        <h2>Now Playing</h2>
+        <button class="card-hide" title="Hide card">&times;</button>
+      </header>
+      <div class="now-art-wrap">
+        <img class="now-art" id="now-art" alt="" />
+      </div>
+      <div class="now-meta">
+        <div class="now-track" id="now-track">&mdash;</div>
+        <div class="now-artist" id="now-artist"></div>
+        <div class="now-album" id="now-album"></div>
+      </div>
+      <div class="row transport">
+        <button class="btn-icon" data-tx="previous" title="Previous">&#9198;</button>
+        <button class="btn-icon" data-tx="playpause" title="Play / Pause">&#9654;</button>
+        <button class="btn-icon" data-tx="next"     title="Next">&#9197;</button>
+      </div>
+      <div class="muted" id="now-source">&nbsp;</div>
+    </section>
+
+    <section class="card preset-card" data-card="preset">
+      <header class="card-head">
+        <h2>Net Radio Presets</h2>
+        <button class="card-hide" title="Hide card">&times;</button>
+      </header>
+      <div class="preset-list" id="preset-list">
+        <span class="muted">loading presets...</span>
+      </div>
+    </section>
+
+    <section class="card library-card" data-card="library">
+      <header class="card-head">
+        <h2>Library</h2>
+        <button class="card-hide" title="Hide card">&times;</button>
+      </header>
+      <div class="row library-search">
+        <input type="search" id="library-q" placeholder="Search Roon library (artists, albums, tracks)..." />
+        <button class="btn-secondary" id="library-search-btn">Search</button>
+      </div>
+      <div class="library-header">
+        <button class="btn-secondary" id="library-back" title="Back">&larr; Back</button>
+        <button class="btn-secondary" id="library-home" title="Home">Home</button>
+        <span class="library-crumb" id="library-crumb">&mdash;</span>
+      </div>
+      <div class="library-list" id="library-list">
+        <span class="muted">authorize the Cockpit in Roon to begin</span>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

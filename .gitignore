@@ -121,3 +121,9 @@ Googe Cloud Admin/
 
 # Node modules (if ever scaffolded locally)
 node_modules/
+
+# Cockpit local state (per-machine, not source-controlled)
+console/playlist.json
+console/roon_token.json
+console/roon_core.json
+console/.venv/

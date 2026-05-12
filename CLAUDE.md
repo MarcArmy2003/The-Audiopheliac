@@ -1,6 +1,6 @@
 # CLAUDE.md — The Audiopheliac | Cowork Project Instructions
 
-**Version:** 2026.05.1 | **Owner:** Gillon "Gill" Marchetti (MarcArmy2003)
+**Version:** 2026.05.2 | **Owner:** Gillon "Gill" Marchetti (MarcArmy2003)
 
 **Project Folder:** `C:\Users\gillo\The-Audiopheliac`
 **GitHub:** https://github.com/MarcArmy2003/The-Audiopheliac
@@ -193,8 +193,8 @@ The D: drive is the second internal drive on GDMARCHE (original factory drive, s
 - Drives: WD Red Plus 12TB + 10TB | balance-alb trunking across 2x 2.5GbE
 - Passive 5GbE switch (QNAP QSW-1105-5T) between router and both NAS ports
 - **Media servers installed:**
-  - MinimServer (primary) — serving `\\NAS87828E\Music` to R-N800A via UPnP/DLNA. Confirmed working.
-  - Roon Server (installed, trial not yet activated) — 14-day trial pending Gill's activation at GDMARCHE. May replace MinimServer if A/B testing favors it. Both coexist during evaluation.
+  - MinimServer (fallback role) — serving `\\NAS87828E\Music` to R-N800A via UPnP/DLNA. Confirmed working. Retained as fallback if Roon trial does not convert.
+  - Roon Server (Docker, primary) — `ghcr.io/roonlabs/roonserver:latest` running in Container Station at `/share/Container/RoonServer/`. Replaced the failed 2023 community QPKG (cangerie/RoonServer_QNAP_Installer) on 2026-05-11. Trial active until 2026-05-25, auto-renews to $149.88/yr unless cancelled. Library scan complete (13,450 tracks indexed). See `docs/software/Roon.md` for the full deploy spec, container config, and runbook.
 
 ### Network
 - Spectrum SAX2V1R router (192.168.1.1)
@@ -325,6 +325,13 @@ C:\Users\gillo\The-Audiopheliac   (live repo — edit here)
   App path: `C:\Users\gillo\AppData\Local\Packages\SpotifyAB.SpotifyMusic_zpdnekdrzrea0\LocalState\Spotify\`
   Network path: Streamed from GDMARCHE to Yamaha R-N800A
   Note: `gdmarche-user` is the Microsoft Store app identifier, not the Spotify social username.
+  Profile: `docs/software/Spotify.md`
+- **Roon (library + playback brain):** Server in Docker on NAS, Bridge as Windows service on GDMARCHE, Remote desktop app on GDMARCHE.
+  - Server image: `ghcr.io/roonlabs/roonserver:latest` (production, 2.66 build 1658). Compose at `/share/Container/RoonServer/docker-compose.yml`.
+  - Two zones: "The Audiopheliac Library" (AirPlay 2 to R-N800A, Family Room) and AIR HUB ASIO (via Bridge, Studio).
+  - Trial expires 2026-05-25. Subscription $149.88/yr unless cancelled.
+  - Profile: `docs/software/Roon.md`
+- **Yamaha R-N800A (YXC API):** Receiver-side controls (power, volume, mute, source, transport, Net Radio presets) via the unauthenticated YXC HTTP/JSON API at `http://192.168.1.191/YamahaExtendedControl/v1/`. Tone control and Pure Direct are NOT exposed by this firmware (verified 2026-05-11 via direct probes); front panel only. Profile: `docs/software/Yamaha-RN800A.md`
 - **Default script location:** `C:\Scripts` unless a project folder already exists
 
 ---
@@ -339,6 +346,18 @@ automation/         All executable scripts. No outputs, no configs.
   spotify_pull.py
   spotify_local_match.py
   spotify_gap_report.py
+
+console/            Audiopheliac Cockpit v0.2 (Roon-backed local control panel)
+  app.py            Flask routes (YXC + Roon)
+  yamaha.py         YXC HTTP/JSON client
+  roon.py           Roon API extension client (wraps roonapi)
+  launch.pyw        Silent launcher (pythonw + Chrome --app)
+  Create-Shortcut.ps1   Desktop shortcut generator
+  config.json       yamaha_ip, roon_host, host, port (config; safe to commit)
+  requirements.txt  flask, requests, roonapi
+  static/           style.css (Nashville Midnight), app.js (UI controller)
+  templates/        index.html
+  README.md         Install, run, extension auth, troubleshooting
 
 config/             Credentials (.env) and structured config (.json) — gitignored
   music_sources.json
@@ -540,7 +559,11 @@ Create the `lyrics/` and `prompts/` subdirectories under `Suno/` if they do not 
 | Canva brand kit kAHGkHrcJYU: update with Nashville Midnight palette | Open |
 | Suno "First Tracks": early experiments, library indexed | Active |
 | Re-run music_indexer.py from GDMARCHE (Rafa) to pick up First Tracks rename | Pending — index currently stale (0 tracks after sandbox misfire) |
-| Roon Server 14-day trial: activate from GDMARCHE, A/B test vs MinimServer | Pending Gill activation |
+| Roon Server: trial activated, Docker deploy on QNAP complete, library scanned (13,450 tracks), two zones live | Complete |
+| Roon subscription decision (auto-renews 2026-05-25 at $149.88/yr unless cancelled) | Pending |
+| Roon: schedule weekly DB backup to `/RoonBackups` once trial decision is made | Open |
+| Audiopheliac Cockpit v0.2 (console/) — YXC + Roon integrated, library + zones + transport functional | Complete |
+| Cockpit: rename one of the two "The Audiopheliac Library" zones to disambiguate (recommend AirPlay → "Family Room", AIR HUB ASIO → "Studio") | Open |
 | Signal map update (MusicCast/MinimServer confirmation) | Pending Gill playback test |
 
 ---
@@ -911,6 +934,8 @@ These do not duplicate each other. Each has its lane.
 ---
 
 ## HISTORY
+
+**2026-05-11 (Roon pivot + Cockpit v0.2, end of day):** Two-part substantial session. (1) Built the Audiopheliac Cockpit local control panel (`console/`) as a Python/Flask + browser UI on GDMARCHE, originally targeting YXC for both receiver controls AND library browse. After observing that YXC's library surface is firmware-thin (8-item page cap on `getListInfo`, no real metadata, no Spotify-class search) and that Roon Server was already installed but stopped on the NAS, pivoted the library + playback substrate from YXC + DLNA to Roon. (2) Activated the free Roon trial (expires 2026-05-25, paid $149.88/yr after); removed the failed 2023 community QPKG; deployed Roon Server as a Docker container on QNAP TS-473A via Container Station using Roon Labs' official image (`ghcr.io/roonlabs/roonserver:latest`), with one fix to the generator's compose file (`/dev/dri` device passthrough removed because the Ryzen V1500B exposes no iGPU). Library scanned cleanly (13,450 tracks). Installed Roon Bridge on GDMARCHE as a Windows service to expose the M-Audio AIR Hub as a Roon zone. Enabled two zones: AirPlay 2 to the R-N800A (Family Room) and AIR HUB ASIO via Bridge (Studio); both currently named "The Audiopheliac Library" (rename queued). Cockpit refactored to call Roon via `roonapi` (Python) for library/search/browse/transport while retaining YXC for receiver-side power/volume/mute/source/Net Radio presets. Tone card removed from the Cockpit on the strength of direct YXC probes confirming the R-N800A firmware does not expose `tone_control` or `setDirect`. Two new per-package profiles created: `docs/software/Roon.md` and `docs/software/Yamaha-RN800A.md`. Lane discipline applied: Cowork drafted the Docker compose YAML review, the recovery prompt after the first deploy failed on PATH discovery, and the second recovery after the `/dev/dri` failure; Rafa executed all NAS-side SSH/Docker work via PowerShell from GDMARCHE. Paperclip ticketing remains on hold (Audiopheliac Operator agent not yet created).
 
 **2026-05-11 (scope clarification, later):** Rewrote IDENTITY AND ROLE to lead with the lifestyle-brand framing. The prior statement described The Audiopheliac as a "personal music intelligence and home AV system" with the web presence as one of several components, which under-represented the actual project scope: `theaudiopheliac.com` (domain through 2028-04-19), public-facing website on Cloudflare Pages with brand voice guidelines and Nashville Midnight identity, content production pipeline (blog, product reviews, deep-dives), AI integrations including commercial-use Suno music releases, Amazon Associates affiliate stream via the gear-discovery proxy, potential Amazon storefront, and downstream music releases under the brand. The hardware/signal-chain/studio components are the credibility foundation, not the brand itself. The "hobby" framing Gill uses distinguishes Audiopheliac from VAL as an existing legal entity; it does NOT signal limited commercial scope. Added BEHAVIORAL RULE: "Do not collapse Audiopheliac scope to solo/hobby framing." Expanded `docs/Audiopheliac_Paperclip_Reference.md` §0.1 with a fifteen-item, five-lane paperclip use-case map (core ops, content production, music releases, revenue/commercial, compliance/governance/tax) replacing the prior five-item solo-scope list.
 

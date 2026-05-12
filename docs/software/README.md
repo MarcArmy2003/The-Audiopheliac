@@ -29,6 +29,8 @@ Triggers:
 | Package | Path | Status | Last reviewed |
 |---|---|---|---|
 | Spotify (Windows desktop) | [Spotify.md](Spotify.md) | Active | 2026-05-11 |
+| Roon (Server + Bridge + Remote) | [Roon.md](Roon.md) | Trial (paid 2026-05-25) | 2026-05-11 |
+| Yamaha R-N800A (YXC API) | [Yamaha-RN800A.md](Yamaha-RN800A.md) | Active | 2026-05-11 |
 
 Add a row when a new profile lands. Update Last reviewed when you touch the profile.
 
