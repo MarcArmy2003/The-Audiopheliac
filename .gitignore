@@ -128,3 +128,5 @@ console/playlist.json
 console/roon_token.json
 console/roon_core.json
 console/.venv/
+console/spotify_token.json
+console/spotify_secret.json

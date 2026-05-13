@@ -1,0 +1,248 @@
+<!--
+  Cockpit v0.7 template draft — work in progress, NOT production.
+
+  Saved here on 2026-05-13 as part of the audio:close handoff. This is a
+  faithful port of `_dev/01_brand/cockpit_redesign_mockup.html` to the
+  Flask template plus the v0.6 functional additions (CSRF meta, Spotify
+  device picker modal, system pills, smart play-to routing).
+
+  Next session must complete the v0.7 rebuild before swapping this in:
+
+    1. Write console/static/style.css covering all the new classes used
+       here: .shell, .col, .col-left, .col-right, .tile, .yamaha-grid,
+       .sources, .master-vol, .master-vol-num, .presets, .preset,
+       .preset-num, .search-row, .search-input, .tabs, .tab, .tab-spacer,
+       .lib-list, .lib-item, .lib-thumb, .lib-text, .lib-main, .lib-sub,
+       .lib-kind, .queue-list, .queue-item, .q-num, .q-text, .q-main,
+       .q-sub, .q-len, .footer, .ver, .accent, .topbar-clock, .now-art-label,
+       .power, .power-dot, .t-toggle, .t-spacer.
+
+    2. Rewrite console/static/app.js bindings for:
+         - Topbar clock tick (every minute)
+         - Per-zone volume sliders with new /api/roon/zone-volume POST
+         - Shuffle / Repeat t-toggle pills (Spotify state for now; Roon later)
+         - Library tabs (Roon | Spotify); search routes per active tab
+         - Mute t-toggle (no separate mute button; lives in Yamaha card tile)
+         - Power toggle (single button cycling On / Standby)
+         - Net Radio preset 4-column grid
+         - Up next queue from new /api/roon/queue endpoint
+         - Drag/restore: REMOVED in v0.7 (cards have fixed positions per
+           the mockup, not user-rearrangeable)
+
+    3. Add console/app.py endpoints:
+         POST /api/roon/zone-volume  body: { zone_id, level (0-100) }
+         GET  /api/roon/queue?zone_id=...
+
+    4. Add console/roon.py methods:
+         set_zone_volume(zone_id, level)   wraps roonapi change_volume
+         zone_queue(zone_id)                returns list of upcoming tracks
+
+    5. Swap this template into console/templates/index.html in one move
+       AFTER 1-4 land. Don't half-port like I did in this session.
+
+  Master volume returns to the Yamaha card (where the mockup put it),
+  out of Now Playing. This is intentional per Gill's "where you'd expect
+  them" feedback at the end of the session.
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="cockpit-csrf" content="{{ csrf_token }}">
+  <title>The Audiopheliac Cockpit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Unica+One&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body data-yamaha-ip="{{ yamaha_ip }}">
+
+  <header class="topbar">
+    <img class="topbar-mark" src="{{ url_for('static', filename='audiopheliac-mark.jpg') }}" alt="" aria-hidden="true" />
+    <div class="brand-titles">
+      <div class="mark">The Audiopheliac</div>
+      <div class="brand-sub">Cockpit &middot; v0.7</div>
+    </div>
+    <div class="device" id="device-name">{{ device_name }}</div>
+    <div class="topbar-state">
+      <span class="topbar-pill" id="topbar-roon">Roon &middot; checking</span>
+      <span class="topbar-pill" id="topbar-yamaha"><span class="status-dot" id="status-dot"></span> R-N800A</span>
+      <span class="topbar-pill" id="topbar-spotify">Spotify &middot; checking</span>
+      <button class="topbar-pill" id="topbar-bridge" style="display:none;" title="Click to start Roon Bridge">Bridge &middot; checking</button>
+      <button class="topbar-pill" id="topbar-server" style="display:none;" title="Click to start Roon Server">Server &middot; checking</button>
+      <span class="topbar-clock" id="topbar-clock">--:--</span>
+      <button class="topbar-btn" id="btn-reset-layout" title="Reset card layout">Reset layout</button>
+    </div>
+  </header>
+
+  <main class="shell">
+
+    <!-- Now Playing - full-width hero -->
+    <section class="card card-now" data-card="now">
+      <header class="card-head">
+        <h2>Now playing</h2>
+        <span class="card-meta" id="now-zone-label">Pick a zone to start</span>
+      </header>
+      <div class="now-body">
+        <div class="now-art-wrap">
+          <img class="now-art" id="now-art" alt="" />
+          <div class="now-art-placeholder" aria-hidden="true">
+            <span class="now-art-label" id="now-art-label">Idle</span>
+          </div>
+        </div>
+        <div class="now-info">
+          <h3 class="now-track" id="now-track">Nothing playing yet.</h3>
+          <p class="now-artist" id="now-artist"></p>
+          <p class="now-album" id="now-album"></p>
+          <div class="now-meta" id="now-meta"></div>
+          <div class="scrub">
+            <span id="now-elapsed">--:--</span>
+            <div class="scrub-bar"><div class="scrub-fill" id="now-scrub-fill"></div></div>
+            <span id="now-total">--:--</span>
+          </div>
+          <div class="transport">
+            <button class="tb" data-tx="previous" aria-label="Previous">&#x23EE;</button>
+            <button class="tb tb-primary" data-tx="playpause" id="btn-playpause" aria-label="Play / pause">&#x25B6;</button>
+            <button class="tb" data-tx="next" aria-label="Next">&#x23ED;</button>
+            <span class="t-spacer"></span>
+            <button class="t-toggle" id="btn-shuffle" data-state="off">Shuffle off</button>
+            <button class="t-toggle" id="btn-repeat" data-state="off">Repeat off</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="grid">
+      <div class="col col-left">
+
+        <section class="card card-zone" data-card="zone">
+          <header class="card-head">
+            <h2>Roon zones</h2>
+            <span class="card-meta" id="zone-meta">checking</span>
+          </header>
+          <div class="zones" id="zone-list">
+            <span class="muted">Waiting on the Roon Core.</span>
+          </div>
+        </section>
+
+        <section class="card card-yamaha" data-card="yamaha">
+          <header class="card-head">
+            <h2>Yamaha R-N800A</h2>
+            <span class="card-meta" id="yamaha-meta">YXC &middot; 192.168.1.191</span>
+          </header>
+
+          <div class="yamaha-grid">
+            <div class="tile">
+              <span class="tile-label">Power</span>
+              <div class="tile-row">
+                <button class="power" id="btn-power-toggle"><span class="power-dot"></span> <span id="power-state-label">On</span></button>
+                <span class="tile-value" id="power-sub" style="font-size:0.8rem;color:var(--paper-muted);">live</span>
+              </div>
+            </div>
+            <div class="tile">
+              <span class="tile-label">Mute</span>
+              <div class="tile-row">
+                <span class="tile-value" id="mute-state-label">Off</span>
+                <button class="t-toggle" id="btn-mute">Toggle</button>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <span class="tile-label" style="display:block;margin-bottom:0.5rem;">Source</span>
+            <div class="sources" id="input-list">
+              <span class="muted">Loading sources.</span>
+            </div>
+          </div>
+
+          <div class="master-vol">
+            <label for="vol-slider">Master</label>
+            <button class="icon-btn" id="btn-vol-down" title="Volume down">&minus;</button>
+            <input type="range" id="vol-slider" min="0" max="161" value="40" aria-label="Master volume" />
+            <button class="icon-btn" id="btn-vol-up" title="Volume up">&plus;</button>
+            <span class="master-vol-num" id="vol-pct">--%</span>
+          </div>
+
+          <div>
+            <span class="tile-label" style="display:block;margin:0.85rem 0 0.5rem;">Net Radio presets</span>
+            <div class="presets" id="preset-list">
+              <span class="muted">Loading presets.</span>
+            </div>
+            <div class="preset-foot muted">
+              Presets save on the receiver via the MusicCast app. Use the suggestions below to find stations.
+            </div>
+            <div class="suggest-list" id="suggest-list">
+              <span class="muted">Suggestions on the way.</span>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <div class="col col-right">
+
+        <section class="card card-library" data-card="library">
+          <header class="card-head">
+            <h2>Library</h2>
+            <span class="card-meta" id="library-crumb">Roon home</span>
+          </header>
+
+          <div class="search-row">
+            <input type="search" class="search-input" id="lib-q" placeholder="Search artist, album, track, or playlist" />
+            <button class="primary-btn" id="lib-search-btn">Search</button>
+          </div>
+
+          <div class="tabs">
+            <button class="tab active" data-tab="roon">Roon</button>
+            <button class="tab" data-tab="spotify">Spotify</button>
+            <span class="tab-spacer"></span>
+            <button class="ghost-btn" id="lib-back">&larr; Back</button>
+            <button class="ghost-btn" id="lib-home">Home</button>
+          </div>
+
+          <div class="lib-list" id="lib-list">
+            <span class="muted">Connect Roon to begin browsing.</span>
+          </div>
+
+          <div class="sp-auth-prompt" id="sp-auth-prompt" style="display:none;">
+            <p>Spotify is wired but not authorized yet.</p>
+            <a class="primary-btn" href="/spotify/auth" id="sp-auth-link">Connect Spotify</a>
+          </div>
+        </section>
+
+        <section class="card card-upnext" data-card="upnext">
+          <header class="card-head">
+            <h2>Up next</h2>
+            <span class="card-meta" id="upnext-meta">queue</span>
+          </header>
+          <div class="queue-list" id="upnext-list">
+            <span class="muted">Queue lives here once Roon or Spotify is playing.</span>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <div class="footer">
+      <span class="ver">v0.7</span> <span class="accent">The Audiopheliac Cockpit</span> &middot; Full Spectrum &middot; loopback only
+    </div>
+  </main>
+
+  <div class="modal-backdrop" id="sp-device-modal" style="display:none;" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="sp-device-modal-title">
+      <header class="modal-head">
+        <h3 id="sp-device-modal-title">Pick a Spotify target</h3>
+        <button class="card-hide" id="sp-device-modal-close" aria-label="Close">&times;</button>
+      </header>
+      <p class="muted modal-body-text">Spotify can&rsquo;t see the Yamaha under any of the names the Cockpit checks. Pick the right device from what Spotify actually reports. Your choice sticks for future plays.</p>
+      <div class="modal-list" id="sp-device-modal-list"></div>
+      <footer class="modal-foot">
+        <button class="ghost-btn" id="sp-device-modal-cancel">Cancel</button>
+      </footer>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
