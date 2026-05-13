@@ -2,8 +2,8 @@
 
 **Package:** Spotify (Windows desktop client)
 **Owner:** Gillon "Gill" Marchetti (MarcArmy2003)
-**Profile version:** 2026.05.1
-**Last reviewed:** 2026-05-11
+**Profile version:** 2026.05.2
+**Last reviewed:** 2026-05-12
 **Status:** Active (Premier / Lossless tier)
 
 > Per-package configuration profile for The Audiopheliac. Source of truth for Spotify desktop client, Developer App registration, bit-perfect playback chain through the M-Audio AIR Hub, Local Files indexing into the music library at `M:\The Audiopheliac\`, and the automation pipeline that pulls library state into `data/spotify/`. Cross-references to canonical inventory at `docs/av_master_inventory_2026.md` and to the live signal map at `config/audiopheliac_signal_map_v_2026_05.md`.
@@ -159,16 +159,74 @@ python automation\spotify_gap_report.py
 
 ## 7. Spotify Developer App
 
+Snapshot as saved 2026-05-12. Authoritative for redirect URIs, API surface, and registration metadata.
+
+### 7.1 Basic Information
+
 | Field | Value |
 |---|---|
 | App name | The Audiopheliac |
+| App description | Personal music intelligence system that links local FLAC libraries, Spotify data, and Discogs collections to enable analysis, matching, and automated playlist generation for The Audiopheliac project. |
+| Website | theaudiopheliac.com |
 | Client ID | `7b8b0cd38be7496b864a0380b8c2a16c` |
-| Client secret | Stored in `config/spotify.env` (gitignored). Not in this file. |
 | Status | Development mode |
-| User cap | Max 5 authorized users |
-| Redirect URI | `https://github.com/MarcArmy2003/The-Audiopheliac` |
+| Dashboard | https://developer.spotify.com/dashboard/7b8b0cd38be7496b864a0380b8c2a16c |
+
+### 7.2 Redirect URIs
+
+| URI | Purpose |
+|---|---|
+| `http://127.0.0.1:5000/spotify/callback` | Audiopheliac Cockpit (Flask app on GDMARCHE, console/app.py) |
+| `http://127.0.0.1:8888/callback` | Audiopheliac automation pipeline (`automation/spotify_pull.py` and downstream scripts). Matches `SPOTIFY_REDIRECT_URI` in `config/spotify.env`. Verified 2026-05-12. |
+
+### 7.3 Bundle IDs / Native packages
+
+| Surface | Value |
+|---|---|
+| iOS app bundles | (none registered) |
+| Android packages | (none registered) |
+
+### 7.4 APIs / SDKs enabled
+
+| Surface | Enabled | Use case |
+|---|---|---|
+| Web API | Yes | Cockpit playback control (search, playlists, transport, devices, transfer) via spotipy; automation pipeline (`automation/spotify_pull.py`) |
+| Web Playback SDK | Yes | Reserved for future browser-as-Spotify-Connect-device use (e.g., theaudiopheliac.com player, Cockpit-as-endpoint). Premier required, no code against it yet. |
+| Ads API | No | Not relevant |
+| iOS SDK | No | No native iOS app planned |
+| Android SDK | No | No native Android app planned |
+
+### 7.5 Secrets and credentials
+
+| Item | Location |
+|---|---|
+| Client secret (canonical) | `config/spotify.env` (gitignored). Single source of truth; consumed by both the automation pipeline and the Cockpit. |
+| Client secret (optional Cockpit override) | `console/spotify_secret.json` (gitignored). If present, takes precedence over `config/spotify.env`. Template at `console/spotify_secret.example.json`. Use only if you want a separate secret scoped to the Cockpit. |
+| Token cache (pipeline scripts) | Per-script local cache (varies); see `automation/spotify_pull.py` |
+| Token cache (Cockpit) | `console/spotify_token.json` (gitignored), managed by spotipy `SpotifyOAuth` |
 | Authorized users | gillon.marchetti@gmail.com, gillon.marchetti@veterananalytics.com |
-| Dashboard | https://developer.spotify.com/dashboard |
+
+### 7.6 OAuth scopes (Cockpit)
+
+Requested by `console/spotify.py`:
+
+```
+user-read-playback-state
+user-modify-playback-state
+user-read-currently-playing
+user-read-private
+user-library-read
+playlist-read-private
+playlist-read-collaborative
+```
+
+### 7.7 OAuth state nonce
+
+The Codex security audit (2026-05-12) flagged the absence of an explicit `state` nonce check in `console/app.py`'s `/spotify/callback` handler. Investigated and intentionally not duplicated at the app layer: `spotipy.SpotifyOAuth.get_authorize_url()` generates a per-flow `state` parameter and `get_access_token()` validates it against the local cache before returning a token. The Cockpit calls `sp.exchange_code(code)` which routes through `get_access_token()`. No additional Cockpit-layer code required. Logged here so a future reader does not re-flag.
+
+### 7.8 CSRF + Host allowlist (Codex audit 2026-05-12)
+
+A per-process CSRF token is generated at Flask start (`secrets.token_urlsafe(32)`) and rendered into `index.html` as `<meta name="cockpit-csrf">`. All `POST`/`PUT`/`PATCH`/`DELETE` requests must echo the token in an `X-Cockpit-CSRF` header and originate from `127.0.0.1:5000` or `localhost:5000`. Defense against DNS rebinding and cross-site form submissions targeting the local control surface. Token resets on Flask restart; existing browser tabs surface a "session expired, reload" toast on the resulting 403.
 
 ---
 
@@ -232,6 +290,7 @@ python automation\spotify_gap_report.py
 | Date | Profile version | Change |
 |---|---|---|
 | 2026-05-11 | 2026.05.1 | Initial profile. Documents Premier / Lossless tier, full bit-perfect chain through M-Audio AIR Hub (after Focusrite Solo failure), Local Files config against `M:\The Audiopheliac\`, Developer App registration, `Set-AIRHub-And-Launch-Spotify.ps1` wrapper, full troubleshooting runbook covering format reversion, output routing, Local Files visibility, OAuth failures, and quality downgrades. |
+| 2026-05-12 | 2026.05.2 | Updated Section 7 (Developer App) post-Save: full description and website fields logged, redirect URIs updated to the Cockpit (`http://127.0.0.1:5000/spotify/callback`, newly added) and the pre-existing automation-pipeline callback (`http://127.0.0.1:8888/callback`, matches `SPOTIFY_REDIRECT_URI` in `config/spotify.env`). Web Playback SDK added to APIs alongside Web API. Bundle IDs and Android packages noted as empty. Added §7.5 (secrets) and §7.6 (OAuth scopes) sub-sections. Clarified `config/spotify.env` is canonical and `console/spotify_secret.json` is an optional Cockpit-only override. App name was unchanged ("The Audiopheliac" with the space, as it has been throughout). |
 
 ---
 

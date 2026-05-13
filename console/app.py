@@ -7,23 +7,32 @@ from __future__ import annotations
 
 import json
 import random
+import re
 import threading
 import time
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
+from secrets import token_urlsafe
 from typing import Any
 
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, abort, jsonify, render_template, request
+from markupsafe import escape
 
 from yamaha import Yamaha, YamahaError
-from roon import RoonClient, RoonNotAuthorized, RoonError
+from roon import (
+    RoonClient, RoonNotAuthorized, RoonError,
+    windows_service_status, windows_service_start, nas_ssh_exec,
+)
+from spotify import SpotifyClient, SpotifyConfigError, SpotifyError
 
 
 HERE = Path(__file__).resolve().parent
 CONFIG_PATH = HERE / "config.json"
 PLAYLIST_PATH = HERE / "playlist.json"
 ROON_TOKEN_PATH = HERE / "roon_token.json"
+SPOTIFY_TOKEN_PATH = HERE / "spotify_token.json"
+SPOTIFY_SECRET_PATH = HERE / "spotify_secret.json"
 _playlist_lock = threading.Lock()
 DEFAULT_CONFIG = {
     "yamaha_ip": "192.168.1.191",
@@ -39,6 +48,60 @@ def load_config() -> dict[str, Any]:
         with CONFIG_PATH.open("r", encoding="utf-8") as f:
             return {**DEFAULT_CONFIG, **json.load(f)}
     return DEFAULT_CONFIG
+
+
+def load_spotify_secret() -> str | None:
+    """Read the Spotify client_secret from gitignored local config.
+
+    Checks two locations in order:
+      1. console/spotify_secret.json   -- {"client_secret": "..."}
+      2. config/spotify.env            -- SPOTIFY_CLIENT_SECRET=...
+
+    The second is the pipeline's canonical secret store (consumed by
+    automation/spotify_pull.py and friends). The Cockpit reads from the
+    same source so we don't fork the secret across two files.
+    """
+    if SPOTIFY_SECRET_PATH.exists():
+        try:
+            with SPOTIFY_SECRET_PATH.open("r", encoding="utf-8") as f:
+                data = json.load(f)
+            secret = data.get("client_secret")
+            if secret:
+                return secret
+        except (json.JSONDecodeError, OSError):
+            pass
+    pipeline_env = HERE.parent / "config" / "spotify.env"
+    if pipeline_env.exists():
+        try:
+            with pipeline_env.open("r", encoding="utf-8") as f:
+                for raw in f:
+                    line = raw.strip()
+                    if not line or line.startswith("#") or "=" not in line:
+                        continue
+                    key, val = line.split("=", 1)
+                    if key.strip() == "SPOTIFY_CLIENT_SECRET":
+                        return val.strip().strip('"').strip("'") or None
+        except OSError:
+            pass
+    return None
+
+
+def build_spotify_client(cfg: dict[str, Any]) -> SpotifyClient | None:
+    sp_cfg = cfg.get("spotify") or {}
+    client_id = sp_cfg.get("client_id")
+    redirect_uri = sp_cfg.get("redirect_uri", "http://127.0.0.1:5000/spotify/callback")
+    secret = load_spotify_secret()
+    if not client_id or not secret:
+        return None
+    try:
+        return SpotifyClient(
+            client_id=client_id,
+            client_secret=secret,
+            redirect_uri=redirect_uri,
+            token_path=SPOTIFY_TOKEN_PATH,
+        )
+    except SpotifyConfigError:
+        return None
 
 
 def load_playlist() -> list[dict[str, Any]]:
@@ -64,7 +127,54 @@ yam = Yamaha(host=config["yamaha_ip"])
 roon = RoonClient(token_path=ROON_TOKEN_PATH,
                   configured_host=config.get("roon_host"))
 roon.start()
+spotify = build_spotify_client(config)
 app = Flask(__name__)
+
+SPOTIFY_YAMAHA_HINT_DEFAULT = "Yamaha R-N800A"
+SPOTIFY_YAMAHA_HINT_FALLBACKS = ["Yamaha R-N800A", "R-N800A", "Yamaha", "MusicCast"]
+
+# Per-process CSRF token + loopback Host allowlist. Generated fresh on each
+# Flask start so a browser tab from a previous process gets a 403 and must
+# reload (the UI surfaces that on 403). Codex audit 2026-05-12, HIGH-1.
+CSRF_TOKEN = token_urlsafe(32)
+_MUTATING_METHODS = {"POST", "PUT", "PATCH", "DELETE"}
+_ALLOWED_HOSTS = {"127.0.0.1", "localhost"}
+_CONTAINER_NAME_RE = re.compile(r"^[a-zA-Z0-9_.-]{1,64}$")
+
+
+@app.before_request
+def protect_local_control_surface():
+    """Enforce loopback Host header on all requests, Origin allowlist and
+    CSRF token on mutating methods. Defense against DNS rebinding and
+    cross-site form submissions targeting the Cockpit."""
+    host = (request.host or "").split(":", 1)[0].lower()
+    if host not in _ALLOWED_HOSTS:
+        abort(403)
+    if request.method in _MUTATING_METHODS:
+        port = int(config.get("port", 5000))
+        allowed_origins = {
+            f"http://127.0.0.1:{port}",
+            f"http://localhost:{port}",
+        }
+        origin = request.headers.get("Origin")
+        if origin and origin not in allowed_origins:
+            abort(403)
+        if request.headers.get("X-Cockpit-CSRF") != CSRF_TOKEN:
+            abort(403)
+
+
+def _clamp_int(raw, default: int, lo: int, hi: int) -> int:
+    """Parse `raw` as int, clamp to [lo, hi], return default on failure.
+    Used for limit/count/size params to prevent runaway requests."""
+    try:
+        v = int(raw)
+    except (TypeError, ValueError):
+        return default
+    if v < lo:
+        return lo
+    if v > hi:
+        return hi
+    return v
 
 
 def _ok(payload: dict | None = None, **kwargs) -> Any:
@@ -94,6 +204,16 @@ def _roon_err(e: RoonError):
     return _err(str(e))
 
 
+@app.errorhandler(SpotifyError)
+def _spotify_err(e: SpotifyError):
+    return _err(str(e))
+
+
+@app.errorhandler(SpotifyConfigError)
+def _spotify_cfg_err(e: SpotifyConfigError):
+    return jsonify({"ok": False, "error": str(e), "code": "spotify_unconfigured"}), 503
+
+
 # ---------- pages ----------
 
 @app.route("/")
@@ -102,6 +222,7 @@ def index():
         "index.html",
         device_name=config["yamaha_name"],
         yamaha_ip=config["yamaha_ip"],
+        csrf_token=CSRF_TOKEN,
     )
 
 
@@ -115,7 +236,159 @@ def client_config():
         "preferred_zones": config.get("preferred_zones", []),
         "net_radio_suggestions": config.get("net_radio_suggestions", []),
         "device_name": config.get("yamaha_name"),
+        "spotify_configured": spotify is not None,
+        "spotify_authorized": bool(spotify and spotify.is_authorized()),
     })
+
+
+# ---------- Spotify: auth + status + control ----------
+
+def _require_spotify() -> SpotifyClient:
+    if spotify is None:
+        raise SpotifyConfigError(
+            "Spotify is not configured. Add client_id to config.json under 'spotify' "
+            "and create console/spotify_secret.json with {\"client_secret\": \"...\"}."
+        )
+    return spotify
+
+
+@app.route("/spotify/auth")
+def spotify_auth():
+    sp = _require_spotify()
+    from flask import redirect
+    return redirect(sp.auth_url())
+
+
+@app.route("/spotify/callback")
+def spotify_callback():
+    # Codex audit 2026-05-12 HIGH-2: escape reflected query params; never
+    # leak exception text to the client. Detailed errors go to the log only.
+    sp = _require_spotify()
+    code = request.args.get("code")
+    error = request.args.get("error")
+    if error:
+        return (
+            f"<h1>Spotify authorization failed</h1><p>{escape(error)}</p>",
+            400,
+        )
+    if not code:
+        return "<h1>Missing authorization code</h1>", 400
+    try:
+        sp.exchange_code(code)
+    except Exception:
+        app.logger.exception("Spotify token exchange failed")
+        return (
+            "<h1>Token exchange failed</h1>"
+            "<p>Check the Cockpit logs for details.</p>",
+            500,
+        )
+    return (
+        "<h1>Spotify connected</h1>"
+        "<p>The Audiopheliac Cockpit is now authorized. You can close this tab "
+        "and return to the Cockpit.</p>"
+        "<p><a href='/'>Back to the Cockpit</a></p>"
+    )
+
+
+@app.route("/api/spotify/status")
+def spotify_status():
+    sp = _require_spotify()
+    if not sp.is_authorized():
+        return _ok({"authorized": False, "now_playing": None, "devices": []})
+    np = sp.now_playing()
+    devices = sp.devices()
+    return _ok({"authorized": True, "now_playing": np, "devices": devices})
+
+
+@app.route("/api/spotify/devices")
+def spotify_devices():
+    sp = _require_spotify()
+    return _ok({"devices": sp.devices()})
+
+
+@app.post("/api/spotify/transfer")
+def spotify_transfer():
+    sp = _require_spotify()
+    body = request.get_json() or {}
+    device_id = body.get("device_id")
+    play = bool(body.get("play", False))
+    if not device_id:
+        return _err("device_id is required", status=400)
+    sp.transfer_to(device_id, play=play)
+    return _ok()
+
+
+@app.post("/api/spotify/playback/<action>")
+def spotify_playback(action: str):
+    sp = _require_spotify()
+    body = request.get_json(silent=True) or {}
+    device_id = body.get("device_id")
+    if action == "play":
+        sp.play(
+            device_id=device_id,
+            context_uri=body.get("context_uri"),
+            uris=body.get("uris"),
+            offset=body.get("offset"),
+            position_ms=body.get("position_ms"),
+        )
+    elif action == "pause":
+        sp.pause(device_id)
+    elif action in ("next", "skip"):
+        sp.next(device_id)
+    elif action in ("previous", "prev"):
+        sp.previous(device_id)
+    elif action == "seek":
+        pos = int(body.get("position_ms", 0))
+        sp.seek(pos, device_id)
+    else:
+        return _err(f"unsupported action: {action}", status=400)
+    return _ok()
+
+
+@app.post("/api/spotify/volume")
+def spotify_volume():
+    sp = _require_spotify()
+    body = request.get_json() or {}
+    level = body.get("level")
+    if level is None:
+        return _err("level (0-100) is required", status=400)
+    sp.set_volume(int(level), device_id=body.get("device_id"))
+    return _ok()
+
+
+@app.post("/api/spotify/shuffle")
+def spotify_shuffle():
+    sp = _require_spotify()
+    body = request.get_json() or {}
+    sp.set_shuffle(bool(body.get("state", False)), device_id=body.get("device_id"))
+    return _ok()
+
+
+@app.post("/api/spotify/repeat")
+def spotify_repeat():
+    sp = _require_spotify()
+    body = request.get_json() or {}
+    sp.set_repeat(str(body.get("state", "off")), device_id=body.get("device_id"))
+    return _ok()
+
+
+@app.route("/api/spotify/search")
+def spotify_search():
+    sp = _require_spotify()
+    q = (request.args.get("q") or "").strip()[:200]  # cap query length
+    if not q:
+        return _ok({"results": {"track": [], "album": [], "artist": [], "playlist": []}})
+    kinds = request.args.get("type", "track,album,artist,playlist")
+    limit = _clamp_int(request.args.get("limit"), default=20, lo=1, hi=50)
+    results = sp.search(q=q, kinds=kinds, limit=limit)
+    return _ok({"results": results})
+
+
+@app.route("/api/spotify/playlists")
+def spotify_playlists():
+    sp = _require_spotify()
+    limit = _clamp_int(request.args.get("limit"), default=50, lo=1, hi=200)
+    return _ok({"playlists": sp.playlists(limit=limit)})
 
 
 # ---------- state ----------
@@ -243,9 +516,9 @@ def preset(num: int):
 @app.route("/api/browse")
 def browse_list():
     input_name = request.args.get("input", "server")
-    index = int(request.args.get("index", 0))
+    index = _clamp_int(request.args.get("index"), default=0, lo=0, hi=100000)
     # YXC caps the page size at 8; clamp here so callers don't trip a 4.
-    size = max(1, min(int(request.args.get("size", 8)), 8))
+    size = _clamp_int(request.args.get("size"), default=8, lo=1, hi=8)
     return _ok({"list": yam.list_info(input_name, index, size)})
 
 
@@ -584,6 +857,25 @@ def roon_status():
     return _ok(roon.status())
 
 
+@app.post("/api/roon/reconnect")
+def roon_reconnect():
+    """Tear down and re-establish the Roon connection without a Flask
+    restart. Use when zones go empty while the topbar pill still says
+    connected, typically after a Roon Server bounce on the QNAP or a
+    wedged WebSocket session.
+    """
+    global roon
+    try:
+        roon = RoonClient(
+            token_path=ROON_TOKEN_PATH,
+            configured_host=config.get("roon_host"),
+        )
+        roon.start()
+    except Exception as e:
+        return _err(f"reconnect failed: {e}")
+    return _ok({"state": roon.state})
+
+
 @app.route("/api/roon/zones")
 def roon_zones():
     return _ok({"zones": roon.zones()})
@@ -600,7 +892,7 @@ def roon_now_playing():
 @app.route("/api/roon/image")
 def roon_image():
     image_key = request.args.get("key")
-    size = int(request.args.get("size", 256))
+    size = _clamp_int(request.args.get("size"), default=256, lo=16, hi=2048)
     if not image_key:
         return _err("Missing key", status=400)
     url = roon.image_url(image_key, size=size)
@@ -637,8 +929,8 @@ def roon_browse_back():
 
 @app.route("/api/roon/browse/page")
 def roon_browse_page():
-    offset = int(request.args.get("offset", 0))
-    count = int(request.args.get("count", 100))
+    offset = _clamp_int(request.args.get("offset"), default=0, lo=0, hi=100000)
+    count = _clamp_int(request.args.get("count"), default=100, lo=1, hi=500)
     return _ok({"list": roon.browse_page(offset=offset, count=count)})
 
 
@@ -670,6 +962,432 @@ def roon_transport(action: str):
         return _err("Missing zone_id", status=400)
     roon.transport(zone_id, action)
     return _ok()
+
+
+@app.route("/api/roon/debug/browse")
+def roon_debug_browse():
+    """Return Roon's raw browse_load at the current cursor for diagnostics."""
+    return _ok({"loaded": roon.debug_browse()})
+
+
+@app.post("/api/roon/play-path")
+def roon_play_path():
+    """Walk a name-based path and fire play at the leaf.
+
+    Body: { "zone_id": "...", "path": ["Library", "Albums", "..."] }
+    """
+    body = request.get_json(silent=True) or {}
+    zone_id = body.get("zone_id")
+    path = body.get("path") or []
+    if not zone_id or not path:
+        return _err("Missing zone_id or path", status=400)
+    src = _resolve_yamaha_source_for_zone(zone_id)
+    source_switched = None
+    if src:
+        try:
+            yam.set_input(src)
+            source_switched = src
+            time.sleep(0.4)
+        except YamahaError:
+            pass
+    result = roon.play_path(zone_id, list(path))
+    return _ok({"played": result.get("played"), "source_switched": source_switched})
+
+
+# ---------- system bootstrap (Buckets B, C, E) ----------
+
+ROON_BRIDGE_SERVICE = "Roon Bridge"
+
+
+def _roon_server_status() -> dict[str, Any]:
+    """Health check the Roon Server container on the NAS.
+
+    Two strategies in order:
+      1. SSH into the QNAP and run `docker inspect roonserver --format ...`.
+         Requires a configured SSH key (config.roon_server.ssh_key_path).
+      2. Fallback: probe the Roon Core's WebSocket port reachability.
+    """
+    rs_cfg = config.get("roon_server") or {}
+    host = rs_cfg.get("host") or config.get("roon_host") or "192.168.1.230"
+    ssh_user = rs_cfg.get("ssh_user") or "admin"
+    ssh_key = rs_cfg.get("ssh_key_path")
+    container = rs_cfg.get("container_name") or "roonserver"
+    # Codex audit 2026-05-12 LOW-10: validate container name before
+    # interpolating into an SSH command. Trusted-source today, defensive
+    # against future config drift or accidental injection.
+    if not _CONTAINER_NAME_RE.match(container or ""):
+        return {
+            "state": "unknown",
+            "host": host,
+            "container": container,
+            "method": "rejected",
+            "note": "container_name failed validation; expected [A-Za-z0-9_.-]{1,64}",
+        }
+
+    if ssh_key:
+        rc, out, err = nas_ssh_exec(
+            f"{ssh_user}@{host}",
+            ssh_key,
+            f"docker inspect {container} --format '{{{{.State.Running}}}}'",
+            timeout=6.0,
+        )
+        if rc == 0:
+            running = "true" in (out or "").lower()
+            return {
+                "state": "running" if running else "stopped",
+                "host": host,
+                "container": container,
+                "method": "ssh",
+            }
+        # SSH failed; surface why but fall through to reachability probe.
+        ssh_error = (err or "").strip()[:200]
+    else:
+        ssh_error = "ssh_key_path not configured in config.roon_server"
+
+    # Fallback: if the Cockpit's roonapi is already connected, the server is
+    # by definition reachable, even if we can't determine the container state.
+    reachable = roon.state == "connected"
+    return {
+        "state": "running" if reachable else "unknown",
+        "host": host,
+        "container": container,
+        "method": "fallback_reachability",
+        "note": ssh_error,
+    }
+
+
+@app.route("/api/system/roon-bridge/status")
+def roon_bridge_status():
+    return _ok({
+        "state": windows_service_status(ROON_BRIDGE_SERVICE),
+        "service_name": ROON_BRIDGE_SERVICE,
+    })
+
+
+@app.post("/api/system/roon-bridge/start")
+def roon_bridge_start():
+    ok, msg = windows_service_start(ROON_BRIDGE_SERVICE)
+    if not ok:
+        return _err(msg, status=502)
+    return _ok({"message": msg, "state": windows_service_status(ROON_BRIDGE_SERVICE)})
+
+
+@app.route("/api/system/roon-server/status")
+def roon_server_status():
+    return _ok(_roon_server_status())
+
+
+@app.post("/api/system/roon-server/start")
+def roon_server_start():
+    rs_cfg = config.get("roon_server") or {}
+    host = rs_cfg.get("host") or config.get("roon_host") or "192.168.1.230"
+    ssh_user = rs_cfg.get("ssh_user") or "admin"
+    ssh_key = rs_cfg.get("ssh_key_path")
+    container = rs_cfg.get("container_name") or "roonserver"
+    if not _CONTAINER_NAME_RE.match(container or ""):
+        return _err(
+            "container_name failed validation; expected [A-Za-z0-9_.-]{1,64}",
+            status=400,
+        )
+    if not ssh_key:
+        return _err(
+            "Cockpit can't auto-start Roon Server without an SSH key. "
+            "Set config.roon_server.ssh_key_path to the path of an OpenSSH "
+            "private key whose public counterpart is in the QNAP user's "
+            "~/.ssh/authorized_keys.",
+            status=503,
+        )
+    rc, out, err = nas_ssh_exec(
+        f"{ssh_user}@{host}",
+        ssh_key,
+        f"docker start {container}",
+        timeout=10.0,
+    )
+    if rc != 0:
+        return _err(
+            f"docker start failed (rc={rc}): {(err or out).strip()[:300]}",
+            status=502,
+        )
+    return _ok({"message": f"requested start of container {container}"})
+
+
+@app.route("/api/system/bootstrap")
+def system_bootstrap():
+    """One-shot health report for every Cockpit dependency.
+
+    Returns the topbar/launcher's source of truth: each component's state
+    and whether the Cockpit can recover it from the UI.
+    """
+    yam_ok = False
+    yam_err: str | None = None
+    try:
+        s = yam.status()
+        yam_ok = s.get("power") in ("on", "standby")
+    except YamahaError as e:
+        yam_err = str(e)
+
+    bridge_state = windows_service_status(ROON_BRIDGE_SERVICE)
+    server_info = _roon_server_status()
+
+    spotify_state = "unconfigured"
+    if spotify is not None:
+        spotify_state = "authorized" if spotify.is_authorized() else "unauthorized"
+
+    return _ok({
+        "yamaha": {
+            "state": "reachable" if yam_ok else "unreachable",
+            "host": config.get("yamaha_ip"),
+            "error": yam_err,
+        },
+        "roon_core": {
+            "state": roon.state,
+            "core_name": roon.core_name,
+            "error": roon.error,
+        },
+        "roon_server": server_info,
+        "roon_bridge": {
+            "state": bridge_state,
+            "service_name": ROON_BRIDGE_SERVICE,
+        },
+        "spotify": {"state": spotify_state},
+    })
+
+
+# ---------- smart play routing (intent-driven) ----------
+
+def _resolve_yamaha_source_for_zone(zone_id: str | None) -> str | None:
+    """Map a Roon zone to the Yamaha source it implies, if any.
+
+    Naming convention locked 2026-05-12. Only "Family Room — Yamaha"
+    (AirPlay 2 to R-N800A) demands a Yamaha source switch. Other zones
+    route through Chromecast endpoints, the Roon Bridge ASIO target, or
+    a separate AirPlay device (Bose) and the receiver stays out of it.
+    """
+    if not zone_id:
+        return None
+    try:
+        zones = roon.zones()
+    except RoonError:
+        return None
+    zone = next((z for z in zones if z.get("zone_id") == zone_id), None)
+    if not zone:
+        return None
+    name = (zone.get("display_name") or "").lower()
+    if "yamaha" in name and "family room" in name:
+        return "airplay"
+    return None
+
+
+def _find_spotify_yamaha_device(devices: list[dict], hints) -> tuple[str | None, str | None]:
+    """Locate the Yamaha receiver in a Spotify devices list.
+
+    Accepts a single hint string or a list of candidate substrings.
+    Returns (device_id, device_name) for the first match, else (None, None).
+    Case-insensitive substring match.
+    """
+    if not devices or not hints:
+        return None, None
+    if isinstance(hints, str):
+        hints = [hints]
+    candidates = [h.lower().strip() for h in hints if h and h.strip()]
+    for needle in candidates:
+        for d in devices:
+            nm = (d.get("name") or "").lower()
+            if needle in nm:
+                return d.get("id"), d.get("name")
+    return None, None
+
+
+@app.post("/api/playback/play-to")
+def play_to():
+    """Intent-driven play. Resolves source/transport/handoff automatically.
+
+    Body:
+      {
+        "intent": {
+          "kind": "roon-item" | "spotify-uri" | "net-radio-preset",
+          // roon-item: "item_key"
+          // spotify-uri: "context_uri" or "uris", optional "offset", "position_ms"
+          // net-radio-preset: "preset_num"
+        },
+        "zone_id": "..."          // required for roon-item
+      }
+
+    Returns:
+      { ok, source_switched: "airplay"|"spotify"|"net_radio"|null,
+        engine: "roon"|"spotify"|"yamaha", warning: "..." }
+    """
+    body = request.get_json(silent=True) or {}
+    intent = body.get("intent") or {}
+    kind = (intent.get("kind") or "").strip()
+    zone_id = body.get("zone_id")
+    source_switched: str | None = None
+    warning: str | None = None
+
+    if kind == "roon-item":
+        item_key = intent.get("item_key")
+        if not zone_id or not item_key:
+            return _err("Missing zone_id or item_key", status=400)
+        src = _resolve_yamaha_source_for_zone(zone_id)
+        if src:
+            try:
+                yam.set_input(src)
+                source_switched = src
+                time.sleep(0.4)
+            except YamahaError as e:
+                warning = f"Roon play continued, Yamaha source switch failed: {e}"
+        roon.select_action(zone_id, item_key)
+        engine = "roon"
+
+    elif kind == "spotify-uri":
+        sp = _require_spotify()
+
+        # Two device-id sources: explicit (from the Cockpit's picker) takes
+        # priority and skips name matching entirely. Otherwise we do a
+        # multi-hint substring match against Spotify's reported device list.
+        explicit_device_id = body.get("device_id")
+
+        try:
+            yam.set_input("spotify")
+            source_switched = "spotify"
+            time.sleep(0.6)
+        except YamahaError as e:
+            return _err(f"Couldn't switch Yamaha to Spotify input: {e}", status=502)
+
+        if explicit_device_id:
+            device_id = explicit_device_id
+            matched_name = None
+        else:
+            sp_cfg = config.get("spotify") or {}
+            cfg_hint = body.get("yamaha_device_hint") or sp_cfg.get("yamaha_device_name_hint")
+            # Build the candidate list: any explicit hint first, then the
+            # standard fallbacks. De-duplicate while preserving order.
+            hints: list[str] = []
+            for h in [cfg_hint, *SPOTIFY_YAMAHA_HINT_FALLBACKS]:
+                if h and h not in hints:
+                    hints.append(h)
+            devices = sp.devices()
+            device_id, matched_name = _find_spotify_yamaha_device(devices, hints)
+            retries = 0
+            # Give the Yamaha up to ~6 seconds to register as a Spotify
+            # Connect endpoint after the source switch.
+            while not device_id and retries < 6:
+                time.sleep(1.0)
+                devices = sp.devices()
+                device_id, matched_name = _find_spotify_yamaha_device(devices, hints)
+                retries += 1
+            if not device_id:
+                visible = [d.get("name") for d in (devices or []) if d.get("name")]
+                msg = (
+                    "Spotify doesn't see the Yamaha. Tried hints "
+                    + ", ".join(repr(h) for h in hints)
+                    + ". Devices Spotify currently sees: "
+                    + (", ".join(repr(n) for n in visible) if visible else "none")
+                    + ". If your receiver is in that list under a different name, "
+                    + "set config.spotify.yamaha_device_name_hint to a substring "
+                    + "of that name and restart Flask. Or pick it in the Cockpit "
+                    + "device dropdown before pressing Play."
+                )
+                return _err(msg, status=503)
+
+        sp.play(
+            device_id=device_id,
+            context_uri=intent.get("context_uri"),
+            uris=intent.get("uris"),
+            offset=intent.get("offset"),
+            position_ms=intent.get("position_ms"),
+        )
+        engine = "spotify"
+
+    elif kind == "net-radio-preset":
+        preset_num = int(intent.get("preset_num") or 0)
+        if preset_num < 1:
+            return _err("Missing preset_num", status=400)
+        try:
+            yam.set_input("net_radio")
+            source_switched = "net_radio"
+            time.sleep(0.4)
+        except YamahaError as e:
+            return _err(f"Couldn't switch Yamaha to Net Radio: {e}", status=502)
+        yam.recall_preset(preset_num)
+        engine = "yamaha"
+
+    else:
+        return _err(f"Unknown intent kind: {kind!r}", status=400)
+
+    payload: dict[str, Any] = {"source_switched": source_switched, "engine": engine}
+    if warning:
+        payload["warning"] = warning
+    return _ok(payload)
+
+
+# ---------- active engine detection ----------
+
+@app.route("/api/playback/active")
+def playback_active():
+    """Detect which engine is actually producing sound right now.
+
+    Decision tree:
+      1. If Yamaha source is "spotify" AND Spotify reports is_playing -> spotify
+      2. If a Roon zone is playing AND zone routes to the Yamaha or any
+         Roon endpoint Gill is listening to -> roon
+      3. Otherwise -> yamaha (whatever YXC says is playing, or idle)
+
+    Used by the Now Playing hub to bind master volume, transport, and
+    metadata to the engine that's actually authoritative.
+    """
+    yam_src = None
+    yam_power = None
+    try:
+        s = yam.status()
+        yam_src = s.get("input")
+        yam_power = s.get("power")
+    except YamahaError:
+        pass
+
+    # Spotify check
+    spotify_playing = False
+    spotify_device = None
+    if spotify is not None and spotify.is_authorized():
+        try:
+            np = spotify.now_playing()
+            spotify_playing = bool(np.get("is_playing"))
+            spotify_device = (np.get("device") or {}).get("name")
+        except SpotifyError:
+            pass
+
+    if yam_src == "spotify" and spotify_playing:
+        return _ok({
+            "engine": "spotify",
+            "yamaha_source": yam_src,
+            "yamaha_power": yam_power,
+            "spotify_device": spotify_device,
+        })
+
+    # Roon check: any zone in 'playing' state
+    roon_playing_zone = None
+    try:
+        for z in roon.zones():
+            if (z.get("state") or "").lower() == "playing":
+                roon_playing_zone = z
+                break
+    except RoonError:
+        pass
+
+    if roon_playing_zone:
+        return _ok({
+            "engine": "roon",
+            "yamaha_source": yam_src,
+            "yamaha_power": yam_power,
+            "roon_zone": roon_playing_zone.get("display_name"),
+            "roon_zone_id": roon_playing_zone.get("zone_id"),
+        })
+
+    return _ok({
+        "engine": "yamaha",
+        "yamaha_source": yam_src,
+        "yamaha_power": yam_power,
+    })
 
 
 if __name__ == "__main__":

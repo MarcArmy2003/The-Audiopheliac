@@ -18,6 +18,20 @@
 
   "preferred_zones": ["Family Room", "Studio", "Lanai", "Master Bedroom"],
 
+  "spotify": {
+    "client_id": "7b8b0cd38be7496b864a0380b8c2a16c",
+    "redirect_uri": "http://127.0.0.1:5000/spotify/callback",
+    "yamaha_device_name_hint": "Yamaha R-N800A"
+  },
+
+  "roon_server": {
+    "host": "192.168.1.230",
+    "ssh_user": "admin",
+    "ssh_key_path": "",
+    "container_name": "roonserver",
+    "_comment": "Auto-start Roon Server on the QNAP. Set ssh_key_path to an OpenSSH private key whose public key is in the QNAP user's ~/.ssh/authorized_keys. Leave blank to disable auto-start (Cockpit falls back to reachability probe via the Roon WebSocket)."
+  },
+
   "net_radio_suggestions": [
     {
       "name": "WMOT Roots Radio",

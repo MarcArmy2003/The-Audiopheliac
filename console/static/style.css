@@ -1,6 +1,7 @@
-/* Audiopheliac Cockpit v0.4 — Full Spectrum
-   Combined Power+Volume into "Receiver", filtered sources, structured zones,
-   prepopulated Net Radio suggestions, draggable cards, restore bar.
+/* Audiopheliac Cockpit v0.5 — Full Spectrum, intent-driven
+   Now Playing is the hub: master volume + transport bound to active engine.
+   Spotify card upgraded with search, playlists, device picker.
+   Up Next card returns. Yamaha Source card demoted to default-hidden override.
    Tokens mirror site/src/styles/tokens.css. */
 
 :root {
@@ -21,6 +22,8 @@
   --sapphire: #0F82DF;
   --indigo:   #5E54D4;
   --magenta:  #C24CC8;
+
+  --spotify-green: #1DB954;
 
   --success: var(--signal);
   --warning: var(--sunlamp);
@@ -80,17 +83,19 @@ input[type="search"]::-webkit-search-cancel-button { filter: invert(0.6); }
   font-size: 0.92rem; margin-left: 0.5rem;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.topbar-state { display: flex; align-items: center; gap: 0.5rem; }
+.topbar-state { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
 .topbar-pill {
   display: inline-flex; align-items: center; gap: 0.45rem;
   padding: 0.4rem 0.7rem;
   border: 1px solid var(--hairline-2); border-radius: var(--r-pill);
   font-size: 0.75rem; color: var(--paper-dim); letter-spacing: 0.04em;
   background: var(--ink-2);
+  text-decoration: none;
 }
 .topbar-pill.ok  { border-color: rgba(65,217,154,0.45); color: var(--signal); }
 .topbar-pill.warn { border-color: rgba(248,233,31,0.45); color: var(--sunlamp); }
 .topbar-pill.err  { border-color: rgba(226,75,106,0.5); color: var(--danger); }
+.topbar-pill.spotify-ok { border-color: rgba(29,185,84,0.55); color: var(--spotify-green); }
 .status-dot {
   width: 8px; height: 8px; border-radius: 50%; background: var(--paper-muted);
 }
@@ -125,6 +130,7 @@ input[type="search"]::-webkit-search-cancel-button { filter: invert(0.6); }
 
 /* ============================================================
    Grid layout — 12-column responsive, drag-friendly
+   Now Playing is the hub at full width. Source card hidden by default.
    ============================================================ */
 .grid {
   max-width: 1320px; margin: 0 auto; padding: 1rem 1.25rem 3rem;
@@ -139,10 +145,12 @@ input[type="search"]::-webkit-search-cancel-button { filter: invert(0.6); }
 .card { grid-column: span 6; }
 .card-now      { grid-column: span 12; }
 .card-receiver { grid-column: span 6; }
-.card-input    { grid-column: span 6; }
 .card-zone     { grid-column: span 6; }
 .card-library  { grid-column: span 6; }
+.card-spotify  { grid-column: span 6; }
+.card-upnext   { grid-column: span 6; }
 .card-preset   { grid-column: span 12; }
+.card-input    { grid-column: span 6; }
 
 @media (max-width: 1000px) {
   .card { grid-column: span 6; }
@@ -201,8 +209,14 @@ input[type="search"]::-webkit-search-cancel-button { filter: invert(0.6); }
 
 .muted { color: var(--paper-muted); font-size: 0.85rem; }
 
+/* Visual prominence: Now Playing card sits taller and brighter */
+.card-now {
+  background: linear-gradient(180deg, var(--ink-2) 0%, #0e0e12 100%);
+  border-color: rgba(248,233,31,0.18);
+}
+
 /* ============================================================
-   Receiver card (Power + Volume + Mute)
+   Receiver card (Power + helper hint)
    ============================================================ */
 .receiver-grid {
   display: grid;
@@ -212,6 +226,7 @@ input[type="search"]::-webkit-search-cancel-button { filter: invert(0.6); }
 @media (max-width: 540px) { .receiver-grid { grid-template-columns: 1fr; } }
 
 .recv-power { display: flex; gap: 0.4rem; }
+.recv-hint { font-size: 0.78rem; line-height: 1.45; }
 .power-btn {
   background: transparent; border: 1px solid var(--hairline-2);
   color: var(--paper-dim); padding: 0.55rem 0.95rem;
@@ -227,10 +242,6 @@ input[type="search"]::-webkit-search-cancel-button { filter: invert(0.6); }
   border-color: var(--paper-dim);
 }
 
-.recv-volume { min-width: 0; }
-.vol-row {
-  display: flex; align-items: center; gap: 0.5rem;
-}
 .icon-btn {
   background: transparent; border: 1px solid var(--hairline-2);
   color: var(--paper); border-radius: var(--r-md);
@@ -239,22 +250,12 @@ input[type="search"]::-webkit-search-cancel-button { filter: invert(0.6); }
   font-size: 1.1rem;
 }
 .icon-btn:hover { border-color: var(--sunlamp); color: var(--sunlamp); }
-#vol-slider {
-  flex: 1; accent-color: var(--sunlamp); background: transparent;
-  min-width: 0;
-}
-.vol-readout {
-  margin-top: 0.55rem;
-  display: flex; align-items: center; justify-content: space-between;
-}
-#vol-pct {
-  font-variant-numeric: tabular-nums;
-  color: var(--sunlamp); font-weight: 600; font-size: 0.95rem;
-}
+
 .ghost-btn, .primary-btn {
   background: transparent; border: 1px solid var(--hairline-2);
   color: var(--paper-dim); padding: 0.4rem 0.85rem;
   border-radius: var(--r-pill); font-size: 0.78rem; letter-spacing: 0.04em;
+  text-decoration: none; display: inline-flex; align-items: center; gap: 0.3rem;
 }
 .ghost-btn:hover { border-color: var(--sunlamp); color: var(--sunlamp); }
 .primary-btn {
@@ -264,7 +265,7 @@ input[type="search"]::-webkit-search-cancel-button { filter: invert(0.6); }
 .primary-btn:hover { background: var(--magenta); border-color: var(--magenta); color: var(--paper); }
 
 /* ============================================================
-   Yamaha source list (filtered)
+   Yamaha source list (manual override card, default-hidden)
    ============================================================ */
 .input-list {
   display: grid;
@@ -402,16 +403,16 @@ input[type="search"]::-webkit-search-cancel-button { filter: invert(0.6); }
 }
 
 /* ============================================================
-   Now playing
+   Now playing — the hub
    ============================================================ */
 .now-body {
   display: grid;
-  grid-template-columns: 160px 1fr;
-  gap: 1rem; align-items: center;
+  grid-template-columns: 200px 1fr;
+  gap: 1.25rem; align-items: start;
 }
 @media (max-width: 720px) { .now-body { grid-template-columns: 1fr; } }
 .now-art-wrap {
-  width: 160px; height: 160px;
+  width: 200px; height: 200px;
   border-radius: var(--r-md); overflow: hidden;
   position: relative;
   background: var(--ink-3);
@@ -432,7 +433,7 @@ input[type="search"]::-webkit-search-cancel-button { filter: invert(0.6); }
 .now-info { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .now-track {
   font-family: var(--font-display);
-  font-size: clamp(1.4rem, 3.2vw, 2rem);
+  font-size: clamp(1.5rem, 3.4vw, 2.2rem);
   letter-spacing: 0.02em; line-height: 1.05;
 }
 .now-artist { color: var(--sunlamp); font-size: 0.95rem; font-weight: 500; }
@@ -457,6 +458,48 @@ input[type="search"]::-webkit-search-cancel-button { filter: invert(0.6); }
   background: linear-gradient(90deg, var(--sunlamp), var(--spring));
   border-radius: var(--r-pill);
 }
+
+/* Master volume embedded in Now Playing */
+.now-master-vol {
+  margin-top: 0.85rem;
+  display: flex; flex-direction: column; gap: 0.4rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  background: rgba(0,0,0,0.18);
+}
+.nmv-row {
+  display: flex; align-items: center; gap: 0.55rem;
+  flex-wrap: wrap;
+}
+.nmv-row #vol-slider {
+  flex: 1; min-width: 120px;
+  accent-color: var(--sunlamp); background: transparent;
+}
+.nmv-pct {
+  font-variant-numeric: tabular-nums;
+  color: var(--sunlamp); font-weight: 600; font-size: 0.95rem;
+  min-width: 4ch; text-align: right;
+}
+.nmv-note {
+  display: flex; gap: 0.7rem; align-items: center;
+  font-size: 0.72rem; color: var(--paper-muted);
+  letter-spacing: 0.06em; text-transform: uppercase;
+  font-family: var(--font-mono);
+}
+.nmv-engine {
+  padding: 2px 8px;
+  border: 1px solid var(--hairline-2);
+  border-radius: var(--r-pill);
+  letter-spacing: 0.08em;
+}
+.nmv-engine.engine-roon    { color: var(--signal);   border-color: rgba(65,217,154,0.45); }
+.nmv-engine.engine-spotify { color: var(--spotify-green); border-color: rgba(29,185,84,0.55); }
+.nmv-engine.engine-yamaha  { color: var(--sunlamp);  border-color: rgba(248,233,31,0.45); }
+.nmv-source {
+  color: var(--paper-quiet);
+}
+
 .transport {
   display: flex; align-items: center; gap: 0.5rem;
   margin-top: 0.85rem;
@@ -478,6 +521,183 @@ input[type="search"]::-webkit-search-cancel-button { filter: invert(0.6); }
   font-size: 0.72rem; color: var(--paper-muted);
   letter-spacing: 0.08em; text-transform: uppercase;
   font-family: var(--font-mono);
+}
+
+/* ============================================================
+   Spotify card
+   ============================================================ */
+.spotify-body {
+  display: flex; flex-direction: column; gap: 1rem;
+}
+.sp-section {
+  display: flex; flex-direction: column; gap: 0.5rem;
+}
+.sp-section-head {
+  font-size: 0.72rem; color: var(--paper-muted);
+  letter-spacing: 0.16em; text-transform: uppercase;
+}
+
+.sp-auth-prompt {
+  display: flex; flex-direction: column; gap: 0.6rem;
+  padding: 0.85rem 1rem;
+  border: 1px dashed rgba(29,185,84,0.45);
+  border-radius: var(--r-md);
+  background: rgba(29,185,84,0.05);
+  align-items: flex-start;
+}
+.sp-auth-prompt p { margin: 0; color: var(--paper-dim); font-size: 0.9rem; }
+
+.sp-search-row {
+  display: flex; gap: 0.5rem; align-items: center;
+}
+.sp-search-row input[type="search"] {
+  flex: 1; background: var(--ink);
+  border: 1px solid var(--hairline); border-radius: var(--r-md);
+  padding: 0.55rem 0.85rem; color: var(--paper); font-size: 0.9rem;
+}
+.sp-search-row input[type="search"]:focus { outline: none; border-color: var(--spotify-green); }
+.sp-search-row input[type="search"]::placeholder { color: var(--paper-muted); }
+
+.sp-results {
+  display: flex; flex-direction: column; gap: 0.3rem;
+  max-height: 320px; overflow-y: auto;
+  padding: 0.25rem;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  background: rgba(0,0,0,0.18);
+}
+.sp-results:empty { display: none; }
+.sp-results-section {
+  font-size: 0.7rem; color: var(--paper-muted);
+  letter-spacing: 0.16em; text-transform: uppercase;
+  padding: 0.45rem 0.5rem 0.2rem;
+}
+.sp-result-item {
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  gap: 0.55rem; align-items: center;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--paper); font-family: inherit; font-size: 0.86rem;
+  text-align: left; width: 100%;
+}
+.sp-result-item:hover { border-color: rgba(29,185,84,0.35); background: var(--ink); }
+.sp-result-thumb {
+  width: 40px; height: 40px; border-radius: 4px;
+  object-fit: cover; background: var(--ink-3);
+}
+.sp-result-text { display: flex; flex-direction: column; min-width: 0; }
+.sp-result-name {
+  font-weight: 500; color: var(--paper);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.sp-result-sub {
+  font-size: 0.74rem; color: var(--paper-muted);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.sp-result-hint {
+  font-size: 0.7rem; color: var(--spotify-green);
+  letter-spacing: 0.08em; text-transform: uppercase;
+  font-family: var(--font-mono);
+}
+
+.sp-playlist-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.6rem;
+}
+.sp-playlist-card {
+  display: flex; flex-direction: column; gap: 0.4rem;
+  padding: 0.6rem;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  background: var(--ink);
+  cursor: pointer;
+  text-align: left;
+}
+.sp-playlist-card:hover { border-color: var(--spotify-green); }
+.sp-playlist-art {
+  width: 100%; aspect-ratio: 1/1; border-radius: var(--r-sm);
+  object-fit: cover; background: var(--ink-3);
+}
+.sp-playlist-name {
+  font-size: 0.85rem; font-weight: 500; color: var(--paper);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.sp-playlist-meta {
+  font-size: 0.7rem; color: var(--paper-muted);
+}
+
+.sp-device-row {
+  display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;
+}
+.sp-device-row label {
+  font-size: 0.78rem; color: var(--paper-dim);
+}
+.sp-device-row select {
+  flex: 1; min-width: 140px;
+  background: var(--ink); border: 1px solid var(--hairline);
+  border-radius: var(--r-md); padding: 0.45rem 0.6rem;
+  color: var(--paper); font-size: 0.84rem; font-family: inherit;
+}
+
+.sp-volume-row {
+  display: flex; gap: 0.6rem; align-items: center;
+}
+.sp-volume-row label {
+  font-size: 0.78rem; color: var(--paper-dim);
+  white-space: nowrap;
+}
+.sp-volume-row input[type="range"] {
+  flex: 1; accent-color: var(--spotify-green);
+}
+.sp-volume-row #sp-vol-pct {
+  font-variant-numeric: tabular-nums; color: var(--spotify-green);
+  font-weight: 600; font-size: 0.85rem; min-width: 4ch; text-align: right;
+}
+
+.sp-foot { font-size: 0.74rem; line-height: 1.45; }
+.sp-controls { gap: 0.6rem; }
+
+/* ============================================================
+   Up Next card
+   ============================================================ */
+.upnext-list {
+  display: flex; flex-direction: column; gap: 0.3rem;
+  max-height: 320px; overflow-y: auto;
+  padding: 0.3rem;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  background: rgba(0,0,0,0.18);
+}
+.upnext-item {
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  gap: 0.55rem; align-items: center;
+  padding: 0.4rem 0.55rem;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+}
+.upnext-item:hover { border-color: var(--hairline-2); background: var(--ink); }
+.upnext-item.now { border-color: rgba(248,233,31,0.4); background: rgba(248,233,31,0.04); }
+.upnext-thumb {
+  width: 36px; height: 36px; border-radius: 4px;
+  object-fit: cover; background: var(--ink-3);
+}
+.upnext-text { display: flex; flex-direction: column; min-width: 0; }
+.upnext-name {
+  font-size: 0.85rem; color: var(--paper); font-weight: 500;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.upnext-sub {
+  font-size: 0.72rem; color: var(--paper-muted);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.upnext-pos {
+  font-size: 0.7rem; color: var(--paper-quiet);
+  font-family: var(--font-mono); letter-spacing: 0.06em;
 }
 
 /* ============================================================
@@ -530,4 +750,130 @@ input[type="search"]::-webkit-search-cancel-button { filter: invert(0.6); }
 .suggest-actions .copied { color: var(--signal); border-color: var(--signal); }
 .preset-foot {
   font-size: 0.72rem; line-height: 1.5; margin-top: 0.3rem;
+}
+
+/* ============================================================
+   v0.6 — System pills (Bridge / Server) in topbar
+   ============================================================ */
+button.topbar-pill {
+  font-family: inherit; cursor: pointer;
+}
+button.topbar-pill:hover {
+  background: var(--ink-3); border-color: var(--paper-dim);
+}
+.topbar-pill.system-stopped {
+  border-color: rgba(248,233,31,0.55);
+  color: var(--sunlamp);
+  background: rgba(248,233,31,0.06);
+}
+.topbar-pill.system-starting {
+  border-color: rgba(15,130,223,0.55);
+  color: var(--sapphire);
+}
+.topbar-pill.system-running {
+  border-color: rgba(65,217,154,0.55);
+  color: var(--signal);
+}
+.topbar-pill.system-missing {
+  border-color: rgba(226,75,106,0.55);
+  color: var(--danger);
+}
+
+/* ============================================================
+   v0.6 — Track listing inside the Library card
+   ============================================================ */
+.library-track {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  gap: 0.5rem; align-items: center;
+  padding: 0.4rem 0.55rem;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  color: var(--paper); font-size: 0.86rem;
+  text-align: left; width: 100%;
+  background: transparent;
+}
+.library-track:hover {
+  border-color: var(--sunlamp);
+  background: rgba(248,233,31,0.04);
+}
+.library-track-num {
+  color: var(--paper-quiet); font-family: var(--font-mono);
+  font-size: 0.78rem; text-align: right;
+}
+.library-track-title {
+  font-weight: 500;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.library-track-sub {
+  font-size: 0.72rem; color: var(--paper-muted);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.library-track-hint {
+  font-size: 0.7rem; color: var(--sunlamp);
+  letter-spacing: 0.08em; text-transform: uppercase;
+  font-family: var(--font-mono);
+  opacity: 0; transition: opacity 120ms;
+}
+.library-track:hover .library-track-hint { opacity: 1; }
+
+/* ============================================================
+   v0.6 — Modal (Spotify device picker)
+   ============================================================ */
+.modal-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.62);
+  z-index: 100;
+  display: flex; align-items: center; justify-content: center;
+  padding: 1rem;
+}
+.modal {
+  background: var(--ink-2);
+  border: 1px solid var(--hairline-2);
+  border-radius: var(--r-lg);
+  max-width: 480px; width: 100%;
+  display: flex; flex-direction: column; gap: 0.85rem;
+  padding: 1.1rem 1.2rem;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+}
+.modal-head {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-head h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.05rem; letter-spacing: 0.16em;
+  text-transform: uppercase; font-weight: 400;
+}
+.modal-body-text {
+  margin: 0; font-size: 0.85rem; line-height: 1.5;
+}
+.modal-list {
+  display: flex; flex-direction: column; gap: 0.4rem;
+  max-height: 320px; overflow-y: auto;
+  padding: 0.25rem;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  background: rgba(0,0,0,0.18);
+}
+.modal-device {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.55rem; align-items: center;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-sm);
+  background: var(--ink);
+  color: var(--paper); font-size: 0.88rem;
+  text-align: left; cursor: pointer;
+}
+.modal-device:hover {
+  border-color: var(--spotify-green);
+  background: rgba(29,185,84,0.05);
+}
+.modal-device-meta {
+  font-size: 0.74rem; color: var(--paper-muted);
+}
+.modal-foot {
+  display: flex; justify-content: flex-end; gap: 0.5rem;
 }

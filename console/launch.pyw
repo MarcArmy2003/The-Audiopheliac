@@ -67,6 +67,23 @@ def open_app_window(url: str) -> bool:
     return False
 
 
+def warm_bootstrap(host: str, port: int) -> None:
+    """Hit /api/system/bootstrap once so the first paint shows live state.
+
+    Side effect: any topbar pills with cached failures resolve before the
+    Chrome window even renders. If the request fails we don't care; the
+    Cockpit's intervals will catch up.
+    """
+    try:
+        import urllib.request
+        with urllib.request.urlopen(
+            f"http://{host}:{port}/api/system/bootstrap", timeout=4
+        ) as r:
+            r.read()
+    except Exception:
+        pass
+
+
 def main() -> None:
     cfg_path = HERE / "config.json"
     cfg = {"host": "127.0.0.1", "port": 5000}
@@ -81,6 +98,11 @@ def main() -> None:
     port = int(cfg["port"])
     if not wait_for_port(host, port):
         sys.exit(1)
+
+    # Prime the system bootstrap so the topbar pills are accurate when the
+    # browser window appears. Adds ~half a second to launch time but the
+    # UX win is large: no flash of "checking" pills on first paint.
+    warm_bootstrap(host, port)
 
     url = f"http://{host}:{port}"
     if not open_app_window(url):

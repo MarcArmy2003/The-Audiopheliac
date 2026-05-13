@@ -281,30 +281,231 @@ class RoonClient:
         return self._browse_load(offset=offset, count=count)
 
     def search(self, zone_id: str, query: str) -> dict[str, Any]:
-        # Roon search: pop the browse session to root and pass the query
-        # as `input`. Roon returns a results hierarchy (Artists, Albums,
-        # Tracks, etc.) which we then load.
-        self._browse_browse({
-            "hierarchy": "browse",
-            "pop_all": True,
-            "zone_or_output_id": zone_id,
-            "input": query,
-        })
-        return self._browse_load()
+        """Roon full-library search.
+
+        Walk: pop to root, find any item whose title contains "search",
+        descend into it, submit the query as `input`, then load results.
+        If no match, fall back to root + input directly (works on some
+        Roon builds, ignored on others).
+        """
+        api = self._require_api()
+        try:
+            # Step 1: pop to root.
+            api.browse_browse({
+                "hierarchy": "browse",
+                "pop_all": True,
+                "zone_or_output_id": zone_id,
+            })
+            root = api.browse_load({
+                "hierarchy": "browse", "offset": 0, "count": 200,
+            }) or {}
+            # Step 2: locate the Search entry. Be flexible about the title.
+            search_item = None
+            for it in (root.get("items") or []):
+                title = (it.get("title") or "").strip().lower()
+                if "search" in title and len(title) < 24:
+                    search_item = it
+                    break
+            if search_item and search_item.get("item_key"):
+                api.browse_browse({
+                    "hierarchy": "browse",
+                    "item_key": search_item["item_key"],
+                    "zone_or_output_id": zone_id,
+                })
+                api.browse_browse({
+                    "hierarchy": "browse",
+                    "input": query,
+                    "zone_or_output_id": zone_id,
+                })
+            else:
+                api.browse_browse({
+                    "hierarchy": "browse",
+                    "input": query,
+                    "pop_all": True,
+                    "zone_or_output_id": zone_id,
+                })
+            result = api.browse_load({
+                "hierarchy": "browse", "offset": 0, "count": 200,
+            }) or {}
+        except Exception as e:
+            raise RoonError(f"search failed: {e}") from e
+        for item in result.get("items", []) or []:
+            key = item.get("image_key")
+            if key:
+                item["image_url"] = self.image_url(key, size=80)
+        return result
+
+    # ------------------------------------------------------------------
+    # Raw browse access (for debugging / UI inspection)
+    # ------------------------------------------------------------------
+
+    def debug_browse(self, zone_id: str | None = None) -> dict[str, Any]:
+        """Return the current browse state at the cursor without moving it.
+
+        Used by `/api/roon/debug/browse` to surface Roon's actual response
+        shape so the UI can adapt. No side effects on the browse cursor.
+        """
+        api = self._require_api()
+        try:
+            loaded = api.browse_load({
+                "hierarchy": "browse", "offset": 0, "count": 200,
+            }) or {}
+        except Exception as e:
+            raise RoonError(f"debug_browse failed: {e}") from e
+        return loaded
 
     # ------------------------------------------------------------------
     # Playback
     # ------------------------------------------------------------------
 
+    # Titles that mean "fire this action now" if found inside an action sub-list.
+    PLAY_TITLES = (
+        "play now", "play", "play album", "play track", "play artist",
+        "play playlist", "play tracks", "play song", "start radio",
+    )
+
     def select_action(self, zone_id: str, item_key: str) -> dict[str, Any]:
-        """Click an action-list item (e.g. "Play Now", "Queue", "Add Next")."""
-        self._browse_browse({
-            "hierarchy": "browse",
-            "item_key": item_key,
-            "zone_or_output_id": zone_id,
-        })
-        # Action items return empty or move on; reload to surface what happened
-        return self._browse_load()
+        """Click any browse item.
+
+        - If Roon descends into a sub-list whose items are all action-hinted,
+          look for a "Play Now"-style entry and auto-fire it. Up to two
+          levels of descent (covers "Play Album" -> action menu -> Play Now).
+        - Otherwise, return the loaded list so the UI can render it.
+
+        Sets `_auto_played` and `_descent_depth` on the returned payload for
+        the UI to surface what happened.
+        """
+        api = self._require_api()
+        depth = 0
+        auto_played = False
+
+        def _do_click(key: str) -> dict[str, Any]:
+            api.browse_browse({
+                "hierarchy": "browse",
+                "item_key": key,
+                "zone_or_output_id": zone_id,
+            })
+            return api.browse_load({
+                "hierarchy": "browse", "offset": 0, "count": 200,
+            }) or {}
+
+        try:
+            loaded = _do_click(item_key)
+            depth = 1
+            for _ in range(2):
+                items = loaded.get("items") or []
+                if not items:
+                    break
+                action_items = [
+                    it for it in items
+                    if (it.get("hint") or "").lower() == "action"
+                ]
+                if not action_items:
+                    break
+                play_item = self._pick_play_item(action_items)
+                if not play_item or not play_item.get("item_key"):
+                    break
+                loaded = _do_click(play_item["item_key"])
+                depth += 1
+                auto_played = True
+        except Exception as e:
+            raise RoonError(f"select_action failed: {e}") from e
+
+        for item in loaded.get("items", []) or []:
+            key = item.get("image_key")
+            if key:
+                item["image_url"] = self.image_url(key, size=80)
+        loaded["_auto_played"] = auto_played
+        loaded["_descent_depth"] = depth
+        return loaded
+
+    def _pick_play_item(self, items: list[dict]) -> dict | None:
+        """Return the first action item whose title indicates 'play now'."""
+        for needle in self.PLAY_TITLES:
+            for it in items:
+                title = (it.get("title") or "").strip().lower()
+                if title == needle:
+                    return it
+        # Looser: any title that starts with "play"
+        for it in items:
+            title = (it.get("title") or "").strip().lower()
+            if title.startswith("play "):
+                return it
+        return None
+
+    def play_path(self, zone_id: str, path: list[str]) -> dict[str, Any]:
+        """Walk a browse path by name match at each level, then play.
+
+        Example path: ["Library", "Albums", "Mom, We See You"]
+        At each segment, browse_loads the current level, finds an item whose
+        title matches (case-insensitive), and descends. At the final segment,
+        relies on select_action's auto-play-now logic to fire playback.
+
+        Raises RoonError if any segment fails to match.
+        """
+        if not path:
+            raise RoonError("play_path: empty path")
+        api = self._require_api()
+        try:
+            api.browse_browse({
+                "hierarchy": "browse",
+                "pop_all": True,
+                "zone_or_output_id": zone_id,
+            })
+            for i, segment in enumerate(path):
+                loaded = api.browse_load({
+                    "hierarchy": "browse", "offset": 0, "count": 500,
+                }) or {}
+                items = loaded.get("items") or []
+                target = next(
+                    (it for it in items
+                     if (it.get("title") or "").strip().lower() == segment.strip().lower()),
+                    None,
+                )
+                if not target:
+                    target = next(
+                        (it for it in items
+                         if segment.strip().lower() in (it.get("title") or "").strip().lower()),
+                        None,
+                    )
+                if not target or not target.get("item_key"):
+                    raise RoonError(
+                        f"play_path: segment {segment!r} not found at level {i}. "
+                        f"Available titles: "
+                        + ", ".join(repr(it.get("title")) for it in items[:10])
+                    )
+                api.browse_browse({
+                    "hierarchy": "browse",
+                    "item_key": target["item_key"],
+                    "zone_or_output_id": zone_id,
+                })
+        except RoonError:
+            raise
+        except Exception as e:
+            raise RoonError(f"play_path navigation failed: {e}") from e
+        # Now at the leaf; reuse select_action's auto-play logic.
+        loaded = api.browse_load({
+            "hierarchy": "browse", "offset": 0, "count": 200,
+        }) or {}
+        items = loaded.get("items") or []
+        action_items = [
+            it for it in items if (it.get("hint") or "").lower() == "action"
+        ] or items
+        play_item = self._pick_play_item(action_items)
+        if not play_item:
+            raise RoonError(
+                "play_path: leaf reached but no play action available. "
+                "Items: " + ", ".join(repr(it.get("title")) for it in items[:10])
+            )
+        try:
+            api.browse_browse({
+                "hierarchy": "browse",
+                "item_key": play_item["item_key"],
+                "zone_or_output_id": zone_id,
+            })
+        except Exception as e:
+            raise RoonError(f"play_path play action failed: {e}") from e
+        return {"played": True, "path": path}
 
     def transport(self, zone_id: str, action: str) -> None:
         api = self._require_api()
@@ -316,3 +517,81 @@ class RoonClient:
             api.playback_control(zone_id, control=action)
         except Exception as e:
             raise RoonError(f"transport failed: {e}") from e
+
+
+# ----------------------------------------------------------------------
+# System dependencies: Roon Bridge service (Windows) and Roon Server
+# container (QNAP NAS). Used by the Cockpit's single-trigger bootstrap.
+# ----------------------------------------------------------------------
+
+import subprocess
+
+
+def windows_service_status(service_name: str) -> str:
+    """Return 'running', 'stopped', 'not_installed', or 'unknown'.
+
+    Uses `sc query` (no admin required for read).
+    """
+    try:
+        r = subprocess.run(
+            ["sc", "query", service_name],
+            capture_output=True, text=True, timeout=5,
+        )
+    except (subprocess.SubprocessError, OSError):
+        return "unknown"
+    out = (r.stdout or "") + (r.stderr or "")
+    if "FAILED 1060" in out or "does not exist" in out.lower():
+        return "not_installed"
+    if "RUNNING" in out:
+        return "running"
+    if "STOPPED" in out or "STOP_PENDING" in out:
+        return "stopped"
+    if "START_PENDING" in out:
+        return "starting"
+    return "unknown"
+
+
+def windows_service_start(service_name: str) -> tuple[bool, str]:
+    """Start a Windows service. Returns (success, message).
+
+    `sc start` requires the user to have Service Control permissions.
+    Gill is local admin on GDMARCHE; if not, returns the OS error message.
+    """
+    try:
+        r = subprocess.run(
+            ["sc", "start", service_name],
+            capture_output=True, text=True, timeout=10,
+        )
+    except (subprocess.SubprocessError, OSError) as e:
+        return False, str(e)
+    out = (r.stdout or "") + (r.stderr or "")
+    if r.returncode == 0 or "START_PENDING" in out or "RUNNING" in out:
+        return True, "service start requested"
+    if "FAILED 5" in out or "Access is denied" in out:
+        return False, "access denied; run Cockpit as admin or grant service-start permission"
+    if "FAILED 1056" in out:
+        return True, "already running"
+    return False, out.strip()[:200] or "unknown"
+
+
+def nas_ssh_exec(host: str, key_path: str, command: str, timeout: float = 8.0) -> tuple[int, str, str]:
+    """Run a command on the NAS over SSH using Windows' built-in ssh.exe.
+
+    Returns (returncode, stdout, stderr). No interactive prompts.
+    """
+    try:
+        r = subprocess.run(
+            [
+                "ssh",
+                "-i", key_path,
+                "-o", "BatchMode=yes",
+                "-o", "StrictHostKeyChecking=accept-new",
+                "-o", f"ConnectTimeout={int(timeout)}",
+                host,
+                command,
+            ],
+            capture_output=True, text=True, timeout=timeout + 2,
+        )
+        return r.returncode, r.stdout or "", r.stderr or ""
+    except (subprocess.SubprocessError, OSError) as e:
+        return -1, "", str(e)
