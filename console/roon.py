@@ -283,12 +283,24 @@ class RoonClient:
     def search(self, zone_id: str, query: str) -> dict[str, Any]:
         """Roon full-library search.
 
-        Walk: pop to root, find any item whose title contains "search",
-        descend into it, submit the query as `input`, then load results.
-        If no match, fall back to root + input directly (works on some
-        Roon builds, ignored on others).
+        Roon's Search entry is typically nested under Library, not at the
+        root. Walk: root -> find an entry whose title contains "search"
+        OR descend into Library first then look for Search. Whichever is
+        found, descend, submit input=query, load results.
+
+        Field-test 2026-05-12: the v0.6 implementation only checked the
+        root for a Search entry and fell through to "input at root" which
+        Roon ignores, returning the regular root menu.
         """
         api = self._require_api()
+
+        def _find_search_item(items: list[dict]) -> dict | None:
+            for it in items or []:
+                title = (it.get("title") or "").strip().lower()
+                if title == "search" or title.startswith("search "):
+                    return it
+            return None
+
         try:
             # Step 1: pop to root.
             api.browse_browse({
@@ -299,36 +311,50 @@ class RoonClient:
             root = api.browse_load({
                 "hierarchy": "browse", "offset": 0, "count": 200,
             }) or {}
-            # Step 2: locate the Search entry. Be flexible about the title.
-            search_item = None
-            for it in (root.get("items") or []):
-                title = (it.get("title") or "").strip().lower()
-                if "search" in title and len(title) < 24:
-                    search_item = it
-                    break
+
+            # Step 2: try to find Search at the root first.
+            search_item = _find_search_item(root.get("items") or [])
+
+            # Step 3: if not at root, descend into Library and look there.
+            if not search_item:
+                library_item = next(
+                    (it for it in (root.get("items") or [])
+                     if (it.get("title") or "").strip().lower() == "library"),
+                    None,
+                )
+                if library_item and library_item.get("item_key"):
+                    api.browse_browse({
+                        "hierarchy": "browse",
+                        "item_key": library_item["item_key"],
+                        "zone_or_output_id": zone_id,
+                    })
+                    library = api.browse_load({
+                        "hierarchy": "browse", "offset": 0, "count": 200,
+                    }) or {}
+                    search_item = _find_search_item(library.get("items") or [])
+
+            # Step 4: descend into Search.
             if search_item and search_item.get("item_key"):
                 api.browse_browse({
                     "hierarchy": "browse",
                     "item_key": search_item["item_key"],
                     "zone_or_output_id": zone_id,
                 })
-                api.browse_browse({
-                    "hierarchy": "browse",
-                    "input": query,
-                    "zone_or_output_id": zone_id,
-                })
-            else:
-                api.browse_browse({
-                    "hierarchy": "browse",
-                    "input": query,
-                    "pop_all": True,
-                    "zone_or_output_id": zone_id,
-                })
+
+            # Step 5: submit the query as input at the current level.
+            api.browse_browse({
+                "hierarchy": "browse",
+                "input": query,
+                "zone_or_output_id": zone_id,
+            })
+
+            # Step 6: load the results.
             result = api.browse_load({
                 "hierarchy": "browse", "offset": 0, "count": 200,
             }) or {}
         except Exception as e:
             raise RoonError(f"search failed: {e}") from e
+
         for item in result.get("items", []) or []:
             key = item.get("image_key")
             if key:
@@ -526,6 +552,14 @@ class RoonClient:
 
 import subprocess
 
+# When the Cockpit runs under pythonw.exe (no console), every subprocess
+# that spawns a console child (sc, tasklist, ssh) will flash a black
+# window for a few hundred ms unless we explicitly suppress it.
+# Field-test 2026-05-12: Gill saw "annoying black flashing box every
+# 3 - 5 seconds." Cause was unsuppressed tasklist polling from
+# windows_process_running. Same fix applied to every helper here.
+_NO_WINDOW = 0x08000000  # subprocess.CREATE_NO_WINDOW on Windows
+
 
 def windows_service_status(service_name: str) -> str:
     """Return 'running', 'stopped', 'not_installed', or 'unknown'.
@@ -536,6 +570,7 @@ def windows_service_status(service_name: str) -> str:
         r = subprocess.run(
             ["sc", "query", service_name],
             capture_output=True, text=True, timeout=5,
+            creationflags=_NO_WINDOW,
         )
     except (subprocess.SubprocessError, OSError):
         return "unknown"
@@ -561,6 +596,7 @@ def windows_service_start(service_name: str) -> tuple[bool, str]:
         r = subprocess.run(
             ["sc", "start", service_name],
             capture_output=True, text=True, timeout=10,
+            creationflags=_NO_WINDOW,
         )
     except (subprocess.SubprocessError, OSError) as e:
         return False, str(e)
@@ -572,6 +608,34 @@ def windows_service_start(service_name: str) -> tuple[bool, str]:
     if "FAILED 1056" in out:
         return True, "already running"
     return False, out.strip()[:200] or "unknown"
+
+
+def windows_process_running(process_name: str) -> bool:
+    """Return True if a Windows process by image name is running.
+
+    `process_name` should be the executable name without `.exe`. Uses
+    `tasklist` with a name filter and CSV output, no header row.
+
+    Detects user-mode Roon Bridge (`RAATServer.exe`) which does not
+    register as a Windows service. Complement to `windows_service_status`.
+    """
+    exe = process_name if process_name.lower().endswith(".exe") else f"{process_name}.exe"
+    try:
+        r = subprocess.run(
+            ["tasklist", "/FI", f"IMAGENAME eq {exe}", "/FO", "CSV", "/NH"],
+            capture_output=True, text=True, timeout=5,
+            creationflags=_NO_WINDOW,
+        )
+    except (subprocess.SubprocessError, OSError):
+        return False
+    out = (r.stdout or "").strip()
+    if not out:
+        return False
+    # tasklist prints "INFO: No tasks are running..." to stdout (not stderr)
+    # when nothing matches. Treat that as not-running.
+    if out.lower().startswith("info:"):
+        return False
+    return exe.lower() in out.lower()
 
 
 def nas_ssh_exec(host: str, key_path: str, command: str, timeout: float = 8.0) -> tuple[int, str, str]:
@@ -591,6 +655,7 @@ def nas_ssh_exec(host: str, key_path: str, command: str, timeout: float = 8.0) -
                 command,
             ],
             capture_output=True, text=True, timeout=timeout + 2,
+            creationflags=_NO_WINDOW,
         )
         return r.returncode, r.stdout or "", r.stderr or ""
     except (subprocess.SubprocessError, OSError) as e:

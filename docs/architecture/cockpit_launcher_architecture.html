@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cockpit Launcher Architecture — The Audiopheliac</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Unica+One&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink: #0A0A0B;
+      --ink-2: #121214;
+      --ink-3: #1A1A1E;
+      --paper: #F5F5F7;
+      --paper-dim: rgba(245,245,247,0.72);
+      --paper-muted: rgba(245,245,247,0.48);
+      --paper-quiet: rgba(245,245,247,0.28);
+      --hairline: rgba(255,255,255,0.08);
+      --hairline-2: rgba(255,255,255,0.14);
+      --sunlamp:  #F8E91F;
+      --spring:   #99E257;
+      --signal:   #41D99A;
+      --cyan:     #0ABED3;
+      --sapphire: #0F82DF;
+      --indigo:   #5E54D4;
+      --magenta:  #C24CC8;
+      --font-display: 'Unica One', system-ui, sans-serif;
+      --font-body:    'Inter', -apple-system, system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0;
+      background: var(--ink); color: var(--paper);
+      font-family: var(--font-body);
+      -webkit-font-smoothing: antialiased;
+    }
+    .page {
+      max-width: 1200px; margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+    header.title {
+      display: flex; flex-direction: column; gap: 0.4rem;
+      margin-bottom: 1.4rem;
+    }
+    .mark {
+      font-family: var(--font-display);
+      font-size: 1.6rem; letter-spacing: 0.04em;
+      color: var(--paper); line-height: 1;
+    }
+    .sub {
+      font-size: 0.78rem; color: var(--paper-muted);
+      letter-spacing: 0.18em; text-transform: uppercase; font-weight: 500;
+    }
+    h2 {
+      font-family: var(--font-display);
+      font-size: 1.05rem; letter-spacing: 0.18em;
+      color: var(--paper); text-transform: uppercase; font-weight: 400;
+      margin: 2rem 0 1rem;
+    }
+    p.lede {
+      font-size: 0.95rem; line-height: 1.55;
+      color: var(--paper-dim);
+      max-width: 780px;
+    }
+    .diagram-wrap {
+      background: var(--ink-2);
+      border: 1px solid var(--hairline);
+      border-radius: 14px;
+      padding: 1.25rem;
+      margin: 1rem 0 1.5rem;
+      overflow-x: auto;
+    }
+    svg.arch { display: block; max-width: 100%; height: auto; }
+    .legend {
+      display: flex; flex-wrap: wrap; gap: 1rem;
+      margin-top: 0.85rem;
+      font-size: 0.78rem; color: var(--paper-muted);
+    }
+    .legend span { display: inline-flex; align-items: center; gap: 0.45rem; }
+    .swatch {
+      width: 12px; height: 12px; border-radius: 3px;
+      display: inline-block;
+    }
+    table.flow {
+      width: 100%; border-collapse: collapse;
+      margin-top: 0.5rem; font-size: 0.85rem;
+    }
+    table.flow th, table.flow td {
+      text-align: left; padding: 0.55rem 0.7rem;
+      border-bottom: 1px solid var(--hairline);
+      vertical-align: top;
+    }
+    table.flow th {
+      color: var(--paper-muted); font-weight: 500;
+      letter-spacing: 0.06em; text-transform: uppercase; font-size: 0.72rem;
+    }
+    table.flow td.step { font-family: ui-monospace, monospace; color: var(--sunlamp); width: 80px; }
+    table.flow td.label { font-weight: 500; color: var(--paper); }
+    table.flow td.note { color: var(--paper-dim); }
+    footer.foot {
+      margin-top: 2rem; padding-top: 1.5rem;
+      border-top: 1px solid var(--hairline);
+      font-size: 0.78rem; color: var(--paper-muted);
+    }
+    code {
+      font-family: ui-monospace, 'JetBrains Mono', Menlo, monospace;
+      background: var(--ink); padding: 1px 6px; border-radius: 3px;
+      font-size: 0.85em; color: var(--paper);
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="title">
+      <div class="mark">The Audiopheliac</div>
+      <div class="sub">Cockpit launcher architecture &middot; v0.6 &middot; 2026-05-12</div>
+    </header>
+
+    <p class="lede">
+      One click on the desktop shortcut takes the Cockpit from cold to listening. The launcher is the orchestration layer: it checks for an existing instance, wakes Roon Bridge if it's asleep, kicks the QNAP container if SSH is configured, starts Flask, primes the bootstrap endpoint, and opens a Chrome <code>--app</code> window. Every subprocess runs silent. The browser opens with live state on the first frame.
+    </p>
+
+    <h2>Cold-start flow</h2>
+
+    <div class="diagram-wrap">
+      <svg class="arch" viewBox="0 0 1120 660" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="arch-title arch-desc">
+        <title id="arch-title">Cockpit launcher architecture</title>
+        <desc id="arch-desc">Click the desktop shortcut. launch.pyw runs six steps in order: singleton check, pre-flight Roon Bridge, pre-flight Roon Server, start Flask, warm bootstrap, open Chrome. Each step touches a specific external component.</desc>
+
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#F5F5F7" opacity="0.55"/>
+          </marker>
+          <marker id="arrow-yellow" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#F8E91F"/>
+          </marker>
+        </defs>
+
+        <!-- Step 0: Desktop shortcut -->
+        <g transform="translate(440,16)">
+          <rect width="240" height="60" rx="10" fill="#1A1A1E" stroke="#F8E91F" stroke-width="1.5"/>
+          <text x="120" y="26" text-anchor="middle" font-family="Unica One" font-size="13" fill="#F5F5F7" letter-spacing="2">DESKTOP SHORTCUT</text>
+          <text x="120" y="46" text-anchor="middle" font-family="Inter" font-size="11" fill="#F5F5F7" opacity="0.72">Audiopheliac Cockpit.lnk</text>
+        </g>
+
+        <line x1="560" y1="76" x2="560" y2="100" stroke="#F8E91F" stroke-width="2" marker-end="url(#arrow-yellow)"/>
+
+        <!-- launch.pyw container -->
+        <g transform="translate(60,110)">
+          <rect width="1000" height="220" rx="14" fill="#121214" stroke="rgba(248,233,31,0.18)" stroke-width="1.5"/>
+          <text x="20" y="32" font-family="Unica One" font-size="14" fill="#F5F5F7" letter-spacing="2">LAUNCH.PYW</text>
+          <text x="20" y="50" font-family="ui-monospace" font-size="10" fill="#F5F5F7" opacity="0.48">pythonw, no console, silent</text>
+
+          <!-- Step 1: Singleton -->
+          <g transform="translate(20,68)">
+            <rect width="155" height="140" rx="8" fill="#0A0A0B" stroke="rgba(15,130,223,0.45)"/>
+            <text x="78" y="22" text-anchor="middle" font-family="ui-monospace" font-size="10" fill="#0F82DF">STEP 1</text>
+            <text x="78" y="44" text-anchor="middle" font-family="Inter" font-size="12" font-weight="500" fill="#F5F5F7">Singleton</text>
+            <text x="78" y="62" text-anchor="middle" font-family="Inter" font-size="10" fill="#F5F5F7" opacity="0.72">HTTP probe</text>
+            <text x="78" y="76" text-anchor="middle" font-family="Inter" font-size="10" fill="#F5F5F7" opacity="0.72">/api/config</text>
+            <text x="78" y="106" text-anchor="middle" font-family="Inter" font-size="9" fill="#F5F5F7" opacity="0.48">if running:</text>
+            <text x="78" y="120" text-anchor="middle" font-family="Inter" font-size="9" fill="#F5F5F7" opacity="0.48">reuse + exit</text>
+          </g>
+
+          <!-- Step 2: Bridge -->
+          <g transform="translate(185,68)">
+            <rect width="155" height="140" rx="8" fill="#0A0A0B" stroke="rgba(248,233,31,0.45)"/>
+            <text x="78" y="22" text-anchor="middle" font-family="ui-monospace" font-size="10" fill="#F8E91F">STEP 2</text>
+            <text x="78" y="44" text-anchor="middle" font-family="Inter" font-size="12" font-weight="500" fill="#F5F5F7">Bridge wake</text>
+            <text x="78" y="62" text-anchor="middle" font-family="Inter" font-size="10" fill="#F5F5F7" opacity="0.72">tasklist probe</text>
+            <text x="78" y="76" text-anchor="middle" font-family="Inter" font-size="10" fill="#F5F5F7" opacity="0.72">RAATServer.exe</text>
+            <text x="78" y="106" text-anchor="middle" font-family="Inter" font-size="9" fill="#F5F5F7" opacity="0.48">if absent:</text>
+            <text x="78" y="120" text-anchor="middle" font-family="Inter" font-size="9" fill="#F5F5F7" opacity="0.48">spawn Bridge.exe</text>
+          </g>
+
+          <!-- Step 3: Server -->
+          <g transform="translate(350,68)">
+            <rect width="155" height="140" rx="8" fill="#0A0A0B" stroke="rgba(248,233,31,0.45)"/>
+            <text x="78" y="22" text-anchor="middle" font-family="ui-monospace" font-size="10" fill="#F8E91F">STEP 3</text>
+            <text x="78" y="44" text-anchor="middle" font-family="Inter" font-size="12" font-weight="500" fill="#F5F5F7">Server wake</text>
+            <text x="78" y="62" text-anchor="middle" font-family="Inter" font-size="10" fill="#F5F5F7" opacity="0.72">ssh inspect</text>
+            <text x="78" y="76" text-anchor="middle" font-family="Inter" font-size="10" fill="#F5F5F7" opacity="0.72">docker start</text>
+            <text x="78" y="106" text-anchor="middle" font-family="Inter" font-size="9" fill="#F5F5F7" opacity="0.48">if no SSH key:</text>
+            <text x="78" y="120" text-anchor="middle" font-family="Inter" font-size="9" fill="#F5F5F7" opacity="0.48">skip silently</text>
+          </g>
+
+          <!-- Step 4: Flask -->
+          <g transform="translate(515,68)">
+            <rect width="155" height="140" rx="8" fill="#0A0A0B" stroke="rgba(65,217,154,0.45)"/>
+            <text x="78" y="22" text-anchor="middle" font-family="ui-monospace" font-size="10" fill="#41D99A">STEP 4</text>
+            <text x="78" y="44" text-anchor="middle" font-family="Inter" font-size="12" font-weight="500" fill="#F5F5F7">Flask</text>
+            <text x="78" y="62" text-anchor="middle" font-family="Inter" font-size="10" fill="#F5F5F7" opacity="0.72">daemon thread</text>
+            <text x="78" y="76" text-anchor="middle" font-family="Inter" font-size="10" fill="#F5F5F7" opacity="0.72">port 5000</text>
+            <text x="78" y="106" text-anchor="middle" font-family="Inter" font-size="9" fill="#F5F5F7" opacity="0.48">wait_for_port</text>
+            <text x="78" y="120" text-anchor="middle" font-family="Inter" font-size="9" fill="#F5F5F7" opacity="0.48">15s timeout</text>
+          </g>
+
+          <!-- Step 5: Bootstrap -->
+          <g transform="translate(680,68)">
+            <rect width="155" height="140" rx="8" fill="#0A0A0B" stroke="rgba(10,190,211,0.45)"/>
+            <text x="78" y="22" text-anchor="middle" font-family="ui-monospace" font-size="10" fill="#0ABED3">STEP 5</text>
+            <text x="78" y="44" text-anchor="middle" font-family="Inter" font-size="12" font-weight="500" fill="#F5F5F7">Warm bootstrap</text>
+            <text x="78" y="62" text-anchor="middle" font-family="Inter" font-size="10" fill="#F5F5F7" opacity="0.72">GET /api/system</text>
+            <text x="78" y="76" text-anchor="middle" font-family="Inter" font-size="10" fill="#F5F5F7" opacity="0.72">/bootstrap</text>
+            <text x="78" y="106" text-anchor="middle" font-family="Inter" font-size="9" fill="#F5F5F7" opacity="0.48">primes state</text>
+            <text x="78" y="120" text-anchor="middle" font-family="Inter" font-size="9" fill="#F5F5F7" opacity="0.48">before paint</text>
+          </g>
+
+          <!-- Step 6: Chrome -->
+          <g transform="translate(845,68)">
+            <rect width="135" height="140" rx="8" fill="#0A0A0B" stroke="rgba(194,76,200,0.45)"/>
+            <text x="68" y="22" text-anchor="middle" font-family="ui-monospace" font-size="10" fill="#C24CC8">STEP 6</text>
+            <text x="68" y="44" text-anchor="middle" font-family="Inter" font-size="12" font-weight="500" fill="#F5F5F7">Chrome --app</text>
+            <text x="68" y="62" text-anchor="middle" font-family="Inter" font-size="10" fill="#F5F5F7" opacity="0.72">1280 x 820</text>
+            <text x="68" y="76" text-anchor="middle" font-family="Inter" font-size="10" fill="#F5F5F7" opacity="0.72">chromeless</text>
+            <text x="68" y="106" text-anchor="middle" font-family="Inter" font-size="9" fill="#F5F5F7" opacity="0.48">Edge fallback</text>
+            <text x="68" y="120" text-anchor="middle" font-family="Inter" font-size="9" fill="#F5F5F7" opacity="0.48">webbrowser if both</text>
+          </g>
+        </g>
+
+        <!-- External dependencies -->
+        <line x1="262" y1="330" x2="262" y2="370" stroke="#F8E91F" stroke-width="1.5" marker-end="url(#arrow-yellow)"/>
+        <line x1="427" y1="330" x2="427" y2="370" stroke="#F8E91F" stroke-width="1.5" marker-end="url(#arrow-yellow)"/>
+        <line x1="592" y1="330" x2="592" y2="370" stroke="#41D99A" stroke-width="1.5" marker-end="url(#arrow)"/>
+        <line x1="912" y1="330" x2="912" y2="370" stroke="#C24CC8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+        <g transform="translate(180,375)">
+          <rect width="170" height="64" rx="10" fill="#1A1A1E" stroke="rgba(248,233,31,0.45)"/>
+          <text x="85" y="26" text-anchor="middle" font-family="Inter" font-size="11" font-weight="500" fill="#F5F5F7">Roon Bridge</text>
+          <text x="85" y="44" text-anchor="middle" font-family="Inter" font-size="10" fill="#F5F5F7" opacity="0.6">RAATServer.exe</text>
+          <text x="85" y="58" text-anchor="middle" font-family="ui-monospace" font-size="9" fill="#F5F5F7" opacity="0.48">local tray app</text>
+        </g>
+
+        <g transform="translate(345,375)">
+          <rect width="170" height="64" rx="10" fill="#1A1A1E" stroke="rgba(248,233,31,0.45)"/>
+          <text x="85" y="26" text-anchor="middle" font-family="Inter" font-size="11" font-weight="500" fill="#F5F5F7">Roon Server</text>
+          <text x="85" y="44" text-anchor="middle" font-family="Inter" font-size="10" fill="#F5F5F7" opacity="0.6">docker on NAS</text>
+          <text x="85" y="58" text-anchor="middle" font-family="ui-monospace" font-size="9" fill="#F5F5F7" opacity="0.48">192.168.1.230</text>
+        </g>
+
+        <!-- Flask box and its three downstream connections -->
+        <g transform="translate(515,375)">
+          <rect width="170" height="64" rx="10" fill="#1A1A1E" stroke="rgba(65,217,154,0.55)"/>
+          <text x="85" y="26" text-anchor="middle" font-family="Inter" font-size="11" font-weight="500" fill="#F5F5F7">Flask process</text>
+          <text x="85" y="44" text-anchor="middle" font-family="Inter" font-size="10" fill="#F5F5F7" opacity="0.6">Werkzeug, 127.0.0.1:5000</text>
+          <text x="85" y="58" text-anchor="middle" font-family="ui-monospace" font-size="9" fill="#F5F5F7" opacity="0.48">CSRF + Host allowlist</text>
+        </g>
+
+        <g transform="translate(845,375)">
+          <rect width="135" height="64" rx="10" fill="#1A1A1E" stroke="rgba(194,76,200,0.55)"/>
+          <text x="68" y="26" text-anchor="middle" font-family="Inter" font-size="11" font-weight="500" fill="#F5F5F7">Chrome --app</text>
+          <text x="68" y="44" text-anchor="middle" font-family="Inter" font-size="10" fill="#F5F5F7" opacity="0.6">UI surface</text>
+          <text x="68" y="58" text-anchor="middle" font-family="ui-monospace" font-size="9" fill="#F5F5F7" opacity="0.48">single window</text>
+        </g>
+
+        <!-- Flask → YXC / Roon / Spotify -->
+        <line x1="540" y1="439" x2="420" y2="495" stroke="#F5F5F7" stroke-opacity="0.45" stroke-width="1.2" marker-end="url(#arrow)"/>
+        <line x1="600" y1="439" x2="600" y2="495" stroke="#F5F5F7" stroke-opacity="0.45" stroke-width="1.2" marker-end="url(#arrow)"/>
+        <line x1="660" y1="439" x2="780" y2="495" stroke="#F5F5F7" stroke-opacity="0.45" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+        <g transform="translate(320,500)">
+          <rect width="200" height="60" rx="10" fill="#1A1A1E" stroke="rgba(245,245,247,0.18)"/>
+          <text x="100" y="26" text-anchor="middle" font-family="Inter" font-size="11" font-weight="500" fill="#F5F5F7">Yamaha R-N800A</text>
+          <text x="100" y="44" text-anchor="middle" font-family="Inter" font-size="10" fill="#F5F5F7" opacity="0.6">YXC HTTP &middot; 192.168.1.191</text>
+        </g>
+
+        <g transform="translate(540,500)">
+          <rect width="160" height="60" rx="10" fill="#1A1A1E" stroke="rgba(245,245,247,0.18)"/>
+          <text x="80" y="26" text-anchor="middle" font-family="Inter" font-size="11" font-weight="500" fill="#F5F5F7">Roon Core</text>
+          <text x="80" y="44" text-anchor="middle" font-family="Inter" font-size="10" fill="#F5F5F7" opacity="0.6">extension WS &middot; roonapi</text>
+        </g>
+
+        <g transform="translate(720,500)">
+          <rect width="220" height="60" rx="10" fill="#1A1A1E" stroke="rgba(245,245,247,0.18)"/>
+          <text x="110" y="26" text-anchor="middle" font-family="Inter" font-size="11" font-weight="500" fill="#F5F5F7">Spotify Web API</text>
+          <text x="110" y="44" text-anchor="middle" font-family="Inter" font-size="10" fill="#F5F5F7" opacity="0.6">spotipy &middot; OAuth Authorization Code</text>
+        </g>
+
+        <!-- Audio outputs -->
+        <line x1="420" y1="560" x2="420" y2="600" stroke="#F5F5F7" stroke-opacity="0.3" stroke-width="1.2" marker-end="url(#arrow)"/>
+        <line x1="620" y1="560" x2="620" y2="600" stroke="#F5F5F7" stroke-opacity="0.3" stroke-width="1.2" marker-end="url(#arrow)"/>
+        <line x1="830" y1="560" x2="830" y2="600" stroke="#F5F5F7" stroke-opacity="0.3" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+        <g transform="translate(320,605)">
+          <rect width="200" height="40" rx="6" fill="#0A0A0B" stroke="rgba(245,245,247,0.1)"/>
+          <text x="100" y="25" text-anchor="middle" font-family="Inter" font-size="10" fill="#F5F5F7" opacity="0.72">Polk ES60 + SVS SB-1000 Pro</text>
+        </g>
+
+        <g transform="translate(540,605)">
+          <rect width="160" height="40" rx="6" fill="#0A0A0B" stroke="rgba(245,245,247,0.1)"/>
+          <text x="80" y="25" text-anchor="middle" font-family="Inter" font-size="10" fill="#F5F5F7" opacity="0.72">7 Roon zones</text>
+        </g>
+
+        <g transform="translate(720,605)">
+          <rect width="220" height="40" rx="6" fill="#0A0A0B" stroke="rgba(245,245,247,0.1)"/>
+          <text x="110" y="25" text-anchor="middle" font-family="Inter" font-size="10" fill="#F5F5F7" opacity="0.72">Yamaha Connect target</text>
+        </g>
+      </svg>
+
+      <div class="legend">
+        <span><span class="swatch" style="background:#0F82DF;"></span>Reuse path (singleton hit)</span>
+        <span><span class="swatch" style="background:#F8E91F;"></span>Recovery path (Bridge or Server wake)</span>
+        <span><span class="swatch" style="background:#41D99A;"></span>Boot path (Flask, wait, primed)</span>
+        <span><span class="swatch" style="background:#C24CC8;"></span>UI path (Chrome --app)</span>
+      </div>
+    </div>
+
+    <h2>Step contract</h2>
+    <table class="flow">
+      <thead>
+        <tr><th>Step</th><th>Action</th><th>Failure mode + handling</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="step">Step 1</td>
+          <td class="label">Singleton: HTTP probe to <code>/api/config</code></td>
+          <td class="note">If Cockpit responds with our signature, open Chrome and exit. If port is held but no response, fall through to Flask boot (will fail to bind &mdash; manual recovery via Task Manager).</td>
+        </tr>
+        <tr>
+          <td class="step">Step 2</td>
+          <td class="label">Bridge wake: probe <code>RAATServer.exe</code>, spawn <code>Bridge.exe</code> if absent</td>
+          <td class="note">If none of four candidate paths exist, return <code>not_installed</code> and continue silently. Cockpit's in-UI pill surfaces the same conclusion after Flask boots.</td>
+        </tr>
+        <tr>
+          <td class="step">Step 3</td>
+          <td class="label">Server wake: SSH inspect, <code>docker start</code> if down</td>
+          <td class="note">If <code>config.roon_server.ssh_key_path</code> is empty or the key file is missing, skip with <code>no_key</code>. Cockpit's reachability fallback covers detection.</td>
+        </tr>
+        <tr>
+          <td class="step">Step 4</td>
+          <td class="label">Flask: daemon thread, port 5000</td>
+          <td class="note">If <code>wait_for_port</code> times out after 15s, exit 1. Common cause: zombie pythonw holding the port. Manual recovery via Task Manager.</td>
+        </tr>
+        <tr>
+          <td class="step">Step 5</td>
+          <td class="label">Warm bootstrap: <code>/api/system/bootstrap</code></td>
+          <td class="note">Response discarded; the effect is forcing every downstream probe to complete before the browser opens. Failure: silent &mdash; the polling cadence catches up within ~8s of UI load.</td>
+        </tr>
+        <tr>
+          <td class="step">Step 6</td>
+          <td class="label">Chrome <code>--app</code> window</td>
+          <td class="note">Walks Chrome x64, x86, LOCALAPPDATA, Edge x64, x86. Falls back to <code>webbrowser.open()</code> if all miss. UI works either way; chromeless window is cosmetic.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Operational principles applied</h2>
+    <table class="flow">
+      <thead>
+        <tr><th>Principle</th><th>How the launcher honors it</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="label">Diagnostics before changes</td><td class="note">Every write (spawn Bridge, start container, start Flask) is preceded by the corresponding read (tasklist, inspect, port probe).</td></tr>
+        <tr><td class="label">Read-only before write</td><td class="note"><code>tasklist</code>, <code>sc query</code>, <code>docker inspect</code>, port probe &mdash; all read-only and cheap.</td></tr>
+        <tr><td class="label">Minimal scope</td><td class="note">No registry edits, no service stop calls from the launcher, no admin elevation, no policy changes.</td></tr>
+        <tr><td class="label">Reversible</td><td class="note">Bridge spawn closes via tray. Container start reverses with <code>docker stop</code>. Flask exits when launcher exits. Chrome window closes via window chrome.</td></tr>
+        <tr><td class="label">Silent UX</td><td class="note"><code>CREATE_NO_WINDOW</code> on every subprocess. Zero console flashes.</td></tr>
+        <tr><td class="label">Fail open</td><td class="note">Every pre-flight fallback returns a state code, never raises. Cockpit's in-UI bootstrap is the canonical truth.</td></tr>
+      </tbody>
+    </table>
+
+    <footer class="foot">
+      Companion document: <code>docs/architecture/cockpit_launcher_system_design.md</code> &middot;
+      Implementation: <code>console/launch.pyw</code> &middot;
+      Scope memo: <code>_dev/03_decision-log/cockpit_v06_design_memo.md</code> &middot;
+      &ldquo;Where every cable, waveform, and decibel earns its keep.&rdquo;
+    </footer>
+  </div>
+</body>
+</html>

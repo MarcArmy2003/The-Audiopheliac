@@ -493,6 +493,11 @@ function renderZones() {
     if (meta) meta.textContent = 'offline';
     return;
   }
+  // Field-test 2026-05-12: zone count smaller than configured preferred
+  // zone count signals a stale roonapi cache. Surface a Resync action.
+  const preferredCount = (state.config.preferred_zones || []).length;
+  const showStaleResync = preferredCount > 0 && state.zones.length > 0 &&
+                          state.zones.length < preferredCount;
   if (!state.zones.length) {
     host.innerHTML = `
       <span class="muted">Roon Core is connected but reporting zero outputs. Either an output got disabled in Roon Remote (Settings &rsaquo; Audio), or the Cockpit&rsquo;s WebSocket to the Core is wedged. Reconnect tries the second case without leaving the Cockpit.</span>
@@ -563,6 +568,26 @@ function renderZones() {
       libraryHome();
     });
     host.appendChild(row);
+  }
+
+  if (showStaleResync) {
+    const resync = document.createElement('button');
+    resync.className = 'restore-btn';
+    resync.style.cssText = 'margin-top:0.55rem; align-self:flex-start;';
+    resync.textContent = '+ Resync (expected ' + preferredCount + ', seeing ' + state.zones.length + ')';
+    resync.addEventListener('click', async () => {
+      resync.disabled = true; resync.textContent = 'Resyncing...';
+      try {
+        const r = await api('/api/roon/reconnect', { method: 'POST' });
+        if (!r.ok) throw new Error(r.error || 'reconnect failed');
+        flashToast('Roon reconnect requested. Zones should fully repopulate.');
+        setTimeout(refreshRoonStatus, 2000);
+        setTimeout(refreshZones, 5000);
+      } catch (e) {
+        flashToast('Resync failed: ' + (e.message || e));
+      }
+    });
+    host.appendChild(resync);
   }
 }
 
@@ -649,8 +674,25 @@ async function refreshNowPlaying() {
   let np = null;
   const engine = state.active.engine;
 
-  // Pull metadata from authoritative engine
-  if (engine === 'spotify' && state.spotify.nowPlaying) {
+  // Field-test 2026-05-12 round 2: prior fix preferred Roon zone metadata
+  // whenever it existed, which meant stale "last played" data won over
+  // a currently-playing Spotify Connect stream. Tighten: only use Roon
+  // zone metadata when the zone is currently PLAYING. Otherwise let the
+  // actively-playing engine win.
+  const activeZone = state.zones.find(z => z.zone_id === state.activeZoneId);
+  const zoneIsPlaying = !!(activeZone && (activeZone.state || '').toLowerCase() === 'playing');
+  if (state.roonState === 'connected' && state.activeZoneId && zoneIsPlaying) {
+    try {
+      const r = await api('/api/roon/now-playing?zone_id=' + encodeURIComponent(state.activeZoneId));
+      if (r.ok && r.now_playing && r.now_playing.title) {
+        np = { source: 'roon', ...r.now_playing };
+      }
+    } catch (e) {}
+  }
+
+  // Spotify is the next preference when actively playing.
+  const spotifyIsPlaying = !!(state.spotify.nowPlaying && state.spotify.nowPlaying.is_playing);
+  if (!np && spotifyIsPlaying) {
     const sp = state.spotify.nowPlaying;
     np = {
       source: 'spotify',
@@ -662,11 +704,6 @@ async function refreshNowPlaying() {
       length: sp.track_duration_ms ? sp.track_duration_ms / 1000 : null,
       state: sp.is_playing ? 'playing' : 'paused',
     };
-  } else if (state.roonState === 'connected' && state.activeZoneId) {
-    try {
-      const r = await api('/api/roon/now-playing?zone_id=' + encodeURIComponent(state.activeZoneId));
-      if (r.ok && r.now_playing) np = { source: 'roon', ...r.now_playing };
-    } catch (e) {}
   }
 
   if (!np || !np.title) {
@@ -888,6 +925,11 @@ async function playFromLibrary(itemKey) {
     });
     if (!r.ok) throw new Error(r.error || 'play failed');
     if (r.source_switched) flashToast('Yamaha switched to ' + r.source_switched + '.');
+    // Field-test 2026-05-12: surface silent failures where Roon descended
+    // into an action sub-list but the auto-Play-Now heuristic didn't fire.
+    if (r.auto_played === false) {
+      flashToast('Roon didn’t auto-fire a Play action for that item. Try descending into it and clicking the Play option explicitly.');
+    }
     setTimeout(() => { refreshNowPlaying(); refreshActiveEngine(); }, 600);
   } catch (e) {
     flashToast('Couldn’t play that: ' + (e.message || e));

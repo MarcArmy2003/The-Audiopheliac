@@ -22,7 +22,8 @@ from markupsafe import escape
 from yamaha import Yamaha, YamahaError
 from roon import (
     RoonClient, RoonNotAuthorized, RoonError,
-    windows_service_status, windows_service_start, nas_ssh_exec,
+    windows_service_status, windows_service_start,
+    windows_process_running, nas_ssh_exec,
 )
 from spotify import SpotifyClient, SpotifyConfigError, SpotifyError
 
@@ -997,6 +998,7 @@ def roon_play_path():
 # ---------- system bootstrap (Buckets B, C, E) ----------
 
 ROON_BRIDGE_SERVICE = "Roon Bridge"
+ROON_BRIDGE_USER_MODE_PROCESS = "RAATServer"  # user-mode tray app exe
 
 
 def _roon_server_status() -> dict[str, Any]:
@@ -1056,20 +1058,62 @@ def _roon_server_status() -> dict[str, Any]:
     }
 
 
+def _roon_bridge_state() -> dict[str, Any]:
+    """Detect Roon Bridge regardless of install mode.
+
+    Roon Bridge ships in two flavors on Windows:
+      1. Service mode: registers a Windows service named `Roon Bridge`.
+         Cockpit can start it via `sc start`.
+      2. User-mode tray app: runs `RAATServer.exe` under the logged-in
+         user, no service registration. Cockpit can detect via tasklist
+         but cannot auto-start (no service control surface; would need to
+         launch the exe by path, which varies per install).
+
+    Returns: {state: running|stopped|not_installed, mode: service|user_app|none}
+    """
+    svc = windows_service_status(ROON_BRIDGE_SERVICE)
+    if svc == "running":
+        return {"state": "running", "mode": "service", "service_name": ROON_BRIDGE_SERVICE}
+    if svc == "stopped":
+        return {"state": "stopped", "mode": "service", "service_name": ROON_BRIDGE_SERVICE}
+    if svc == "starting":
+        return {"state": "starting", "mode": "service", "service_name": ROON_BRIDGE_SERVICE}
+    # Service not installed; check user-mode tray app process.
+    if windows_process_running(ROON_BRIDGE_USER_MODE_PROCESS):
+        return {"state": "running", "mode": "user_app", "process": ROON_BRIDGE_USER_MODE_PROCESS}
+    return {"state": "not_installed", "mode": "none"}
+
+
 @app.route("/api/system/roon-bridge/status")
 def roon_bridge_status():
-    return _ok({
-        "state": windows_service_status(ROON_BRIDGE_SERVICE),
-        "service_name": ROON_BRIDGE_SERVICE,
-    })
+    return _ok(_roon_bridge_state())
 
 
 @app.post("/api/system/roon-bridge/start")
 def roon_bridge_start():
-    ok, msg = windows_service_start(ROON_BRIDGE_SERVICE)
-    if not ok:
-        return _err(msg, status=502)
-    return _ok({"message": msg, "state": windows_service_status(ROON_BRIDGE_SERVICE)})
+    s = _roon_bridge_state()
+    if s.get("state") == "running":
+        return _ok({"message": "already running", **s})
+    if s.get("mode") == "user_app":
+        # No service to start. The user-mode app starts at login. We can't
+        # safely launch the tray exe without knowing the install path.
+        return _err(
+            "Roon Bridge is installed as a user-mode tray app, not a Windows "
+            "service. The Cockpit can detect it but cannot auto-start it. "
+            "Open the Bridge tray icon manually, or convert to service mode "
+            "(reinstall and pick the service option).",
+            status=409,
+        )
+    if s.get("mode") == "service":
+        ok, msg = windows_service_start(ROON_BRIDGE_SERVICE)
+        if not ok:
+            return _err(msg, status=502)
+        return _ok({"message": msg, **_roon_bridge_state()})
+    return _err(
+        "Roon Bridge is not installed. Download from roonlabs.com and run "
+        "the installer.",
+        status=503,
+    )
 
 
 @app.route("/api/system/roon-server/status")
@@ -1126,7 +1170,7 @@ def system_bootstrap():
     except YamahaError as e:
         yam_err = str(e)
 
-    bridge_state = windows_service_status(ROON_BRIDGE_SERVICE)
+    bridge_info = _roon_bridge_state()
     server_info = _roon_server_status()
 
     spotify_state = "unconfigured"
@@ -1145,10 +1189,7 @@ def system_bootstrap():
             "error": roon.error,
         },
         "roon_server": server_info,
-        "roon_bridge": {
-            "state": bridge_state,
-            "service_name": ROON_BRIDGE_SERVICE,
-        },
+        "roon_bridge": bridge_info,
         "spotify": {"state": spotify_state},
     })
 
@@ -1233,10 +1274,24 @@ def play_to():
             try:
                 yam.set_input(src)
                 source_switched = src
-                time.sleep(0.4)
             except YamahaError as e:
                 warning = f"Roon play continued, Yamaha source switch failed: {e}"
-        roon.select_action(zone_id, item_key)
+            else:
+                # Poll the receiver until it confirms the input. Field-test
+                # 2026-05-12: a flat 0.4s sleep was racing the receiver,
+                # AirPlay stream landed on the wrong source -> silence.
+                for _ in range(15):
+                    time.sleep(0.2)
+                    try:
+                        s = yam.status()
+                        if (s.get("input") or "").lower() == src:
+                            break
+                    except YamahaError:
+                        continue
+        # Capture auto-play outcome so the UI can surface silent failures
+        # where the action list descended but Play Now never fired.
+        sa_result = roon.select_action(zone_id, item_key)
+        auto_played = bool(sa_result.get("_auto_played"))
         engine = "roon"
 
     elif kind == "spotify-uri":
@@ -1247,12 +1302,30 @@ def play_to():
         # multi-hint substring match against Spotify's reported device list.
         explicit_device_id = body.get("device_id")
 
+        # Switch Yamaha to spotify and poll until the receiver confirms,
+        # up to ~3s. Field-test 2026-05-12: a flat 0.6s sleep was racing
+        # the receiver and Spotify saw "device not active" -> silent fail.
         try:
             yam.set_input("spotify")
             source_switched = "spotify"
-            time.sleep(0.6)
         except YamahaError as e:
             return _err(f"Couldn't switch Yamaha to Spotify input: {e}", status=502)
+        confirmed = False
+        for _ in range(15):
+            time.sleep(0.2)
+            try:
+                s = yam.status()
+                if (s.get("input") or "").lower() == "spotify":
+                    confirmed = True
+                    break
+            except YamahaError:
+                continue
+        if not confirmed:
+            return _err(
+                "Yamaha didn't confirm input switch to spotify within 3s. "
+                "Check the receiver's front panel for source state.",
+                status=502,
+            )
 
         if explicit_device_id:
             device_id = explicit_device_id
@@ -1318,6 +1391,10 @@ def play_to():
     payload: dict[str, Any] = {"source_switched": source_switched, "engine": engine}
     if warning:
         payload["warning"] = warning
+    if engine == "roon":
+        # Surface whether the auto-Play-Now heuristic actually fired so
+        # the UI can warn the user instead of silently doing nothing.
+        payload["auto_played"] = locals().get("auto_played", False)
     return _ok(payload)
 
 

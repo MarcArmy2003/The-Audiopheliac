@@ -24,7 +24,7 @@ The Audiopheliac is Gill Marchetti's lifestyle brand at the intersection of audi
 **Motto:** "Rock 'n' roll. Deal with it." — after Bret Easton Ellis, *The Rules of Attraction* (Gill's paraphrase; not verbatim — intentionally kept)
 **Persona:** Enthusiastic, witty, unflinchingly honest.
 **Tone:** Direct, technically precise, conversational. Explain the why behind every recommendation.
-**Companion project:** `The Audiopheliac | Studio Assistant` on claude.ai is available for research, copy iteration, and exploratory prompting while Cowork is processing. It is not part of the production workflow and does not relay, review, or gate any deliverables. Cowork is the primary development surface and executes all work it is capable of directly. Rafa handles only what Cowork cannot reach: localhost (paperclip API), Windows-native PowerShell 5.1, and Cloudflare deployments.
+**Companion project:** `The Audiopheliac | Studio Assistant` on claude.ai is available for research, copy iteration, and exploratory prompting while Cowork is processing. It is not part of the production workflow and does not relay, review, or gate any deliverables. Cowork is the primary development surface and executes all work it is capable of directly. Rafa handles only what Cowork cannot reach: localhost (paperclip API), Windows-native PowerShell, and Cloudflare deployments.
 
 ---
 
@@ -35,7 +35,6 @@ The Audiopheliac is Gill Marchetti's lifestyle brand at the intersection of audi
 - No project KB. This CLAUDE.md is the sole persistent instruction source.
 - Use absolute or UNC paths for all filesystem references. Never assume mapped drives persist.
 - Default script output: `C:\Scripts` unless a project folder already exists.
-- PowerShell 5.1 (not pwsh / PowerShell 7) required for service management on GDMARCHE. PowerShell 7 lacks service permissions in this environment.
 - Confirm before any destructive operation: shell commands, firmware flashes, file deletions, driver uninstalls.
 - Mark firmware procedures with risk level: [LOW], [MODERATE], or [HIGH].
 
@@ -90,7 +89,7 @@ Cowork drafts; Rafa executes anything that touches the running stack on GDMARCHE
 **Default Rafa prompt shape** for Cockpit / Roon / Yamaha ops tasks:
 
 1. State the working directory: `C:\Users\gillo\The-Audiopheliac`.
-2. State the shell: PowerShell 5.1.
+2. State the shell: PowerShell.
 3. State the scope in numbered steps with concrete file paths and exact expected JSON edits or commands.
 4. Provide an Acceptance block — observable state that proves the task ran.
 5. Provide an Out-of-Scope block — what NOT to touch.
@@ -738,7 +737,7 @@ Exit with /produce or /studio. See Suno Production Environment > Integration Not
 ## OUTPUT STANDARDS
 
 - Analytical content as narrative prose. Numbered steps only for sequential procedures.
-- Copy-paste-ready commands with environment (PowerShell 5.1, Ableton menu path, hardware UI), working directory, and privilege level specified.
+- Copy-paste-ready commands with environment (PowerShell, Ableton menu path, hardware UI), working directory, and privilege level specified.
 - No em dashes. Use commas, colons, or parentheses.
 - Signal chain notation: `Source > Device > Device > Destination`
 - UNC paths preferred over mapped drive letters (`\\NAS87828E\...`).
@@ -774,12 +773,12 @@ Exit with /produce or /studio. See Suno Production Environment > Integration Not
 
 **Lane discipline: Cowork executes directly; Rafa for localhost/deploy only; Paperclip for governance. No relay through Chat.**
 
-Cowork does the work. Rafa is invoked only when the task requires localhost access (paperclip API), Windows-native PowerShell 5.1, or Cloudflare deployments. If a larger task bundles Rafa-dependent steps with Cowork-capable steps, Rafa may handle the full series to avoid context-switching overhead. Studio Assistant (Chat) is not in the workflow chain.
+Cowork does the work. Rafa is invoked only when the task requires localhost access (paperclip API), Windows-native PowerShell, or Cloudflare deployments. If a larger task bundles Rafa-dependent steps with Cowork-capable steps, Rafa may handle the full series to avoid context-switching overhead. Studio Assistant (Chat) is not in the workflow chain.
 
 | Surface | Persona/Tool | Role |
 |---|---|---|
 | Cowork | Audiopheliac (this CLAUDE.md governs behavior) | Primary development surface. File ops, docs, Python automation, git staging and commit, session state, Slack canvas management, MCP operations (Slack, GitHub, Ableton Knowledge). Delegates to Rafa only for localhost, PS5.1, or deploy. |
-| CLI | **Rafa** | Localhost access (paperclip REST API at `http://localhost:3100`), Windows-native PowerShell 5.1, Cloudflare Pages deployments. Reports back to Cowork. Does not independently scope work. |
+| CLI | **Rafa** | Localhost access (paperclip REST API at `http://localhost:3100`), Windows-native PowerShell, Cloudflare Pages deployments. Reports back to Cowork. Does not independently scope work. |
 | Chat | **Studio Assistant** (claude.ai project) | Optional sidebar. Research, copy iteration, exploratory prompts. **Not a workflow participant.** Does not relay work to Cowork or Rafa, does not review or gate deliverables. Gill uses it when convenient, not as a handoff point. |
 | Paperclip | **The Audiopheliac company** (agents pending, not yet created) | Orchestration, ticketed work, governance, immutable audit log, cost control, scheduled routines. Local instance at `http://localhost:3100`. Reachable only via Rafa from non-CLI surfaces. See PAPERCLIP SURFACE. |
 
@@ -1017,6 +1016,8 @@ These do not duplicate each other. Each has its lane.
 ---
 
 ## HISTORY
+
+**2026-05-12 (PS5.1 service-management rule removed, late):** Struck the COWORK OPERATING CONSTRAINTS bullet that required PowerShell 5.1 (not PS7) for service management on GDMARCHE on the claim that "PowerShell 7 lacks service permissions in this environment." Origin of the rule unknown to current authors; the technical claim does not hold up generally (PS7 and PS5.1 both call the same Windows Service Control Manager via the same Win32 APIs; access is determined by the process token, not the shell version). Gill owns GDMARCHE and is local admin. Five downstream version pins ("PowerShell 5.1") generalized to "PowerShell" in IDENTITY AND ROLE, CROSS-SURFACE ARCHITECTURE, the Default Rafa prompt shape, OUTPUT STANDARDS, and the lead-in to the operational routing table. If a genuine permission gap surfaces in either shell, document it as a one-off observation and elevate the process; do not re-introduce a blanket version pin.
 
 **2026-05-12 (Roon zone lock + Cockpit preferred_zones, late):** Locked the Roon zone naming convention after Gill renamed seven outputs in the Roon Remote UI: `Family Room — Yamaha` (AirPlay 2 to R-N800A at 192.168.1.191), `Family Room — Bose` (AirPlay 2 to Bose Lifestyle 650 at 192.168.1.102), `Family Room — Shield` (Chromecast to NVIDIA Shield Pro at 192.168.1.250), `Family Room — TV` (Chromecast to Samsung NU6950 at 192.168.1.5), `Studio · AIR HUB` (ASIO via Roon Bridge on GDMARCHE), `Lanai - TV` (Chromecast to Samsung UN65U7900FD at 192.168.1.239), and `Master Bedroom` (Chromecast + AirPlay 2 on the same hardware at 192.168.1.154). Cockpit `console/config.json` `preferred_zones` array set to the four room prefixes `["Family Room", "Studio", "Lanai", "Master Bedroom"]`; the browser UI filters the zone selector to outputs whose names start with one of these substrings. Rafa restarted the Flask process via the project venv pythonw against `console/launch.pyw` and verified `/api/config` returns the new array. **Master Bedroom** newly identified as a Roon-addressable zone — added as a new signal-chain block in CLAUDE.md and as §5b in the signal map. **Lanai** gains a primary Roon endpoint (`Lanai - TV` Chromecast at 192.168.1.239); the legacy Yamaha-PRE-OUT → Rolls MB15b → 1Mii TX → 1Mii RX → Schiit SYS → Bose 3·2·1 AUX path is retained as the secondary route downstream of `Family Room — Yamaha`. Signal map renamed `config/audiopheliac_signal_map_v_2026_01.md` → `config/audiopheliac_signal_map_v_2026_05.md` (version 2026.05.3); references updated across nine docs. `docs/software/Roon.md` gained a "Zone naming convention (locked 2026-05-12)" section and an "Out-of-Roon rooms" subsection covering the Garage (Bluetooth only) and the Lanai secondary path. Open action item for the prior two-zone disambiguation marked Complete — superseded by the seven-zone rename pass. Step 5 (Roon zone grouping) explicitly deferred to Gill in the Roon Remote UI. No git commit, no deploy.
 
