@@ -187,12 +187,26 @@ class RoonClient:
         out = []
         zones = getattr(api, "zones", {}) or {}
         for zid, z in zones.items():
+            outputs = z.get("outputs") or []
+            # Pull volume info from the first output so the UI can render
+            # per-zone sliders without a separate round-trip.
+            vol_info: dict[str, Any] = {}
+            if outputs:
+                vol = outputs[0].get("volume") or {}
+                vol_info = {
+                    "value": vol.get("value"),
+                    "min": vol.get("min", 0),
+                    "max": vol.get("max", 100),
+                    "is_muted": bool(vol.get("is_muted", False)),
+                    "type": vol.get("type"),
+                }
             out.append({
                 "zone_id": zid,
                 "display_name": z.get("display_name"),
                 "state": z.get("state"),
-                "outputs": [o.get("display_name") for o in (z.get("outputs") or [])],
+                "outputs": [o.get("display_name") for o in outputs],
                 "now_playing": z.get("now_playing"),
+                "volume": vol_info,
             })
         return out
 
@@ -532,6 +546,76 @@ class RoonClient:
         except Exception as e:
             raise RoonError(f"play_path play action failed: {e}") from e
         return {"played": True, "path": path}
+
+    def set_zone_volume(self, zone_id: str, level: int) -> None:
+        """Set absolute volume (0-100) on the first output of a zone.
+
+        Uses roonapi.change_volume(output_id, "absolute", level). Volume
+        range is 0-100; values are clamped before the call. Some outputs
+        may report a narrower range via volume.min / volume.max -- the
+        clamp here is conservative; Roon will silently cap at hard limits.
+        """
+        api = self._require_api()
+        zones = getattr(api, "zones", {}) or {}
+        z = zones.get(zone_id)
+        if not z:
+            raise RoonError(f"Zone {zone_id!r} not found")
+        outputs = z.get("outputs") or []
+        if not outputs:
+            raise RoonError(f"Zone {zone_id!r} has no outputs")
+        output_id = outputs[0].get("output_id")
+        if not output_id:
+            raise RoonError(f"Zone {zone_id!r} first output has no output_id")
+        level = max(0, min(100, int(level)))
+        try:
+            api.change_volume(output_id, "absolute", level)
+        except Exception as e:
+            raise RoonError(f"set_zone_volume failed: {e}") from e
+
+    def zone_queue(self, zone_id: str) -> list[dict[str, Any]]:
+        """Return upcoming tracks in a zone's play queue (up to 30 items).
+
+        Navigates browse root with zone context and looks for a top-level
+        "Queue" entry. Returns an empty list if Roon has no queue loaded,
+        the zone is idle, or browse navigation fails -- the UI handles all
+        three states gracefully.
+        """
+        api = self._require_api()
+        try:
+            api.browse_browse({
+                "hierarchy": "browse",
+                "pop_all": True,
+                "zone_or_output_id": zone_id,
+            })
+            root = api.browse_load({
+                "hierarchy": "browse", "offset": 0, "count": 100,
+            }) or {}
+            queue_item = next(
+                (it for it in (root.get("items") or [])
+                 if (it.get("title") or "").strip().lower() == "queue"),
+                None,
+            )
+            if not queue_item or not queue_item.get("item_key"):
+                return []
+            api.browse_browse({
+                "hierarchy": "browse",
+                "item_key": queue_item["item_key"],
+                "zone_or_output_id": zone_id,
+            })
+            loaded = api.browse_load({
+                "hierarchy": "browse", "offset": 0, "count": 30,
+            }) or {}
+            return [
+                {
+                    "title": it.get("title"),
+                    "subtitle": it.get("subtitle"),
+                    "duration": it.get("duration"),
+                    "image_key": it.get("image_key"),
+                }
+                for it in (loaded.get("items") or [])
+            ]
+        except Exception:
+            return []
 
     def transport(self, zone_id: str, action: str) -> None:
         api = self._require_api()

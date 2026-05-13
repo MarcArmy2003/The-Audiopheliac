@@ -971,6 +971,38 @@ def roon_debug_browse():
     return _ok({"loaded": roon.debug_browse()})
 
 
+@app.post("/api/roon/zone-volume")
+def roon_zone_volume():
+    """Set absolute volume on a zone's first output.
+
+    Body: { "zone_id": "...", "level": 0-100 }
+    CSRF + Host allowlist enforced by @app.before_request.
+    """
+    body = request.get_json(silent=True) or {}
+    zone_id = body.get("zone_id")
+    if not zone_id:
+        return _err("zone_id required", status=400)
+    raw_level = body.get("level")
+    if raw_level is None:
+        return _err("level required", status=400)
+    level = _clamp_int(raw_level, default=50, lo=0, hi=100)
+    roon.set_zone_volume(zone_id, level)
+    return _ok()
+
+
+@app.route("/api/roon/queue")
+def roon_queue():
+    """Return upcoming queue items for a zone (up to 30).
+
+    Query param: zone_id
+    """
+    zone_id = request.args.get("zone_id", "")
+    if not zone_id:
+        return _err("zone_id required", status=400)
+    items = roon.zone_queue(zone_id)
+    return _ok({"queue": items})
+
+
 @app.post("/api/roon/play-path")
 def roon_play_path():
     """Walk a name-based path and fire play at the leaf.

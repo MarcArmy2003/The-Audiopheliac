@@ -93,7 +93,7 @@ Cowork drafts; Rafa executes anything that touches the running stack on GDMARCHE
 3. State the scope in numbered steps with concrete file paths and exact expected JSON edits or commands.
 4. Provide an Acceptance block — observable state that proves the task ran.
 5. Provide an Out-of-Scope block — what NOT to touch.
-6. Close with: post a brief note to Slack canvas `F0AU7FEMA7M` and surface tag `Rafa`.
+6. Close with: post a brief note to Slack canvas `F0AU7FEMA7M` (channel `#theaudiopheliac`, ID `C0AUH2RLZ41`) and surface tag `Rafa`. Always include the channel ID explicitly — the VAL CLAUDE.md at `C:\Users\gillo\CLAUDE.md` loads in the same session and contains `C0AUU3PLJGP` (#val_dev); without an explicit ID, Rafa may post to the wrong channel.
 
 When the Audiopheliac Operator paperclip agent exists, the same prompt shape can be filed as a paperclip issue assigned to Operator. Operator picks it up, runs it, posts work products to the issue, transitions to `done`. Cowork drafts the issue body; Rafa files it via `POST /api/issues` until Cowork gains direct paperclip reach.
 
