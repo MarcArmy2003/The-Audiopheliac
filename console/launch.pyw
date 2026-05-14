@@ -139,6 +139,10 @@ def ensure_roon_bridge_running() -> str:
     if _process_running("RAATServer"):
         return "running"
     candidates = [
+        # Confirmed GDMARCHE path (2026-05-13): RoonBridge installs as RoonBridge.exe,
+        # not Bridge.exe. Supervisor binary at %LOCALAPPDATA%\RoonBridge\Application\.
+        Path(os.environ.get("LOCALAPPDATA", "")) / "RoonBridge" / "Application" / "RoonBridge.exe",
+        # Legacy / other install conventions kept as fallback.
         Path(os.environ.get("ProgramFiles", "")) / "Roon" / "Bridge" / "Bridge.exe",
         Path(os.environ.get("ProgramFiles(x86)", "")) / "Roon" / "Bridge" / "Bridge.exe",
         Path(os.environ.get("LOCALAPPDATA", "")) / "Roon" / "Bridge" / "Bridge.exe",

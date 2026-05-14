@@ -41,7 +41,7 @@ APPINFO = {
     "display_version": "0.2.0",
     "publisher": "The Audiopheliac",
     "email": "gillon.marchetti@gmail.com",
-    "website": "https://theaudiopheliac.com",
+    "website": "http://127.0.0.1:5000",
 }
 
 
