@@ -3,264 +3,621 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 <BaseLayout title="Home">
 
-  <!-- HERO -->
+  <!-- ============================================================
+       HERO — two-column
+       ============================================================ -->
   <section class="hero">
-    <p class="hero__eyebrow">Audio · Technology · AI</p>
-    <h1 class="hero__title">
-      Where every cable,<br />
-      waveform, and decibel<br />
-      <span class="hero__title--accent">earns its keep.</span>
-    </h1>
-    <p class="hero__lede">
-      A lifestyle brand built on the credibility of an actual signal chain. Studio
-      monitoring, vinyl rotations across four listening zones, AI-assisted releases on
-      Suno, and gear reviews from rigs we run nightly.
-    </p>
-    <div class="hero__cta">
-      <a href="/studio" class="cta cta--hero">Step into the studio</a>
-      <a href="/journal" class="cta cta--ghost">Read the journal</a>
+    <div class="hero-inner">
+      <div class="hero-text">
+        <p class="hero-eyebrow">Home hi-fi, anti-pretense</p>
+        <h1 class="hero-headline">
+          Where signal flow meets <span class="grad">soul.</span>
+        </h1>
+        <p class="hero-lede">
+          A lifestyle brand built on the credibility of an actual signal chain. Studio
+          monitoring, vinyl rotations across four listening zones, AI-assisted releases on
+          Suno, and gear reviews from rigs we run nightly.
+        </p>
+        <div class="hero-ctas">
+          <a href="/studio" class="cta cta--hero">Step into the studio</a>
+          <a href="/journal" class="cta cta--ghost">Read the journal</a>
+        </div>
+      </div>
+      <div class="hero-mark-wrap">
+        <img
+          class="hero-mark"
+          src="/brand/audiopheliac-mark.jpg"
+          alt="The Audiopheliac — rainbow spectrum vinyl mark"
+          width="480"
+          height="480"
+        />
+      </div>
     </div>
-    <p class="hero__motto">"Rock 'n' roll. Deal with it."</p>
   </section>
 
-  <!-- VALUE-PROP GRID -->
-  <section class="section section--props">
+  <!-- ============================================================
+       MOTTO
+       ============================================================ -->
+  <section class="motto-row">
+    <p class="motto-text">&ldquo;Rock &lsquo;n&rsquo; roll. Deal with it.&rdquo;</p>
+    <p class="motto-attr">After Bret Easton Ellis, <em>The Rules of Attraction</em></p>
+  </section>
+
+  <!-- ============================================================
+       ZONES — four listening rooms
+       ============================================================ -->
+  <section class="section">
     <div class="section__head">
       <div>
-        <p class="section__eyebrow">What you'll find here</p>
-        <h2>Five lanes, one signal chain.</h2>
+        <p class="section__eyebrow">The setup</p>
+        <h2>Four zones. One signal chain.</h2>
       </div>
+      <a href="/studio" class="cta cta--ghost">See the full chain</a>
+    </div>
+    <div class="grid zone-grid">
+      <a class="card zone-card" href="/studio#family-room">
+        <span class="zone-badge zone-badge--fr">FR</span>
+        <div>
+          <h3>Family Room</h3>
+          <p>Technics SL-1200MK2 into a Pro-Ject phono preamp, through a Yamaha R-N800A into Polk ES60s. Wireless distribution hub for Studio, Lanai, and Garage via 1Mii TX.</p>
+        </div>
+      </a>
+      <a class="card zone-card" href="/studio#studio">
+        <span class="zone-badge zone-badge--st">ST</span>
+        <div>
+          <h3>Studio</h3>
+          <p>M-Audio AIR Hub into a Rolls MX28 Mini-Mix, feeding Yamaha HS7s and a JBL LSR310S sub. AT-LP120XUSB via Schiit Mani II. Roon + Ableton Live 12 Suite on GDMARCHE.</p>
+        </div>
+      </a>
+      <a class="card zone-card" href="/studio#lanai">
+        <span class="zone-badge zone-badge--ln">LN</span>
+        <div>
+          <h3>Lanai</h3>
+          <p>Roon Chromecast primary endpoint. 1Mii wireless receiver into a Schiit SYS switcher into a Bose 3&middot;2&middot;1. Samsung eARC extracted via J-Tech adapter for TV audio.</p>
+        </div>
+      </a>
+      <a class="card zone-card" href="/studio#garage">
+        <span class="zone-badge zone-badge--gr">GR</span>
+        <div>
+          <h3>Garage</h3>
+          <p>Bose SoundTouch Genius. Bluetooth from phone or 3.5mm line-in. Amazon Echo as a parallel endpoint. Yamaha R-N800A Bluetooth when signal allows.</p>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       VINYL
+       ============================================================ -->
+  <section class="section">
+    <div class="section__head">
+      <div>
+        <p class="section__eyebrow">The collection</p>
+        <h2>Vinyl on the platter.</h2>
+      </div>
+      <a href="/vinyl" class="cta cta--ghost">See full collection</a>
     </div>
     <div class="grid grid--3">
-      <a class="card prop" href="/studio">
-        <span class="tag tag--bronze">Signal chain</span>
-        <h3>Studio</h3>
-        <p>Four listening zones. Yamaha HS7s and a JBL LSR310S sub anchor the office. Technics SL-1200MK2 and a Yamaha R-N800A run the family room.</p>
-        <span class="card__more">See the chain →</span>
+      <a class="card vinyl-card" href="/vinyl#collection">
+        <p class="vinyl-label">Collection</p>
+        <h3>Curated, growing.</h3>
+        <p>Median Discogs pricing tracked. Country, classic rock, blues-rock, and hard rock anchors. Searched deliberately, not accumulated passively.</p>
+        <span class="card__more">Browse the stack &rarr;</span>
       </a>
-      <a class="card prop" href="/music">
-        <span class="tag tag--bronze">AI music</span>
-        <h3>Music</h3>
-        <p>Suno Premier (10,000 credits/month, commercial use). First Tracks album live, Local Files indexed in Spotify, masters bound for streaming.</p>
-        <span class="card__more">Hear the releases →</span>
+      <a class="card vinyl-card" href="/vinyl#wishlist">
+        <p class="vinyl-label">Wishlist</p>
+        <h3>What&rsquo;s next on the platter.</h3>
+        <p>Titles we're tracking on Discogs before they press again or prices peak. Active research list, not idle bookmarks.</p>
+        <span class="card__more">See what&rsquo;s queued &rarr;</span>
       </a>
-      <a class="card prop" href="/gear">
-        <span class="tag tag--bronze">Reviews</span>
-        <h3>Gear</h3>
-        <p>Reviews and recommendations from gear we actually run. Backed by the Audiopheliac Gear Proxy and an Amazon Associates store.</p>
-        <span class="card__more">Browse gear →</span>
-      </a>
-      <a class="card prop" href="/vinyl">
-        <span class="tag tag--bronze">Collection</span>
-        <h3>Vinyl</h3>
-        <p>A curated, growing collection. Median Discogs pricing tracked. Recent additions from Zach Bryan, Shaboozey, Gavin Adcock, Red Clay Strays.</p>
-        <span class="card__more">See what's on the platter →</span>
-      </a>
-      <a class="card prop" href="/journal">
-        <span class="tag tag--bronze">Notes</span>
-        <h3>Journal</h3>
-        <p>Field notes on signal flow, palette decisions, mid-flight gear failures, and what we learned in the studio this week.</p>
-        <span class="card__more">Read the entries →</span>
-      </a>
-      <a class="card prop card--gated" href="/dashboard">
-        <span class="tag tag--steel">Members</span>
-        <h3>Dashboard</h3>
-        <p>Roon control surface, library browse, transport, zone routing, Spotify-connect. Local Cockpit v0.2 — private surface.</p>
-        <span class="card__more">Sign in →</span>
+      <a class="card vinyl-card" href="/vinyl#recent">
+        <p class="vinyl-label">Recent adds</p>
+        <h3>What just came in.</h3>
+        <p>Zach Bryan, Shaboozey, Gavin Adcock, The Red Clay Strays. Country and roots-adjacent, sequenced for the room.</p>
+        <span class="card__more">Latest arrivals &rarr;</span>
       </a>
     </div>
   </section>
 
-  <!-- FEATURED JOURNAL -->
+  <!-- ============================================================
+       COCKPIT PREVIEW
+       ============================================================ -->
+  <section class="section cockpit-section">
+    <div class="cockpit-inner">
+      <div class="cockpit-text">
+        <p class="section__eyebrow">Local control</p>
+        <h2>The Cockpit.</h2>
+        <p class="lede">
+          A private web app running on the local network. Roon library browse and transport
+          across all zones. Yamaha receiver controls&mdash;power, source, volume, Net Radio presets.
+          Runs at <code class="kbd">127.0.0.1:5000</code> on GDMARCHE.
+        </p>
+        <a href="/cockpit" class="cta" style="margin-top: var(--sp-5); display: inline-flex;">Open Cockpit</a>
+      </div>
+      <div class="cockpit-widget">
+        <div class="cockpit-mock">
+          <div class="cm-header">
+            <img src="/brand/audiopheliac-mark.jpg" alt="" width="28" height="28" style="border-radius:50%; object-fit:contain;" />
+            <span>Cockpit</span>
+          </div>
+          <div class="cm-now-playing">
+            <div class="cm-vinyl-art"></div>
+            <div class="cm-track-info">
+              <p class="cm-track">Now Playing</p>
+              <p class="cm-artist muted">Select a zone to begin</p>
+            </div>
+          </div>
+          <div class="cm-transport">
+            <button class="t-btn" aria-label="Previous" tabindex="-1">&#9198;</button>
+            <button class="t-btn t-btn--primary" aria-label="Play" tabindex="-1">&#9654;</button>
+            <button class="t-btn" aria-label="Next" tabindex="-1">&#9197;</button>
+          </div>
+          <div class="cm-zones">
+            <div class="cm-zone">Family Room &mdash; Yamaha</div>
+            <div class="cm-zone cm-zone--active">Studio &middot; AIR HUB</div>
+            <div class="cm-zone">Lanai - TV</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       TOOLS
+       ============================================================ -->
   <section class="section">
     <div class="section__head">
       <div>
-        <p class="section__eyebrow">From the journal</p>
-        <h2>What changed this week.</h2>
+        <p class="section__eyebrow">Internal tools</p>
+        <h2>Built for the signal chain.</h2>
       </div>
-      <a href="/journal" class="cta cta--ghost">All entries</a>
     </div>
-    <div class="grid grid--2">
-      <article class="card post">
-        <p class="post__date">2026-05-11</p>
-        <h3><a href="/journal#roon-pivot">The Roon pivot.</a></h3>
-        <p>Yamaha Extended Control could turn the receiver on. It could not run a library. Roon Server moved to Docker on the QNAP and 13,450 tracks lit up across two zones.</p>
-        <p class="post__meta"><span class="tag">Infra</span> <span class="tag tag--steel">Library</span></p>
-      </article>
-      <article class="card post">
-        <p class="post__date">2026-05-11</p>
-        <h3><a href="/journal#focusrite-died">The Focusrite died. The AIR Hub saved the day.</a></h3>
-        <p>Solo Gen 4 fried mid-session. M-Audio AIR Hub was already in the box, already drivered. Output-only is fine until an input-capable interface lands.</p>
-        <p class="post__meta"><span class="tag tag--bronze">Hardware</span></p>
-      </article>
-      <article class="card post">
-        <p class="post__date">2026-04-28</p>
-        <h3><a href="/journal#nashville-midnight">Nashville Midnight — a palette for late-night listening.</a></h3>
-        <p>Cream → bronze → steel → indigo → midnight. Derived from emotional lanes in the listening profile, not picked from a moodboard.</p>
-        <p class="post__meta"><span class="tag">Brand</span></p>
-      </article>
-      <article class="card post post--upcoming">
-        <p class="post__date muted">Coming soon</p>
-        <h3>Bit-perfect on Windows 11 without breaking Local Files.</h3>
-        <p>Spotify Premier lossless, M-Audio AIR Hub ASIO at 24/96, and how to keep Spotify's Local Files index from breaking when WAVs and MP3s share a folder.</p>
-        <p class="post__meta"><span class="tag tag--steel">Workflow</span></p>
-      </article>
+    <div class="grid tools-grid">
+      <div class="card tool-card">
+        <div class="tool-head">
+          <h3>File Format Converter</h3>
+          <span class="tag">Active</span>
+        </div>
+        <p>Convert WAV, FLAC, MP3, AIFF, and OGG between formats. Normalize loudness to streaming targets. Batch process without breaking Spotify&rsquo;s Local Files index.</p>
+      </div>
+      <div class="card tool-card">
+        <div class="tool-head">
+          <h3>Music Indexer</h3>
+          <span class="tag tag--bronze">Running</span>
+        </div>
+        <p>Crawls <code class="kbd">\\NAS87828E\Music</code> and builds a structured library index. 13,450 tracks indexed. Source of truth for Spotify gap analysis.</p>
+      </div>
+      <div class="card tool-card">
+        <div class="tool-head">
+          <h3>Gap Reporter</h3>
+          <span class="tag tag--steel">Scheduled</span>
+        </div>
+        <p>Compares local library against Spotify saved tracks. Surfaces missing tracks and unindexed local files. Output: <code class="kbd">spotify_missing_tracks.txt</code>.</p>
+      </div>
+      <div class="card tool-card">
+        <div class="tool-head">
+          <h3>Discogs Sync</h3>
+          <span class="tag tag--steel">Planned</span>
+        </div>
+        <p>Collection and wantlist sync from the Discogs API. Median pricing tracked per release. Intake via <code class="kbd">Vinyl_Collection_Update_Queue.csv</code>.</p>
+      </div>
     </div>
   </section>
 
-  <!-- LISTENING PROFILE -->
+  <!-- ============================================================
+       PLAYLISTS
+       ============================================================ -->
   <section class="section">
     <div class="section__head">
       <div>
-        <p class="section__eyebrow">House sound</p>
-        <h2>What we play, on purpose.</h2>
+        <p class="section__eyebrow">Programmed listening</p>
+        <h2>The Audiopheliac presents.</h2>
       </div>
+      <a href="/music" class="cta cta--ghost">All playlists</a>
     </div>
-    <div class="profile">
-      <div>
-        <p class="lede">
-          Country and country-adjacent. Classic rock, hard rock, blues, blues-rock.
-          Selective hip-hop. Selective crossover pop. Tracks that reward home hi-fi
-          playback: structural bass, full low mids, clear lead vocals, muscular drums.
-        </p>
-        <p class="lede">
-          We don't program for crate-digging cool. We program for the room — long
-          sessions, controlled fatigue, sequencing that respects the energy curve.
-        </p>
-      </div>
-      <ul class="bare profile__list">
-        <li><span class="cream">●</span> Familiarity-positive — recognizable artists, hits, quality deep cuts.</li>
-        <li><span class="cream">●</span> Bass-conscious — structural, not club-oriented.</li>
-        <li><span class="cream">●</span> Vocal-forward — body and clarity over spectacle.</li>
-        <li><span class="cream">●</span> Sequenced — playlists run as programs, not stacks.</li>
-        <li><span class="cream">●</span> Brand-named — "<em>The Audiopheliac presents…</em>"</li>
-      </ul>
+    <div class="grid pl-grid">
+      <a class="card pl-card" href="/music">
+        <div class="pl-art pl-art--country" role="img" aria-label="Country / Roots / Americana"></div>
+        <div class="pl-info">
+          <p class="pl-eyebrow">Country &middot; Roots &middot; Americana</p>
+          <h3>Friday Night at the BR</h3>
+          <p>Zach Bryan, Tyler Childers, Sturgill Simpson, Cody Jinks, Colter Wall. Structured for long sessions, sequenced for the room.</p>
+        </div>
+      </a>
+      <a class="card pl-card" href="/music">
+        <div class="pl-art pl-art--rock" role="img" aria-label="Classic Rock / Hard Rock / Blues-Rock"></div>
+        <div class="pl-info">
+          <p class="pl-eyebrow">Classic Rock &middot; Hard Rock &middot; Blues-Rock</p>
+          <h3>The Riff Cannon</h3>
+          <p>Zeppelin, AC/DC, SRV, Allman Brothers, Black Keys. Bass-heavy, room-filling, no filler.</p>
+        </div>
+      </a>
+      <a class="card pl-card" href="/music">
+        <div class="pl-art pl-art--suno" role="img" aria-label="AI Music / Suno v5.5"></div>
+        <div class="pl-info">
+          <p class="pl-eyebrow">AI Music &middot; Suno v5.5</p>
+          <h3>First Tracks</h3>
+          <p>Original Audiopheliac releases on Suno. Commercial-use Premier plan. Early experiments and first full productions.</p>
+        </div>
+      </a>
+      <a class="card pl-card" href="/music">
+        <div class="pl-art pl-art--deep" role="img" aria-label="Deep Cuts / Album Tracks"></div>
+        <div class="pl-info">
+          <p class="pl-eyebrow">Deep Cuts &middot; Album Tracks</p>
+          <h3>B-Side Protocol</h3>
+          <p>Recognizable artists, less-played tracks. Quality deep cuts, no crate-digging obscurity.</p>
+        </div>
+      </a>
     </div>
   </section>
 
-  <!-- CTA STRIP -->
-  <section class="cta-strip">
-    <div class="cta-strip__inner">
-      <div>
-        <p class="section__eyebrow">Next time you press play</p>
-        <h2>Hear it on a rig that earns its keep.</h2>
+  <!-- ============================================================
+       MANIFESTO
+       ============================================================ -->
+  <section class="section manifesto">
+    <div class="manifesto-inner">
+      <p class="section__eyebrow">About this signal</p>
+      <h2>The Audiopheliac exists because most audio content is either too credentialed or too casual.</h2>
+      <div class="manifesto-body">
+        <p>
+          This isn&rsquo;t a publication for people who spent $40,000 on cable lifters. It&rsquo;s for the person
+          who bought a used Technics, read every spec sheet before pulling the trigger on monitors,
+          and still can&rsquo;t explain to their family why the sub needed its own dedicated outlet.
+        </p>
+        <p>
+          We program for the room. We sequence for long sessions. We review gear we actually run.
+          We release music under our own name. The signal chain is the credibility&mdash;not a credential.
+        </p>
+        <p class="manifesto-motto">&ldquo;Where every cable, waveform, and decibel earns its keep.&rdquo;</p>
       </div>
-      <a href="/gear" class="cta cta--hero">Find your chain</a>
     </div>
   </section>
 
 </BaseLayout>
 
 <style>
-  /* ---------------- HERO ---------------- */
+  /* ============================================================
+     HERO
+     ============================================================ */
   .hero {
-    padding: var(--sp-10) 0 var(--sp-9);
-    text-align: left;
-    background:
-      radial-gradient(circle at 20% 20%, rgba(232, 213, 163, 0.10), transparent 55%),
-      radial-gradient(circle at 80% 0%, rgba(184, 115, 51, 0.12), transparent 50%);
+    padding: var(--sp-9) 0 var(--sp-8);
     border-bottom: 1px solid var(--surface-edge);
-    margin: 0 calc(var(--sp-5) * -1) var(--sp-8);
-    padding-left: var(--sp-5);
-    padding-right: var(--sp-5);
+    margin-bottom: var(--sp-6);
   }
-  .hero__eyebrow {
+  .hero-inner {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: var(--sp-8);
+    align-items: center;
+  }
+  .hero-eyebrow {
     font-family: var(--font-mono);
     font-size: var(--fs-100);
-    letter-spacing: 0.30em;
+    letter-spacing: 0.28em;
     color: var(--spectrum-2);
     text-transform: uppercase;
     margin: 0 0 var(--sp-4);
   }
-  .hero__title {
-    font-size: clamp(var(--fs-800), 9vw, var(--fs-max));
+  .hero-headline {
+    font-size: clamp(var(--fs-700), 7vw, var(--fs-max));
     line-height: 0.95;
     margin: 0 0 var(--sp-5);
     color: var(--paper);
     letter-spacing: 0.01em;
   }
-  .hero__title--accent {
+  .grad {
     background: var(--spectrum-gradient);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
   }
-  .hero__lede {
+  .hero-lede {
     font-size: var(--fs-400);
     color: var(--n-300);
-    max-width: 46rem;
+    max-width: 40rem;
     line-height: var(--lh-normal);
     margin: 0 0 var(--sp-6);
   }
-  .hero__cta {
+  .hero-ctas {
     display: flex;
     gap: var(--sp-4);
     flex-wrap: wrap;
-    margin-bottom: var(--sp-7);
   }
-  .hero__motto {
+  .hero-mark-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .hero-mark {
+    width: 100%;
+    max-width: 420px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 48px rgba(248, 233, 31, 0.18));
+  }
+
+  /* ============================================================
+     MOTTO
+     ============================================================ */
+  .motto-row {
+    text-align: center;
+    padding: var(--sp-7) 0;
+    border-top: 1px solid var(--surface-edge);
+    border-bottom: 1px solid var(--surface-edge);
+    margin-bottom: var(--sp-4);
+  }
+  .motto-text {
     font-family: var(--font-display);
-    font-size: var(--fs-400);
-    color: var(--spectrum-2);
+    font-size: var(--fs-600);
+    color: var(--paper);
+    letter-spacing: 0.03em;
+    margin: 0 0 var(--sp-2);
+  }
+  .motto-attr {
+    font-family: var(--font-mono);
+    font-size: var(--fs-100);
+    letter-spacing: 0.16em;
+    color: var(--n-400);
+    text-transform: uppercase;
     margin: 0;
-    letter-spacing: 0.04em;
-    opacity: 0.85;
   }
 
-  /* ---------------- PROP CARDS ---------------- */
-  .prop { display: flex; flex-direction: column; gap: var(--sp-3); color: var(--paper); border-bottom: none; }
-  .prop h3 { margin: 0; font-size: var(--fs-500); color: var(--spectrum-1); }
-  .prop p  { color: var(--n-300); margin: 0; font-size: var(--fs-200); line-height: var(--lh-normal); }
-  .card__more { margin-top: auto; padding-top: var(--sp-4); color: var(--spectrum-2); font-family: var(--font-mono); font-size: var(--fs-100); letter-spacing: 0.18em; text-transform: uppercase; }
-  .card--gated { background: linear-gradient(160deg, var(--surface), var(--spectrum-5)); }
+  /* ============================================================
+     ZONES
+     ============================================================ */
+  .zone-grid { grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr)); }
+  .zone-card {
+    display: flex;
+    gap: var(--sp-4);
+    align-items: flex-start;
+    color: var(--paper);
+    border-bottom: none;
+  }
+  .zone-card h3 { margin: 0 0 var(--sp-2); font-size: var(--fs-500); color: var(--paper); }
+  .zone-card p  { color: var(--n-300); margin: 0; font-size: var(--fs-200); line-height: var(--lh-normal); }
+  .zone-badge {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--r-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: var(--fs-100);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+  .zone-badge--fr { background: rgba(248, 233, 31, 0.10); color: var(--spectrum-1); border: 1px solid rgba(248, 233, 31, 0.28); }
+  .zone-badge--st { background: rgba(65, 217, 154, 0.10); color: var(--spectrum-2); border: 1px solid rgba(65, 217, 154, 0.28); }
+  .zone-badge--ln { background: rgba(10, 190, 211, 0.10); color: var(--cyan);       border: 1px solid rgba(10, 190, 211, 0.28); }
+  .zone-badge--gr { background: rgba(194, 76, 200, 0.10); color: var(--magenta);    border: 1px solid rgba(194, 76, 200, 0.28); }
 
-  /* ---------------- POSTS ---------------- */
-  .post { color: var(--paper); border-bottom: none; }
-  .post h3 { margin: var(--sp-2) 0 var(--sp-3); font-size: var(--fs-500); }
-  .post h3 a { color: var(--paper); border-bottom: none; }
-  .post h3 a:hover { color: var(--spectrum-1); }
-  .post__date { color: var(--spectrum-2); font-family: var(--font-mono); font-size: var(--fs-100); letter-spacing: 0.14em; text-transform: uppercase; margin: 0; }
-  .post__meta { margin: var(--sp-4) 0 0; display: flex; gap: var(--sp-2); }
-  .post--upcoming { opacity: 0.75; }
+  /* ============================================================
+     VINYL
+     ============================================================ */
+  .vinyl-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-3);
+    color: var(--paper);
+    border-bottom: none;
+  }
+  .vinyl-label {
+    font-family: var(--font-mono);
+    font-size: var(--fs-100);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--spectrum-1);
+    margin: 0;
+  }
+  .vinyl-card h3 { margin: 0; font-size: var(--fs-500); }
+  .vinyl-card p  { color: var(--n-300); margin: 0; font-size: var(--fs-200); line-height: var(--lh-normal); }
+  .card__more {
+    margin-top: auto;
+    padding-top: var(--sp-4);
+    color: var(--spectrum-2);
+    font-family: var(--font-mono);
+    font-size: var(--fs-100);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
 
-  /* ---------------- PROFILE ---------------- */
-  .profile {
+  /* ============================================================
+     COCKPIT PREVIEW
+     ============================================================ */
+  .cockpit-inner {
     display: grid;
-    grid-template-columns: 1.5fr 1fr;
-    gap: var(--sp-7);
-    align-items: start;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--sp-8);
+    align-items: center;
   }
-  .profile__list li {
-    padding: var(--sp-2) 0;
-    border-bottom: 1px dashed var(--surface-edge);
-    font-size: var(--fs-300);
-    color: var(--n-200);
-  }
-  .profile__list li:last-child { border-bottom: 0; }
+  .cockpit-text h2 { margin: var(--sp-3) 0 var(--sp-4); font-size: var(--fs-700); }
+  .cockpit-widget { display: flex; justify-content: center; }
 
-  /* ---------------- CTA STRIP ---------------- */
-  .cta-strip {
-    margin: var(--sp-9) calc(var(--sp-5) * -1) 0;
-    padding: var(--sp-8) var(--sp-5);
-    background: var(--spectrum-gradient);
-    color: var(--ink);
+  .cockpit-mock {
+    background: var(--surface);
+    border: 1px solid var(--surface-edge);
+    border-radius: var(--r-lg);
+    padding: var(--sp-5);
+    width: 100%;
+    max-width: 340px;
+    font-size: var(--fs-200);
   }
-  .cta-strip__inner {
-    max-width: var(--content-max);
-    margin: 0 auto;
+  .cm-header {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-3);
+    margin-bottom: var(--sp-4);
+    color: var(--paper);
+    font-family: var(--font-display);
+    font-size: var(--fs-300);
+    letter-spacing: 0.04em;
+  }
+  .cm-now-playing {
+    display: flex;
+    gap: var(--sp-4);
+    align-items: center;
+    margin-bottom: var(--sp-4);
+    padding: var(--sp-4);
+    background: var(--surface-2);
+    border-radius: var(--r-md);
+  }
+  .cm-vinyl-art {
+    width: 52px;
+    height: 52px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 50% 50%, var(--ink) 26%, transparent 27%),
+      repeating-radial-gradient(circle at 50% 50%,
+        transparent 0, transparent 3px,
+        rgba(255,255,255,0.04) 3px, rgba(255,255,255,0.04) 4px
+      ),
+      #1a1a20;
+    border: 2px solid rgba(248, 233, 31, 0.20);
+  }
+  .cm-track-info { min-width: 0; }
+  .cm-track  { color: var(--paper); margin: 0 0 var(--sp-1); font-weight: 600; font-size: var(--fs-200); }
+  .cm-artist { margin: 0; font-size: var(--fs-100); }
+  .cm-transport {
+    display: flex;
+    justify-content: center;
+    gap: var(--sp-3);
+    margin-bottom: var(--sp-4);
+  }
+  .t-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--surface-edge);
+    background: var(--surface-2);
+    color: var(--n-300);
+    cursor: default;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--fs-200);
+  }
+  .t-btn--primary {
+    background: var(--spectrum-1);
+    color: var(--ink);
+    border-color: var(--spectrum-1);
+    width: 44px;
+    height: 44px;
+    font-size: var(--fs-300);
+  }
+  .cm-zones { display: flex; flex-direction: column; gap: var(--sp-2); }
+  .cm-zone {
+    padding: var(--sp-2) var(--sp-3);
+    border-radius: var(--r-sm);
+    background: var(--surface-2);
+    color: var(--n-400);
+    font-family: var(--font-mono);
+    font-size: var(--fs-100);
+    letter-spacing: 0.10em;
+  }
+  .cm-zone--active {
+    background: rgba(248, 233, 31, 0.07);
+    color: var(--spectrum-1);
+    border: 1px solid rgba(248, 233, 31, 0.20);
+  }
+
+  /* ============================================================
+     TOOLS
+     ============================================================ */
+  .tools-grid { grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr)); }
+  .tool-card { color: var(--paper); }
+  .tool-head {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    gap: var(--sp-6);
-    flex-wrap: wrap;
+    align-items: flex-start;
+    margin-bottom: var(--sp-3);
+    gap: var(--sp-3);
   }
-  .cta-strip h2 { color: var(--ink); margin: var(--sp-2) 0 0; font-size: var(--fs-700); }
-  .cta-strip .section__eyebrow { color: var(--spectrum-5); }
-  .cta-strip .cta { background: var(--ink); color: var(--spectrum-1); }
-  .cta-strip .cta:hover { background: var(--spectrum-4); }
+  .tool-card h3 { margin: 0; font-size: var(--fs-400); }
+  .tool-card p  { color: var(--n-300); margin: 0; font-size: var(--fs-200); line-height: var(--lh-normal); }
 
-  @media (max-width: 760px) {
-    .hero { padding-top: var(--sp-8); padding-bottom: var(--sp-7); }
-    .profile { grid-template-columns: 1fr; }
+  /* ============================================================
+     PLAYLISTS
+     ============================================================ */
+  .pl-grid { grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr)); }
+  .pl-card {
+    display: flex;
+    gap: var(--sp-4);
+    align-items: flex-start;
+    color: var(--paper);
+    border-bottom: none;
+  }
+  .pl-art {
+    flex-shrink: 0;
+    width: 64px;
+    height: 64px;
+    border-radius: var(--r-md);
+    position: relative;
+    overflow: hidden;
+  }
+  .pl-art::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background:
+      radial-gradient(circle at 50% 50%, rgba(10,10,11,0.9) 28%, transparent 29%),
+      repeating-radial-gradient(circle at 50% 50%,
+        transparent 0, transparent 3px,
+        rgba(255,255,255,0.06) 3px, rgba(255,255,255,0.06) 4px
+      );
+  }
+  .pl-art--country { background: linear-gradient(135deg, #F8E91F, #99E257); }
+  .pl-art--rock    { background: linear-gradient(135deg, #C24CC8, #5E54D4); }
+  .pl-art--suno    { background: linear-gradient(135deg, #0ABED3, #0F82DF); }
+  .pl-art--deep    { background: linear-gradient(135deg, #41D99A, #0ABED3); }
+  .pl-eyebrow {
+    font-family: var(--font-mono);
+    font-size: var(--fs-100);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--spectrum-2);
+    margin: 0 0 var(--sp-2);
+  }
+  .pl-info h3 { margin: 0 0 var(--sp-2); font-size: var(--fs-400); }
+  .pl-info p  { color: var(--n-300); margin: 0; font-size: var(--fs-200); line-height: var(--lh-normal); }
+
+  /* ============================================================
+     MANIFESTO
+     ============================================================ */
+  .manifesto-inner { max-width: var(--content-narrow); }
+  .manifesto h2 { margin: var(--sp-3) 0 var(--sp-6); font-size: var(--fs-600); }
+  .manifesto-body p {
+    color: var(--n-300);
+    font-size: var(--fs-400);
+    line-height: var(--lh-loose);
+    margin: 0 0 var(--sp-5);
+  }
+  .manifesto-motto {
+    font-family: var(--font-display);
+    font-size: var(--fs-500);
+    color: var(--spectrum-1);
+    letter-spacing: 0.02em;
+    margin: 0;
+    opacity: 0.90;
+  }
+
+  /* ============================================================
+     RESPONSIVE
+     ============================================================ */
+  @media (max-width: 860px) {
+    .hero-inner {
+      grid-template-columns: 1fr;
+    }
+    .hero-mark-wrap { display: none; }
+    .cockpit-inner  { grid-template-columns: 1fr; }
+    .cockpit-widget { display: none; }
+  }
+  @media (max-width: 600px) {
+    .motto-text { font-size: var(--fs-500); }
+    .hero-headline { font-size: var(--fs-700); }
   }
 </style>

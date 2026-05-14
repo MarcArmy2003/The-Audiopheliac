@@ -36,6 +36,8 @@ const here = Astro.url.pathname.replace(/\/$/, '') || '/';
         </li>
       ))}
     </ul>
+
+    <a href="/music" class="nav-cta">Listen</a>
   </nav>
 </header>
 
@@ -97,6 +99,30 @@ const here = Astro.url.pathname.replace(/\/$/, '') || '/';
   .nav-link:hover { color: var(--paper); border-bottom-color: var(--spectrum-2); }
   .nav-link.is-active { color: var(--spectrum-1); border-bottom-color: var(--spectrum-1); }
 
+  .nav-cta {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    padding: 7px var(--sp-4);
+    background: var(--spectrum-1);
+    color: var(--ink);
+    border-radius: var(--r-pill);
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: var(--fs-100);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    border: none;
+    border-bottom: none;
+    transition: background var(--dur-fast) var(--ease-standard),
+                color var(--dur-fast) var(--ease-standard);
+  }
+  .nav-cta:hover {
+    background: var(--spectrum-5);
+    color: var(--paper);
+    border-bottom: none;
+  }
+
   .menu-toggle {
     display: none;
     flex-direction: column;
@@ -114,6 +140,7 @@ const here = Astro.url.pathname.replace(/\/$/, '') || '/';
   }
 
   @media (max-width: 880px) {
+    .nav-cta { display: none; }
     .menu-toggle { display: flex; }
     .nav-list {
       position: absolute;
