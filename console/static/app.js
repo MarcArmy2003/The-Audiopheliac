@@ -1,1721 +1,657 @@
-// Audiopheliac Cockpit v0.7 — Full Spectrum, intent-driven
-//
-// Core principle: source is a consequence of a Play action, not an input.
-// The user picks WHAT to play (Library item, Spotify track, Net Radio
-// preset) and WHERE (Roon zone). The Cockpit infers and applies the
-// Yamaha source, the Spotify Connect target, the transport, and the
-// metadata binding.
-//
-// v0.7 changes from v0.6:
-//   - Two-column fixed layout; drag/restore and card-hide removed.
-//   - Master volume back in Yamaha card (not Now Playing).
-//   - Library card unifies Roon browse and Spotify behind tabs.
-//   - Per-zone volume sliders in Roon Zones card.
-//   - Topbar live clock.
-//   - Shuffle / Repeat t-toggle pills (Spotify state).
-//   - Mute and Power as single t-toggle / cycling button.
-//   - Up Next reads from /api/roon/queue endpoint.
+// Audiopheliac Cockpit v0.9 — Spotify + YXC only (Roon removed)
+'use strict';
 
-const POLL_STATUS_MS  = 2500;
-const POLL_ROON_MS    = 2500;
-const POLL_SPOTIFY_MS = 4000;
-const POLL_ACTIVE_MS  = 3000;
-const POLL_UPNEXT_MS  = 5000;
+// ── CSRF ────────────────────────────────────────────────────────────────────
+const CSRF = document.querySelector('meta[name="cockpit-csrf"]')?.content ?? '';
 
-const YAMAHA_IP = document.body.dataset.yamahaIp || '192.168.1.191';
+// ── State ───────────────────────────────────────────────────────────────────
+let _spPlaying   = false;
+let _spDeviceId  = null;
+let _spProgress  = 0;     // ms
+let _spDuration  = 0;     // ms
+let _spPollAt    = 0;     // performance.now() at last poll
+let _yamVolMax   = 161;
+let _activeTab   = 'playlists';
+let _toastDedup  = {};
+let _scrubRaf    = null;
 
-// v0.7: no hidden-cards or card-order keys (fixed layout).
-const ACTIVE_ZONE_KEY    = 'audiopheliac.cockpit.activeZoneId.v1';
-const SPOTIFY_TARGET_KEY = 'audiopheliac.cockpit.spotifyTargetDeviceId.v1';
+// ── Utilities ────────────────────────────────────────────────────────────────
+function escHtml(s) {
+  return String(s ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+function escAttr(s) { return escHtml(s); }
 
-// Zone preference order. Cockpit picks the first available match.
-const ZONE_PREFERENCE = ['Family Room — Yamaha', 'Studio · AIR HUB', 'Family Room — Bose'];
-
-const LIBRARY_HOME_HIDE = new Set([
-  'my live radio',
-]);
-
-const state = {
-  config: {
-    enabled_sources: [],
-    preferred_zones: [],
-    net_radio_suggestions: [],
-    spotify_configured: false,
-    spotify_authorized: false,
-  },
-  volumeMin: 0, volumeMax: 161, volumeStep: 1,
-  inputList: [], currentInput: null,
-  power: null, mute: false, volume: 0,
-  roonState: 'disconnected', roonError: null, roonCoreName: null,
-  zones: [],
-  activeZoneId: localStorage.getItem(ACTIVE_ZONE_KEY) || null,
-  spotify: {
-    authorized: false,
-    nowPlaying: null,
-    devices: [],
-    playlists: [],
-    selectedDeviceId: localStorage.getItem(SPOTIFY_TARGET_KEY) || null,
-    shuffleState: false,
-    repeatState: 'off',      // 'off' | 'context' | 'track'
-  },
-  system: {
-    bridge: 'unknown',
-    server: 'unknown',
-    yamaha: 'unknown',
-  },
-  active: {
-    engine: 'yamaha', yamaha_source: null, yamaha_power: null,
-    spotify_device: null, roon_zone: null, roon_zone_id: null,
-  },
-};
-
-let sliderDirty = false;
-let sliderDirtyTimer = null;
-
-// Active tab in the Library card: 'recent'|'albums'|'artists'|'playlists'|'genres'|'spotify'
-let activeLibTab = 'recent';
-// Last Spotify search query rendered in the library tab
-let lastSpotifyResults = null;
-
-// Per-zone volume slider dirty tracking: zone_id -> timer
-const zoneVolDirtyTimers = new Map();
-
-// ----- HTTP -----
-const CSRF_TOKEN =
-  (document.querySelector('meta[name="cockpit-csrf"]') || {}).content || '';
-
-let _csrfStaleNoticed = false;
-function _noticeCsrfStale() {
-  if (_csrfStaleNoticed) return;
-  _csrfStaleNoticed = true;
-  flashToast('Cockpit session expired (Flask restarted). Reload the page.');
+function fmtMs(ms) {
+  const s = Math.max(0, Math.floor(ms / 1000));
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 }
 
-// api() NEVER throws or rejects.  All network and parse errors are caught and
-// returned as { ok: false, error: string } so callers can use plain .then()
-// chains without a .catch() guard.  Do not change this contract without
-// auditing every call-site.
-async function api(path, opts = {}) {
-  const r = await fetch(path, {
-    method: opts.method || 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Cockpit-CSRF': CSRF_TOKEN,
-    },
-    body: opts.body ? JSON.stringify(opts.body) : undefined,
-  });
-  if (r.status === 403) {
-    _noticeCsrfStale();
-    return { ok: false, error: 'csrf token stale (Flask was restarted)' };
-  }
-  try {
-    return await r.json();
-  } catch (e) {
-    return { ok: false, error: 'non-JSON response (status ' + r.status + ')' };
-  }
-}
-
-const _recentToasts = new Map();
-function flashToast(msg) {
+// ── Toast ────────────────────────────────────────────────────────────────────
+function toast(msg, kind = 'info', ms = 3500) {
   const now = Date.now();
-  for (const [k, t] of _recentToasts) {
-    if (now - t > 4000) _recentToasts.delete(k);
-  }
-  if (_recentToasts.has(msg)) return;
-  _recentToasts.set(msg, now);
+  if (_toastDedup[msg] && now - _toastDedup[msg] < 4000) return;
+  _toastDedup[msg] = now;
 
-  let host = document.getElementById('toast-host');
-  if (!host) {
-    host = document.createElement('div');
-    host.id = 'toast-host';
-    host.style.cssText = 'position:fixed;bottom:1.5rem;right:1.5rem;z-index:50;display:flex;flex-direction:column;gap:0.4rem;pointer-events:none;max-width:380px;';
-    document.body.appendChild(host);
-  }
-  const t = document.createElement('div');
-  t.textContent = msg;
-  t.style.cssText = 'background:var(--ink-2);color:var(--paper);border:1px solid var(--hairline-2);border-radius:var(--r-md);padding:0.55rem 0.85rem;font-size:0.85rem;box-shadow:0 8px 24px rgba(0,0,0,0.45);pointer-events:auto;';
-  host.appendChild(t);
-  t.addEventListener('click', () => { t.remove(); });
-  setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity 240ms'; }, 4500);
-  setTimeout(() => { t.remove(); }, 5000);
+  const c = document.getElementById('toast-container');
+  if (!c) return;
+  const el = document.createElement('div');
+  el.className = `toast${kind !== 'info' ? ' ' + kind : ''}`;
+  el.textContent = msg;
+  c.appendChild(el);
+  setTimeout(() => el.remove(), ms + 400);
 }
 
-// ----- Topbar clock -----
+// ── API helpers ──────────────────────────────────────────────────────────────
+async function api(method, path, body) {
+  const opts = {
+    method,
+    headers: { 'X-Cockpit-CSRF': CSRF, 'Content-Type': 'application/json' },
+  };
+  if (body !== undefined) opts.body = JSON.stringify(body);
+  const r = await fetch(path, opts);
+  const ct = r.headers.get('content-type') ?? '';
+  const data = ct.includes('json') ? await r.json() : await r.text();
+  if (!r.ok) throw new Error(typeof data === 'object' ? (data.error ?? r.statusText) : data);
+  return data;
+}
+const apiGet  = path       => api('GET',  path);
+const apiPost = (path, b)  => api('POST', path, b);
+
+// ── Clock ────────────────────────────────────────────────────────────────────
 function startClock() {
   function tick() {
-    const el = document.getElementById('topbar-clock');
+    const el = document.getElementById('clock');
     if (!el) return;
-    const now = new Date();
-    const h = now.getHours().toString().padStart(2, '0');
-    const m = now.getMinutes().toString().padStart(2, '0');
-    el.textContent = h + ':' + m;
+    const d = new Date();
+    let h = d.getHours(), m = d.getMinutes();
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    el.textContent = `${h}:${String(m).padStart(2, '0')} ${ampm}`;
   }
   tick();
-  const now = new Date();
-  const msToNextMinute = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
-  setTimeout(() => { tick(); setInterval(tick, 60000); }, msToNextMinute);
+  setInterval(tick, 10000);
 }
 
-// ----- Topbar pills -----
-function markYamahaStatus(ok) {
-  const dot = document.getElementById('status-dot');
-  if (!dot) return;
-  dot.classList.toggle('ok', ok);
-  dot.classList.toggle('err', !ok);
-  const pill = document.getElementById('topbar-yamaha');
-  if (pill) pill.classList.toggle('err', !ok);
-}
-
-function renderRoonBanner() {
-  const el = document.getElementById('topbar-roon');
-  if (!el) return;
-  el.className = 'topbar-pill';
-  switch (state.roonState) {
-    case 'connected':
-      el.textContent = 'Roon · ' + (state.roonCoreName || 'connected');
-      el.classList.add('ok');
-      break;
-    case 'waiting_for_auth':
-      el.textContent = 'Roon · enable extension';
-      el.classList.add('warn');
-      break;
-    case 'discovering':
-      el.textContent = 'Roon · discovering';
-      el.classList.add('warn');
-      break;
-    case 'error':
-      el.textContent = 'Roon · ' + (state.roonError || 'error');
-      el.classList.add('err');
-      break;
-    default:
-      el.textContent = 'Roon · ' + state.roonState;
-  }
-}
-
-function renderSpotifyPill() {
-  const el = document.getElementById('topbar-spotify');
-  if (!el) return;
-  el.className = 'topbar-pill';
-  if (!state.config.spotify_configured) {
-    el.textContent = 'Spotify · unconfigured';
-    return;
-  }
-  if (!state.spotify.authorized) {
-    el.innerHTML = 'Spotify · <a href="/spotify/auth" style="color:inherit;text-decoration:underline;">Connect</a>';
-    el.classList.add('warn');
-    return;
-  }
-  const np = state.spotify.nowPlaying;
-  if (np && np.is_playing) {
-    el.textContent = 'Spotify · playing';
-    el.classList.add('spotify-ok');
-  } else {
-    el.textContent = 'Spotify · idle';
-    el.classList.add('ok');
-  }
-}
-
-function pctFromVolume(v) {
-  const span = state.volumeMax - state.volumeMin || 1;
-  return Math.round(((v - state.volumeMin) / span) * 100);
-}
-
-// ----- System pills -----
-function renderSystemPill(elId, label, st, clickAction) {
-  const el = document.getElementById(elId);
-  if (!el) return;
-  el.className = 'topbar-pill';
-  if (st === 'not_installed' || st === 'missing') {
-    el.classList.add('system-missing');
-    el.textContent = label + ' · missing';
-    el.style.display = '';
-    return;
-  }
-  if (st === 'stopped') {
-    el.classList.add('system-stopped');
-    el.textContent = 'Start ' + label;
-    el.style.display = '';
-    if (clickAction) el.onclick = clickAction;
-    return;
-  }
-  if (st === 'starting') {
-    el.classList.add('system-starting');
-    el.textContent = label + ' · starting';
-    el.style.display = '';
-    return;
-  }
-  if (st === 'running') {
-    el.style.display = 'none';
-    return;
-  }
-  el.style.display = 'none';
-}
-
-async function startRoonBridge() {
-  try {
-    flashToast('Starting Roon Bridge.');
-    const r = await api('/api/system/roon-bridge/start', { method: 'POST' });
-    if (!r.ok) throw new Error(r.error || 'start failed');
-    setTimeout(refreshSystemBootstrap, 1500);
-    setTimeout(refreshRoonStatus, 3000);
-    setTimeout(refreshZones, 5000);
-  } catch (e) {
-    flashToast('Roon Bridge start failed: ' + (e.message || e));
-  }
-}
-
-async function startRoonServer() {
-  try {
-    flashToast('Starting Roon Server on the NAS.');
-    const r = await api('/api/system/roon-server/start', { method: 'POST' });
-    if (!r.ok) throw new Error(r.error || 'start failed');
-    setTimeout(refreshSystemBootstrap, 3000);
-    setTimeout(refreshRoonStatus, 8000);
-    setTimeout(refreshZones, 12000);
-  } catch (e) {
-    flashToast('Roon Server start failed: ' + (e.message || e));
-  }
-}
-
-async function refreshSystemBootstrap() {
-  try {
-    const r = await api('/api/system/bootstrap');
-    if (!r.ok) return;
-    state.system.bridge = (r.roon_bridge || {}).state || 'unknown';
-    state.system.server = (r.roon_server || {}).state || 'unknown';
-    state.system.yamaha = (r.yamaha || {}).state || 'unknown';
-    renderSystemPill('topbar-bridge', 'Bridge', state.system.bridge, startRoonBridge);
-    renderSystemPill('topbar-server', 'Server', state.system.server, startRoonServer);
-  } catch (e) { /* ignore */ }
-}
-
-// ----- Yamaha: source list -----
-function renderInputList() {
-  const host = document.getElementById('input-list');
-  if (!host) return;
-  host.innerHTML = '';
-  if (!state.inputList.length) {
-    host.innerHTML = '<span class="muted">No sources reported.</span>';
-    return;
-  }
-  const enabled = state.config.enabled_sources || [];
-  const filterOn = enabled.length > 0;
-  const list = filterOn
-    ? state.inputList.filter(name => enabled.includes(name))
-    : state.inputList;
-
-  for (const name of list) {
-    const b = document.createElement('button');
-    b.className = 'src-btn' + (name === state.currentInput ? ' active' : '');
-    b.textContent = name.replace(/_/g, ' ');
-    b.addEventListener('click', async () => {
-      const r = await api('/api/input', { method: 'POST', body: { name } });
-      if (r && !r.ok) flashToast('Input switch failed: ' + (r.error || 'unknown'));
-      await refreshStatus();
-    });
-    host.appendChild(b);
-  }
-  if (filterOn && state.currentInput && !enabled.includes(state.currentInput)) {
-    const b = document.createElement('button');
-    b.className = 'source-btn active';
-    b.textContent = state.currentInput.replace(/_/g, ' ') + ' *';
-    b.title = 'Currently active but not in your enabled-sources filter';
-    host.appendChild(b);
-  }
-}
-
-// ----- Yamaha: power toggle -----
-function renderPowerToggle() {
-  const btn = document.getElementById('btn-power-toggle');
-  const label = document.getElementById('power-state-label');
-  const sub = document.getElementById('power-sub');
-  if (!btn) return;
-  const p = (state.power || '').toLowerCase();
-  const isOn = p === 'on';
-  btn.dataset.state = isOn ? 'on' : 'off';
-  if (label) label.textContent = isOn ? 'On' : 'Standby';
-  if (sub) sub.textContent = p || 'unknown';
-  const dot = btn.querySelector('.power-dot');
-  if (dot) {
-    dot.classList.toggle('on', isOn);
-    dot.classList.toggle('off', !isOn);
-  }
-}
-
-// ----- Yamaha: mute toggle -----
-function renderMuteToggle() {
-  const btn = document.getElementById('btn-mute');
-  const label = document.getElementById('mute-state-label');
-  if (btn) btn.dataset.state = state.mute ? 'on' : 'off';
-  if (label) label.textContent = state.mute ? 'Muted' : 'Off';
-}
-
-async function refreshStatus() {
-  try {
-    const s = await api('/api/status');
-    if (!s.ok) throw new Error(s.error || 'status failed');
-    markYamahaStatus(true);
-    state.volumeMin  = s.volume_min;
-    state.volumeMax  = s.volume_max;
-    state.volumeStep = s.volume_step;
-    state.inputList  = s.input_list || [];
-    state.currentInput = s.input;
-    state.power = s.power;
-    state.mute  = s.mute;
-    state.volume = s.volume;
-
-    renderPowerToggle();
-    renderMuteToggle();
-
-    const slider = document.getElementById('vol-slider');
-    if (slider) {
-      slider.min  = state.volumeMin;
-      slider.max  = state.volumeMax;
-      slider.step = state.volumeStep;
-      if (!sliderDirty) slider.value = state.volume;
-    }
-    const pctEl = document.getElementById('vol-pct');
-    if (pctEl) {
-      pctEl.textContent = pctFromVolume(state.volume) + '%' + (state.mute ? ' (muted)' : '');
-    }
-    renderInputList();
-  } catch (e) {
-    markYamahaStatus(false);
-  }
-}
-
-// ----- Yamaha: Net Radio presets from config (P1-P8) -----
-function renderConfigPresets() {
-  const host = document.getElementById('preset-list');
-  if (!host) return;
-  host.innerHTML = '';
-  const stations = state.config.net_radio_suggestions || [];
-  for (let i = 0; i < 8; i++) {
-    const s = stations[i];
-    const b = document.createElement('button');
-    b.className = 'preset';
-    const num = document.createElement('span');
-    num.className = 'preset-num';
-    num.textContent = 'P' + (i + 1);
-    b.appendChild(num);
-    if (s) {
-      const label = s.vtuner_search || s.name || '';
-      b.appendChild(document.createTextNode(label));
-      const n = i + 1;
-      b.addEventListener('click', () => playFromNetRadioPreset(n));
-    } else {
-      b.appendChild(document.createTextNode('—'));
-      b.disabled = true;
-    }
-    host.appendChild(b);
-  }
-}
-
-async function copyToClipboard(text, btnEl) {
-  try {
-    await navigator.clipboard.writeText(text);
-  } catch (e) {
-    const ta = document.createElement('textarea');
-    ta.value = text; document.body.appendChild(ta); ta.select();
-    try { document.execCommand('copy'); } catch (_) {}
-    document.body.removeChild(ta);
-  }
-  if (btnEl) {
-    const orig = btnEl.textContent;
-    btnEl.textContent = 'Copied';
-    btnEl.classList.add('copied');
-    setTimeout(() => { btnEl.textContent = orig; btnEl.classList.remove('copied'); }, 1200);
-  }
-}
-
-// ----- Roon: status -----
-async function refreshRoonStatus() {
-  try {
-    const r = await api('/api/roon/status');
-    if (!r.ok) return;
-    const prev = state.roonState;
-    state.roonState  = r.state;
-    state.roonError  = r.error;
-    state.roonCoreName = r.core_name;
-    renderRoonBanner();
-    if (prev !== 'connected' && state.roonState === 'connected') {
-      await refreshZones();
-      if (activeLibTab !== 'spotify') await navigateToRoonTab(activeLibTab);
-    } else if (prev === 'connected' && state.roonState !== 'connected') {
-      renderZones();
-      if (activeLibTab !== 'spotify') setLibraryStatus(roonHintForState());
-    }
-  } catch (e) { /* ignore */ }
-}
-
-function roonHintForState() {
-  switch (state.roonState) {
-    case 'waiting_for_auth':
-      return 'Open Roon, Settings, Extensions, and enable The Audiopheliac Cockpit.';
-    case 'discovering': return 'Looking for the Roon Core on the LAN.';
-    case 'error':       return 'Roon error: ' + (state.roonError || 'unknown');
-    default:            return 'Roon: ' + state.roonState;
-  }
-}
-
-function setLibraryStatus(msg) {
-  const list = document.getElementById('lib-list');
-  if (list) list.innerHTML = '<span class="muted">' + msg + '</span>';
-  const crumb = document.getElementById('library-crumb');
-  if (crumb) crumb.textContent = '—';
-}
-
-// ----- Roon: zones with per-zone volume sliders -----
-function renderZones() {
-  const host = document.getElementById('zone-list');
-  const meta = document.getElementById('zone-meta');
-  if (!host) return;
-  host.innerHTML = '';
-
-  if (state.roonState !== 'connected') {
-    host.innerHTML = '<span class="muted">' + roonHintForState() + '</span>';
-    // Show reconnect and clear-auth buttons when not connected
-    const btnRow = document.createElement('div');
-    btnRow.style.cssText = 'margin-top:0.5rem;display:flex;gap:0.4rem;flex-wrap:wrap;';
-
-    const reconnBtn = document.createElement('button');
-    reconnBtn.className = 'primary-btn';
-    reconnBtn.textContent = 'Reconnect';
-    reconnBtn.addEventListener('click', async () => {
-      reconnBtn.disabled = true; reconnBtn.textContent = 'Connecting...';
-      try {
-        const r = await api('/api/roon/reconnect', { method: 'POST' });
-        if (!r.ok) throw new Error(r.error || 'reconnect failed');
-        flashToast('Roon reconnect requested.');
-        setTimeout(refreshRoonStatus, 2000);
-        setTimeout(refreshZones, 4000);
-      } catch (e) {
-        flashToast('Reconnect failed: ' + (e.message || e));
-      } finally {
-        reconnBtn.disabled = false; reconnBtn.textContent = 'Reconnect';
-      }
-    });
-
-    const clearBtn = document.createElement('button');
-    clearBtn.className = 'ghost-btn';
-    clearBtn.textContent = 'Clear auth & reconnect';
-    clearBtn.title = 'Deletes the saved Roon token and starts a fresh authorization. Use when stuck in "discovering" or "error" after a Roon Server reinstall.';
-    clearBtn.addEventListener('click', async () => {
-      clearBtn.disabled = true; clearBtn.textContent = 'Clearing...';
-      try {
-        const r = await api('/api/roon/clear-auth', { method: 'POST' });
-        if (!r.ok) throw new Error(r.error || 'clear failed');
-        flashToast('Token cleared. Open Roon Remote → Settings → Extensions and enable The Audiopheliac Cockpit.');
-        setTimeout(refreshRoonStatus, 2000);
-      } catch (e) {
-        flashToast('Clear auth failed: ' + (e.message || e));
-      } finally {
-        clearBtn.disabled = false; clearBtn.textContent = 'Clear auth & reconnect';
-      }
-    });
-
-    btnRow.append(reconnBtn, clearBtn);
-    host.appendChild(btnRow);
-    if (meta) meta.textContent = 'offline';
-    return;
-  }
-
-  const preferredCount = (state.config.preferred_zones || []).length;
-  const showStaleResync = preferredCount > 0 && state.zones.length > 0 &&
-                          state.zones.length < preferredCount;
-
-  if (!state.zones.length) {
-    host.innerHTML = `
-      <span class="muted">Roon Core is connected but reporting zero outputs. Either an output got disabled in Roon Remote (Settings &rsaquo; Audio), or the Cockpit&rsquo;s WebSocket to the Core is wedged. Reconnect tries the second case without leaving the Cockpit.</span>
-      <div style="margin-top:0.5rem;display:flex;gap:0.4rem;">
-        <button class="primary-btn" id="btn-roon-reconnect">Reconnect Roon</button>
-      </div>
-    `;
-    const btn = document.getElementById('btn-roon-reconnect');
-    if (btn) {
-      btn.addEventListener('click', async () => {
-        btn.disabled = true; btn.textContent = 'Reconnecting...';
-        try {
-          const r = await api('/api/roon/reconnect', { method: 'POST' });
-          if (!r.ok) throw new Error(r.error || 'reconnect failed');
-          flashToast('Roon reconnect requested. Zones should repopulate in a few seconds.');
-          setTimeout(refreshRoonStatus, 2000);
-          setTimeout(refreshZones, 4000);
-        } catch (e) {
-          flashToast('Reconnect failed: ' + (e.message || e));
-        } finally {
-          btn.disabled = false; btn.textContent = 'Reconnect Roon';
-        }
-      });
-    }
-    if (meta) meta.textContent = '0 zones';
-    return;
-  }
-
-  const preferred = state.config.preferred_zones || [];
-  const filterOn  = preferred.length > 0;
-  const matchesPreferred = (z) =>
-    preferred.some(p => (z.display_name || '').toLowerCase().includes(p.toLowerCase()));
-  const sortedZones = [...state.zones].sort((a, b) => {
-    if (filterOn) {
-      const am = matchesPreferred(a), bm = matchesPreferred(b);
-      if (am !== bm) return am ? -1 : 1;
-    }
-    if (a.zone_id === state.activeZoneId) return -1;
-    if (b.zone_id === state.activeZoneId) return 1;
-    return (a.display_name || '').localeCompare(b.display_name || '');
-  });
-  const shown = filterOn ? sortedZones.filter(matchesPreferred) : sortedZones;
-  if (meta) meta.textContent = filterOn
-    ? `${shown.length} of ${state.zones.length} zones`
-    : `${state.zones.length} zones`;
-
-  for (const z of shown) {
-    const isActive   = z.zone_id === state.activeZoneId;
-    const isPlaying  = z.state && z.state === 'playing';
-    const vol        = z.volume || {};
-    const hasVolume  = typeof vol.value === 'number' && typeof vol.max === 'number' && vol.max > 0;
-
-    // Zone row wrapper
-    const row = document.createElement('div');
-    row.className = 'zone-row' + (isActive ? ' active' : '') + (isPlaying ? ' playing' : '');
-
-    // Left: clickable zone selector
-    const selector = document.createElement('button');
-    selector.className = 'zone-selector';
-    selector.type = 'button';
-
-    const led = document.createElement('span');
-    led.className = 'zone-led';
-
-    const info = document.createElement('div');
-    info.className = 'zone-info';
-    const zName = document.createElement('span');
-    zName.className = 'zone-name';
-    zName.textContent = z.display_name || '(unnamed)';
-    const zOut = document.createElement('span');
-    zOut.className = 'zone-out';
-    zOut.textContent = (z.outputs || []).join(', ') || '—';
-    info.append(zName, zOut);
-
-    const zState = document.createElement('span');
-    zState.className = 'zone-state';
-    zState.textContent = z.state || 'idle';
-
-    selector.append(led, info, zState);
-    selector.addEventListener('click', () => {
-      state.activeZoneId = z.zone_id;
-      localStorage.setItem(ACTIVE_ZONE_KEY, z.zone_id);
-      renderZones();
-      refreshNowPlaying();
-      if (activeLibTab === 'roon') libraryHome();
-    });
-
-    row.appendChild(selector);
-
-    // Right: volume slider (only if the zone reports volume data)
-    if (hasVolume) {
-      const volWrap = document.createElement('div');
-      volWrap.className = 'zone-vol';
-
-      const slider = document.createElement('input');
-      slider.type  = 'range';
-      slider.className = 'zone-vol-slider';
-      slider.min   = vol.min || 0;
-      slider.max   = vol.max;
-      slider.value = vol.value;
-      slider.title = 'Zone volume: ' + vol.value;
-
-      slider.addEventListener('input', (e) => {
-        slider.title = 'Zone volume: ' + e.target.value;
-      });
-      slider.addEventListener('change', async (e) => {
-        const level = Number(e.target.value);
-        const zoneId = z.zone_id;
-        // Debounce: cancel prior timer for this zone
-        if (zoneVolDirtyTimers.has(zoneId)) {
-          clearTimeout(zoneVolDirtyTimers.get(zoneId));
-        }
-        const timer = setTimeout(async () => {
-          zoneVolDirtyTimers.delete(zoneId);
-          try {
-            const r = await api('/api/roon/zone-volume', {
-              method: 'POST',
-              body: { zone_id: zoneId, level },
-            });
-            if (!r.ok) throw new Error(r.error || 'volume failed');
-          } catch (err) {
-            flashToast('Zone volume failed: ' + (err.message || err));
-          }
-        }, 300);
-        zoneVolDirtyTimers.set(zoneId, timer);
-      });
-
-      // Muted indicator
-      if (vol.is_muted) {
-        const mutedBadge = document.createElement('span');
-        mutedBadge.className = 'zone-muted-badge';
-        mutedBadge.textContent = 'muted';
-        volWrap.appendChild(mutedBadge);
-      }
-      volWrap.appendChild(slider);
-      row.appendChild(volWrap);
-    }
-
-    host.appendChild(row);
-  }
-
-  if (showStaleResync) {
-    const resync = document.createElement('button');
-    resync.className = 'ghost-btn';
-    resync.style.cssText = 'margin-top:0.55rem;align-self:flex-start;font-size:0.8rem;';
-    resync.textContent = '+ Resync (expected ' + preferredCount + ', seeing ' + state.zones.length + ')';
-    resync.addEventListener('click', async () => {
-      resync.disabled = true; resync.textContent = 'Resyncing...';
-      try {
-        const r = await api('/api/roon/reconnect', { method: 'POST' });
-        if (!r.ok) throw new Error(r.error || 'reconnect failed');
-        flashToast('Roon reconnect requested. Zones should fully repopulate.');
-        setTimeout(refreshRoonStatus, 2000);
-        setTimeout(refreshZones, 5000);
-      } catch (e) {
-        flashToast('Resync failed: ' + (e.message || e));
-      }
-    });
-    host.appendChild(resync);
-  }
-}
-
-function pickPreferredZone(zones) {
-  for (const wanted of ZONE_PREFERENCE) {
-    const w = wanted.toLowerCase();
-    const hit = zones.find(z => (z.display_name || '').toLowerCase().includes(w));
-    if (hit) return hit.zone_id;
-  }
-  return zones.length ? zones[0].zone_id : null;
-}
-
-async function refreshZones() {
-  try {
-    const r = await api('/api/roon/zones');
-    if (!r.ok) return;
-    state.zones = r.zones || [];
-    if (!state.activeZoneId && state.zones.length) {
-      state.activeZoneId = pickPreferredZone(state.zones);
-      if (state.activeZoneId) localStorage.setItem(ACTIVE_ZONE_KEY, state.activeZoneId);
-    }
-    if (state.activeZoneId && !state.zones.find(z => z.zone_id === state.activeZoneId)) {
-      state.activeZoneId = pickPreferredZone(state.zones);
-      if (state.activeZoneId) localStorage.setItem(ACTIVE_ZONE_KEY, state.activeZoneId);
-    }
-    renderZones();
-    refreshNowPlayingZoneLabel();
-  } catch (e) { /* ignore */ }
-}
-
-function refreshNowPlayingZoneLabel() {
-  const label = document.getElementById('now-zone-label');
-  if (!label) return;
-  const z = state.zones.find(z => z.zone_id === state.activeZoneId);
-  label.textContent = z ? `Zone: ${z.display_name}` : 'pick a zone to start';
-}
-
-// ----- Active engine detection -----
-async function refreshActiveEngine() {
-  try {
-    const r = await api('/api/playback/active');
-    if (!r.ok) return;
-    state.active = {
-      engine:          r.engine || 'yamaha',
-      yamaha_source:   r.yamaha_source,
-      yamaha_power:    r.yamaha_power,
-      spotify_device:  r.spotify_device || null,
-      roon_zone:       r.roon_zone || null,
-      roon_zone_id:    r.roon_zone_id || null,
-    };
-    renderEngineTag();
-  } catch (e) { /* ignore */ }
-}
-
-function renderEngineTag() {
-  const tag = document.getElementById('now-engine-tag');
-  const src = document.getElementById('now-source');
-  if (!tag) return;
-  const e = state.active.engine || 'yamaha';
-  tag.className = 'nmv-engine engine-' + e;
-  let label = 'engine · idle';
-  if (e === 'spotify') label = 'engine · spotify';
-  else if (e === 'roon') label = 'engine · roon';
-  else if (e === 'yamaha' && state.active.yamaha_source) {
-    label = 'engine · yamaha (' + (state.active.yamaha_source || '').replace(/_/g, ' ') + ')';
-  } else if (e === 'yamaha') label = 'engine · yamaha';
-  tag.textContent = label;
-  if (src) {
-    if (e === 'spotify' && state.active.spotify_device) {
-      src.textContent = 'connect target · ' + state.active.spotify_device;
-    } else if (e === 'roon' && state.active.roon_zone) {
-      src.textContent = 'zone · ' + state.active.roon_zone;
-    } else {
-      src.textContent = '';
-    }
-  }
-}
-
-// ----- Now Playing hub -----
-async function refreshNowPlaying() {
-  refreshNowPlayingZoneLabel();
-  let np = null;
-  const engine = state.active.engine;
-
-  // Prefer Roon zone metadata only when the zone is currently PLAYING.
-  const activeZone = state.zones.find(z => z.zone_id === state.activeZoneId);
-  const zoneIsPlaying = !!(activeZone && (activeZone.state || '').toLowerCase() === 'playing');
-  if (state.roonState === 'connected' && state.activeZoneId && zoneIsPlaying) {
-    try {
-      const r = await api('/api/roon/now-playing?zone_id=' + encodeURIComponent(state.activeZoneId));
-      if (r.ok && r.now_playing && r.now_playing.title) {
-        np = { source: 'roon', ...r.now_playing };
-      }
-    } catch (e) {}
-  }
-
-  // Spotify is the next preference when actively playing.
-  const spotifyIsPlaying = !!(state.spotify.nowPlaying && state.spotify.nowPlaying.is_playing);
-  if (!np && spotifyIsPlaying) {
-    const sp = state.spotify.nowPlaying;
-    np = {
-      source: 'spotify',
-      title:  sp.track_name,
-      artist: sp.track_artists,
-      album:  sp.track_album,
-      art_url: sp.art_url,
-      seek_position: sp.progress_ms ? sp.progress_ms / 1000 : null,
-      length: sp.track_duration_ms ? sp.track_duration_ms / 1000 : null,
-      state:  sp.is_playing ? 'playing' : 'paused',
-    };
-  }
-
-  if (!np || !np.title) {
-    try {
-      const r = await api('/api/play-info');
-      if (r.ok && r.play) {
-        const p = r.play;
-        if (p.track || p.artist || p.album) {
-          np = {
-            source: 'yamaha',
-            title: p.track, artist: p.artist, album: p.album,
-            albumart_url: p.albumart_url,
-            play_time: p.play_time, total_time: p.total_time,
-          };
-        }
-      }
-    } catch (e) {}
-  }
-
-  document.getElementById('now-track').textContent  = (np && np.title)  || 'Nothing playing yet.';
-  document.getElementById('now-artist').textContent = (np && np.artist) || '';
-  document.getElementById('now-album').textContent  = (np && np.album)  || '';
-
-  const metaEl = document.getElementById('now-meta');
-  if (metaEl) {
-    if (np && np.format) {
-      metaEl.textContent = [np.format, np.sample_rate, np.bitrate].filter(Boolean).join(' · ');
-    } else if (np && np.signal_path_quality) {
-      metaEl.textContent = np.signal_path_quality;
-    } else {
-      metaEl.textContent = '';
-    }
-  }
-
-  const elapsed = np && (np.seek_position ?? np.play_time);
-  const total   = np && (np.length ?? np.total_time);
-  document.getElementById('now-elapsed').textContent = fmtTime(elapsed);
-  document.getElementById('now-total').textContent   = fmtTime(total);
+// ── Scrub bar ────────────────────────────────────────────────────────────────
+function setScrubFill(progress, duration) {
   const fill = document.getElementById('now-scrub-fill');
-  if (fill) {
-    if (elapsed && total && total > 0) {
-      const pct = Math.max(0, Math.min(100, (elapsed / total) * 100));
-      fill.style.inset = `0 ${100 - pct}% 0 0`;
-    } else {
-      fill.style.inset = '0 100% 0 0';
-    }
-  }
+  if (!fill) return;
+  const pct = duration > 0 ? Math.min(100, (progress / duration) * 100) : 0;
+  fill.style.width = pct + '%';
+  document.getElementById('now-elapsed').textContent = fmtMs(progress);
+  document.getElementById('now-total').textContent   = fmtMs(duration);
+}
 
-  const pp = document.getElementById('btn-playpause');
-  if (pp) {
-    let playing = false;
-    if (engine === 'spotify' && state.spotify.nowPlaying) {
-      playing = !!state.spotify.nowPlaying.is_playing;
-    } else if (engine === 'roon') {
-      const zone = state.zones.find(z => z.zone_id === state.activeZoneId);
-      playing = !!(zone && zone.state === 'playing') || (np && np.state === 'playing');
-    } else {
-      playing = np && np.state === 'playing';
+function startScrub() {
+  if (_scrubRaf) cancelAnimationFrame(_scrubRaf);
+  function frame() {
+    if (_spPlaying && _spDuration > 0) {
+      const delta = performance.now() - _spPollAt;
+      const interp = Math.min(_spProgress + delta, _spDuration);
+      setScrubFill(interp, _spDuration);
     }
-    pp.textContent = playing ? '⏸' : '▶';
+    _scrubRaf = requestAnimationFrame(frame);
   }
+  _scrubRaf = requestAnimationFrame(frame);
+}
 
-  const art = document.getElementById('now-art');
-  if (art) {
-    let artUrl = null;
-    if (np && np.source === 'spotify' && np.art_url) {
-      artUrl = np.art_url;
-    } else if (np && np.source === 'roon' && np.image_key) {
-      try {
-        const r = await api('/api/roon/image?key=' + encodeURIComponent(np.image_key) + '&size=512');
-        if (r.ok && r.url) artUrl = r.url;
-      } catch (e) {}
-    } else if (np && np.albumart_url) {
-      artUrl = np.albumart_url.startsWith('http')
-        ? np.albumart_url
-        : 'http://' + YAMAHA_IP + np.albumart_url;
-    }
-    if (artUrl) { art.src = artUrl; art.classList.add('shown'); }
-    else { art.classList.remove('shown'); art.removeAttribute('src'); }
+// ── Status dots ──────────────────────────────────────────────────────────────
+function setSpotifyDot(ok) {
+  const dot = document.getElementById('dot-spotify');
+  if (!dot) return;
+  if (ok) {
+    dot.style.background  = 'var(--signal)';
+    dot.style.boxShadow   = '0 0 6px var(--signal)';
+  } else {
+    dot.style.background  = 'var(--paper-muted)';
+    dot.style.boxShadow   = 'none';
+  }
+}
+function setYamahaDot(ok) {
+  const dot = document.getElementById('dot-yamaha');
+  if (!dot) return;
+  if (ok) {
+    dot.style.background  = 'var(--signal)';
+    dot.style.boxShadow   = '0 0 6px var(--signal)';
+  } else {
+    dot.style.background  = 'var(--paper-muted)';
+    dot.style.boxShadow   = 'none';
   }
 }
 
-function fmtTime(secs) {
-  if (!secs || secs < 0) return '--:--';
-  const s = Math.floor(secs % 60).toString().padStart(2, '0');
-  const m = Math.floor(secs / 60);
-  return `${m}:${s}`;
+// ── Now Playing ──────────────────────────────────────────────────────────────
+function renderNowPlaying(np) {
+  const isPlaying = np.is_playing ?? false;
+  _spPlaying  = isPlaying;
+  _spProgress = (np.progress_ms     ?? 0);
+  _spDuration = (np.track_duration_ms ?? 0);
+  _spPollAt   = performance.now();
+
+  // Art
+  const wrap    = document.getElementById('now-art-wrap');
+  const img     = document.getElementById('now-art-img');
+  const artLbl  = document.getElementById('now-art-label');
+  const artUrl  = np.art_url ?? '';
+  if (artUrl && img) {
+    img.src = artUrl;
+    img.style.display = 'block';
+    wrap?.classList.remove('placeholder');
+    if (artLbl) artLbl.style.display = 'none';
+  } else {
+    if (img) img.style.display = 'none';
+    wrap?.classList.add('placeholder');
+    if (artLbl) { artLbl.style.display = ''; artLbl.textContent = 'Idle'; }
+  }
+
+  // Text
+  const track  = np.track_name    ?? 'Nothing playing yet.';
+  const artist = np.track_artists ?? '';
+  const album  = np.track_album   ?? '';
+  document.getElementById('now-track').textContent  = track;
+  document.getElementById('now-artist').textContent = artist;
+  document.getElementById('now-album').textContent  = album;
+
+  // Meta row (explicit badge)
+  const metaRow = document.getElementById('now-meta-row');
+  if (metaRow) {
+    const parts = [];
+    if (np.track_explicit) parts.push('<span class="badge">E</span>');
+    metaRow.innerHTML = parts.join(' ');
+  }
+
+  // Scrub state
+  setScrubFill(_spProgress, _spDuration);
+
+  // Play/pause button icon
+  const btn = document.getElementById('btn-playpause');
+  if (btn) btn.querySelector('.t-icon-lg').textContent = isPlaying ? '⏸' : '▶';
+
+  // Zone label
+  const zoneLbl = document.getElementById('now-zone-label');
+  if (zoneLbl) zoneLbl.textContent = np.device?.name ?? 'Idle';
 }
 
-// ----- Shuffle / Repeat toggles -----
-function renderShuffleRepeat() {
+function renderShuffleRepeat(np) {
   const shuffleBtn = document.getElementById('btn-shuffle');
   const repeatBtn  = document.getElementById('btn-repeat');
-  if (shuffleBtn) {
-    const on = state.spotify.shuffleState;
-    shuffleBtn.dataset.state = on ? 'on' : 'off';
-    shuffleBtn.textContent = on ? 'Shuffle on' : 'Shuffle off';
-  }
-  if (repeatBtn) {
-    const rs = state.spotify.repeatState;
-    const isOn = rs !== 'off';
-    repeatBtn.dataset.state = isOn ? 'on' : 'off';
-    const label = rs === 'track' ? 'Repeat 1' : rs === 'context' ? 'Repeat all' : 'Repeat off';
-    repeatBtn.textContent = label;
-  }
-}
+  const shuffleLbl = document.getElementById('label-shuffle');
+  const repeatLbl  = document.getElementById('label-repeat');
 
-function wireShuffleRepeat() {
-  const shuffleBtn = document.getElementById('btn-shuffle');
-  if (shuffleBtn) {
-    shuffleBtn.addEventListener('click', async () => {
-      if (!state.spotify.authorized) { flashToast('Connect Spotify first.'); return; }
-      const newState = !state.spotify.shuffleState;
-      try {
-        const r = await api('/api/spotify/playback/shuffle', {
-          method: 'POST', body: { state: newState },
-        });
-        if (!r.ok) throw new Error(r.error || 'shuffle failed');
-        state.spotify.shuffleState = newState;
-        renderShuffleRepeat();
-      } catch (e) {
-        flashToast('Shuffle failed: ' + (e.message || e));
-      }
-    });
-  }
+  const shuffle = np.shuffle_state ?? false;
+  const repeat  = np.repeat_state ?? 'off'; // 'off' | 'context' | 'track'
 
-  const repeatBtn = document.getElementById('btn-repeat');
-  if (repeatBtn) {
-    repeatBtn.addEventListener('click', async () => {
-      if (!state.spotify.authorized) { flashToast('Connect Spotify first.'); return; }
-      // Cycle: off → context → track → off
-      const cycle = { 'off': 'context', 'context': 'track', 'track': 'off' };
-      const newState = cycle[state.spotify.repeatState] || 'off';
-      try {
-        const r = await api('/api/spotify/playback/repeat', {
-          method: 'POST', body: { state: newState },
-        });
-        if (!r.ok) throw new Error(r.error || 'repeat failed');
-        state.spotify.repeatState = newState;
-        renderShuffleRepeat();
-      } catch (e) {
-        flashToast('Repeat failed: ' + (e.message || e));
-      }
-    });
+  shuffleBtn?.classList.toggle('active', shuffle);
+  if (shuffleLbl) shuffleLbl.textContent = shuffle ? 'Shuffle on' : 'Shuffle off';
+
+  const repeatOn = repeat !== 'off';
+  repeatBtn?.classList.toggle('active', repeatOn);
+  if (repeatLbl) {
+    const labels = { off: 'Repeat off', context: 'Repeat all', track: 'Repeat one' };
+    repeatLbl.textContent = labels[repeat] ?? 'Repeat off';
   }
 }
 
-// ----- Library: tabs -----
+// ── Spotify devices (replaces Roon zones) ───────────────────────────────────
+function renderDevices(devices, activeId) {
+  const list = document.getElementById('device-list');
+  if (!list) return;
 
-// Roon browse paths for each tab. Each entry is an array of fallback paths
-// tried in order; the first one that returns items wins.
-const ROON_TAB_PATHS = {
-  recent:    [['Recently Played'], ['History']],
-  albums:    [['Library', 'Albums'], ['Albums']],
-  artists:   [['Library', 'Artists'], ['Artists']],
-  playlists: [['Library', 'Playlists'], ['Playlists']],
-  genres:    [['Library', 'Genres'], ['Genres']],
+  const meta = document.getElementById('devices-meta');
+  if (devices.length === 0) {
+    list.innerHTML = '<span class="muted">No Spotify devices active.</span>';
+    if (meta) meta.textContent = 'none';
+    return;
+  }
+
+  if (meta) meta.textContent = `${devices.length} device${devices.length !== 1 ? 's' : ''}`;
+
+  list.innerHTML = devices.map(d => {
+    const active = d.id === activeId || d.is_active;
+    return `<div class="zone${active ? ' active' : ''}" data-id="${escAttr(d.id)}">
+      <span class="zone-icon">&#x1F4FB;</span>
+      <div class="zone-info">
+        <span class="zone-name">${escHtml(d.name)}</span>
+        <span class="zone-sub">${escHtml(d.type ?? '')}</span>
+      </div>
+      <div class="zone-actions">
+        <button class="zone-vol-btn" title="Transfer playback">&#x25BA;</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  list.querySelectorAll('.zone').forEach(el => {
+    el.addEventListener('click', async () => {
+      const id = el.dataset.id;
+      if (!id) return;
+      try {
+        await apiPost('/api/spotify/transfer', { device_id: id });
+        _spDeviceId = id;
+        list.querySelectorAll('.zone').forEach(z => z.classList.toggle('active', z.dataset.id === id));
+      } catch (e) {
+        toast('Transfer failed: ' + e.message, 'error');
+      }
+    });
+  });
+}
+
+// ── Spotify poll ─────────────────────────────────────────────────────────────
+async function pollSpotify() {
+  try {
+    const data = await apiGet('/api/spotify/status');
+    setSpotifyDot(true);
+
+    const authPrompt = document.getElementById('sp-auth-prompt');
+    if (authPrompt) authPrompt.style.display = 'none';
+
+    const np = data.now_playing ?? {};
+    renderNowPlaying(np);
+    renderShuffleRepeat(np);
+
+    if (np.device?.id) _spDeviceId = np.device.id;
+  } catch (e) {
+    setSpotifyDot(false);
+    const msg = String(e.message ?? '');
+    if (msg.includes('401') || msg.includes('auth') || msg.includes('unauthorized')) {
+      const authPrompt = document.getElementById('sp-auth-prompt');
+      if (authPrompt) authPrompt.style.display = '';
+    }
+  }
+}
+
+async function pollDevices() {
+  try {
+    const data = await apiGet('/api/spotify/devices');
+    renderDevices(data.devices ?? [], _spDeviceId);
+  } catch (_) {
+    // silent — device list is secondary
+  }
+}
+
+// ── Yamaha ───────────────────────────────────────────────────────────────────
+// inputList from YXC is a plain list of strings (source IDs like "airplay", "spotify", etc.)
+const SOURCE_LABELS = {
+  airplay:     'AirPlay', spotify:    'Spotify',  net_radio: 'Net Radio',
+  tuner:       'Tuner',   cd:         'CD',        aux:       'AUX',
+  line1:       'Line 1',  line2:      'Line 2',    optical1:  'Optical 1',
+  optical2:    'Optical 2', coaxial1: 'Coaxial 1', hdmi1:    'HDMI 1',
+  hdmi2:       'HDMI 2',  server:     'Server',    bluetooth: 'Bluetooth',
 };
-
-async function navigateToRoonTab(tab) {
-  if (state.roonState !== 'connected') { setLibraryStatus(roonHintForState()); return; }
-  if (!state.activeZoneId) { setLibraryStatus('Pick a Roon zone to start.'); return; }
-  const pathOptions = ROON_TAB_PATHS[tab];
-  if (!pathOptions) return;
-  for (const path of pathOptions) {
-    try {
-      const r = await api('/api/roon/browse/navigate', {
-        method: 'POST',
-        body: { zone_id: state.activeZoneId, path },
-      });
-      if (r.ok && r.list && (r.list.items || []).length > 0) {
-        renderLibraryList(r.list);
-        return;
-      }
-    } catch (_) {}
-  }
-  // Fallback: show root if path not found in this Roon library
-  libraryHome();
+function srcLabel(id) {
+  return SOURCE_LABELS[id] ?? id.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
 }
 
-function wireTabs() {
-  document.querySelectorAll('.tab[data-tab]').forEach((btn) => {
+function renderSources(inputList, activeInput) {
+  const list = document.getElementById('source-list');
+  if (!list) return;
+  if (!inputList || inputList.length === 0) {
+    list.innerHTML = '<span class="muted">No sources</span>';
+    return;
+  }
+  list.innerHTML = inputList.map(src => {
+    const id     = typeof src === 'string' ? src : (src.id ?? src);
+    const label  = typeof src === 'string' ? srcLabel(src) : (src.name ?? srcLabel(src.id ?? src));
+    const active = id === activeInput;
+    return `<button class="source-btn${active ? ' active' : ''}" data-src="${escAttr(id)}">${escHtml(label)}</button>`;
+  }).join('');
+  list.querySelectorAll('.source-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
-      const tab = btn.dataset.tab;
-      if (tab === activeLibTab) return;
-      activeLibTab = tab;
-      document.querySelectorAll('.tab[data-tab]').forEach(b => {
-        b.classList.toggle('active', b.dataset.tab === activeLibTab);
-      });
-      if (tab === 'spotify') {
-        document.getElementById('lib-back').style.display = 'none';
-        document.getElementById('lib-home').style.display = 'none';
-        renderSpotifyLibrary();
-      } else {
-        document.getElementById('lib-back').style.display = '';
-        document.getElementById('lib-home').style.display = '';
-        await navigateToRoonTab(tab);
+      const src = btn.dataset.src;
+      try {
+        await apiPost('/api/input', { name: src });
+        list.querySelectorAll('.source-btn').forEach(b => b.classList.toggle('active', b.dataset.src === src));
+      } catch (e) {
+        toast('Source change failed: ' + e.message, 'error');
       }
     });
   });
 }
 
-// ----- Library: Roon browse -----
-const libState = { list: null };
-
-async function libraryHome() {
-  if (state.roonState !== 'connected') { setLibraryStatus(roonHintForState()); return; }
-  if (!state.activeZoneId) { setLibraryStatus('Pick a Roon zone to start.'); return; }
-  try {
-    const r = await api('/api/roon/browse/root', { method: 'POST', body: { zone_id: state.activeZoneId } });
-    if (!r.ok) throw new Error(r.error || 'browse failed');
-    renderLibraryList(r.list, { home: true });
-  } catch (e) { setLibraryStatus('Couldn’t load Roon home: ' + (e.message || e)); }
-}
-
-async function libraryDescend(itemKey, hint) {
-  if (!state.activeZoneId) return;
-  const h = (hint || '').toLowerCase();
-  if (h === 'action' || h === 'action_list') {
-    return playFromLibrary(itemKey);
-  }
-  try {
-    const r = await api('/api/roon/browse/descend', {
-      method: 'POST', body: { zone_id: state.activeZoneId, item_key: itemKey },
-    });
-    if (!r.ok) throw new Error(r.error || 'descend failed');
-    renderLibraryList(r.list);
-  } catch (e) { setLibraryStatus('Couldn’t open that item: ' + (e.message || e)); }
-}
-
-async function libraryBack() {
-  if (!state.activeZoneId) return;
-  try {
-    const r = await api('/api/roon/browse/back', { method: 'POST', body: { zone_id: state.activeZoneId } });
-    if (!r.ok) throw new Error(r.error || 'back failed');
-    renderLibraryList(r.list);
-  } catch (e) { setLibraryStatus('Couldn’t back out: ' + (e.message || e)); }
-}
-
-async function librarySearch(query) {
-  if (activeLibTab === 'spotify') {
-    await spotifySearchInTab(query);
+function renderPresets(presets) {
+  const list = document.getElementById('preset-list');
+  if (!list) return;
+  if (!presets || presets.length === 0) {
+    list.innerHTML = '<span class="muted">No presets</span>';
     return;
   }
-  // Roon tabs: navigate or search
-  if (!state.activeZoneId) { setLibraryStatus('Pick a Roon zone to start.'); return; }
-  if (!query) { await navigateToRoonTab(activeLibTab); return; }
-  try {
-    const r = await api('/api/roon/search', {
-      method: 'POST', body: { zone_id: state.activeZoneId, query },
+  list.innerHTML = presets.map(p => {
+    const num   = p.num  ?? p.id  ?? '';
+    const label = p.text ?? p.name ?? (num ? 'Preset ' + num : '—');
+    if (!num) return '';
+    return `<button class="preset-btn" data-preset="${escAttr(num)}">${escHtml(label)}</button>`;
+  }).join('');
+  list.querySelectorAll('.preset-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const num = btn.dataset.preset;
+      try {
+        await apiPost(`/api/preset/${parseInt(num, 10)}`, {});
+        toast('Preset loaded', 'success', 2000);
+      } catch (e) {
+        toast('Preset failed: ' + e.message, 'error');
+      }
     });
-    if (!r.ok) throw new Error(r.error || 'search failed');
-    renderLibraryList(r.list);
-  } catch (e) { setLibraryStatus('Search failed: ' + (e.message || e)); }
-}
-
-function renderLibraryList(list, opts = {}) {
-  if (activeLibTab === 'spotify') return; // Don't clobber Spotify tab
-  libState.list = list || {};
-  let items = (list && list.items) || [];
-  if (opts.home) {
-    items = items.filter(it => !LIBRARY_HOME_HIDE.has((it.title || '').toLowerCase()));
-  }
-
-  const host   = document.getElementById('lib-list');
-  const crumb  = document.getElementById('library-crumb');
-  if (!host) return;
-  if (crumb) crumb.textContent = (list && list.list && list.list.title)
-    || (list && list.title)
-    || (opts.home ? 'Roon home' : '');
-  host.innerHTML = '';
-
-  if (!items.length) {
-    host.innerHTML = '<span class="muted">Nothing at this level.</span>';
-    return;
-  }
-  for (const item of items) {
-    const hint = item.hint || '';
-    if (hint === 'header') {
-      const h = document.createElement('div');
-      h.className = 'lib-section';
-      h.textContent = item.title || '';
-      host.appendChild(h);
-      continue;
-    }
-    const row       = document.createElement('button');
-    const hintLower = (hint || '').toLowerCase();
-    const isAction  = hintLower === 'action' || hintLower === 'action_list';
-    row.className   = 'lib-item' + (isAction ? ' action' : '');
-
-    const thumb = document.createElement('div');
-    thumb.className = 'lib-thumb';
-    if (item.image_url) {
-      const img = document.createElement('img');
-      img.alt = ''; img.src = item.image_url;
-      thumb.appendChild(img);
-    }
-    row.appendChild(thumb);
-
-    const txt  = document.createElement('div');
-    txt.className = 'lib-text';
-    const main = document.createElement('div');
-    main.className = 'lib-main';
-    main.textContent = item.title || '(untitled)';
-    txt.appendChild(main);
-    if (item.subtitle) {
-      const sub = document.createElement('div');
-      sub.className = 'lib-sub';
-      sub.textContent = item.subtitle;
-      txt.appendChild(sub);
-    }
-    if (isAction) {
-      const kind = document.createElement('span');
-      kind.className = 'lib-kind';
-      kind.textContent = 'play';
-      txt.appendChild(kind);
-    }
-    row.appendChild(txt);
-    row.addEventListener('click', () => libraryDescend(item.item_key, hint));
-    host.appendChild(row);
-  }
-}
-
-function wireLibrary() {
-  const searchBtn = document.getElementById('lib-search-btn');
-  const searchQ   = document.getElementById('lib-q');
-  if (searchBtn && searchQ) {
-    searchBtn.addEventListener('click', () => librarySearch(searchQ.value.trim()));
-    searchQ.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') librarySearch(e.target.value.trim());
-    });
-  }
-  const backBtn = document.getElementById('lib-back');
-  if (backBtn) backBtn.addEventListener('click', libraryBack);
-  const homeBtn = document.getElementById('lib-home');
-  if (homeBtn) homeBtn.addEventListener('click', () => {
-    const q = document.getElementById('lib-q');
-    if (q) q.value = '';
-    libraryHome();
   });
 }
 
-// ----- Library: Spotify tab content -----
-function renderSpotifyLibrary() {
-  const host  = document.getElementById('lib-list');
-  const crumb = document.getElementById('library-crumb');
-  if (!host) return;
+function renderYamaha(s) {
+  if (!s) return;
+  setYamahaDot(true);
 
-  if (!state.config.spotify_configured) {
-    host.innerHTML = '<span class="muted">Spotify is not configured. Add the client secret to console/spotify_secret.json and restart.</span>';
-    if (crumb) crumb.textContent = 'Spotify';
-    setSpotifyAuthPrompt(false);
-    return;
-  }
-  if (!state.spotify.authorized) {
-    host.innerHTML = '';
-    if (crumb) crumb.textContent = 'Spotify';
-    setSpotifyAuthPrompt(true);
-    return;
-  }
+  // Power
+  const power    = document.getElementById('btn-power');
+  const powerLbl = document.getElementById('power-label');
+  const powerSub = document.getElementById('power-sub');
+  const isOn     = s.power === 'on';
+  if (power) power.classList.toggle('off', !isOn);
+  if (powerLbl) powerLbl.textContent = isOn ? 'On' : 'Standby';
+  if (powerSub) powerSub.textContent = 'live';
 
-  setSpotifyAuthPrompt(false);
-  if (crumb) crumb.textContent = 'Spotify library';
+  // Mute
+  const muteLbl = document.getElementById('mute-label');
+  const muteBtn = document.getElementById('btn-mute');
+  const muted   = !!s.mute;
+  if (muteLbl) muteLbl.textContent = muted ? 'On' : 'Off';
+  if (muteBtn) muteBtn.classList.toggle('muted', muted);
 
-  if (lastSpotifyResults) {
-    renderSpotifyResultsInTab(lastSpotifyResults);
-    return;
-  }
+  // Volume
+  const slider = document.getElementById('vol-slider');
+  const volNum  = document.getElementById('vol-num');
+  const vol     = s.volume ?? 0;
+  if (s.volume_max != null) _yamVolMax = s.volume_max;
+  if (slider) { slider.max = _yamVolMax; slider.value = vol; }
+  if (volNum) volNum.textContent = vol;
 
-  renderSpotifyPlaylistsInTab();
+  // Sources
+  renderSources(s.input_list ?? [], s.input ?? '');
 }
 
-function renderSpotifyPlaylistsInTab() {
-  const host = document.getElementById('lib-list');
-  if (!host) return;
-  host.innerHTML = '';
-  const list = state.spotify.playlists || [];
-  if (!list.length) {
-    host.innerHTML = '<span class="muted">No playlists yet. Build one in Spotify and it shows up here.</span>';
-    return;
-  }
-  for (const pl of list) {
-    const row = document.createElement('button');
-    row.className = 'lib-item';
-
-    const thumb = document.createElement('div');
-    thumb.className = 'lib-thumb';
-    if (pl.art_url) {
-      const img = document.createElement('img');
-      img.alt = ''; img.src = pl.art_url;
-      thumb.appendChild(img);
-    }
-    const txt = document.createElement('div');
-    txt.className = 'lib-text';
-    const main = document.createElement('div');
-    main.className = 'lib-main';
-    main.textContent = pl.name || '(untitled)';
-    txt.appendChild(main);
-    const sub = document.createElement('div');
-    sub.className = 'lib-sub';
-    sub.textContent = (pl.tracks ? pl.tracks + ' tracks' : '')
-      + (pl.owner ? ' · ' + pl.owner : '');
-    txt.appendChild(sub);
-    const kind = document.createElement('span');
-    kind.className = 'lib-kind';
-    kind.textContent = 'playlist';
-    txt.appendChild(kind);
-
-    row.append(thumb, txt);
-    row.addEventListener('click', () => {
-      if (!pl.uri) return;
-      playFromSpotify({ context_uri: pl.uri });
-    });
-    host.appendChild(row);
-  }
-}
-
-async function spotifySearchInTab(query) {
-  if (!state.spotify.authorized) {
-    flashToast('Connect Spotify first.');
-    return;
-  }
-  const host = document.getElementById('lib-list');
-  if (!host) return;
-  if (!query) {
-    lastSpotifyResults = null;
-    renderSpotifyLibrary();
-    return;
-  }
-  host.innerHTML = '<span class="muted" style="padding:0.5rem;">Searching.</span>';
+async function pollYamaha() {
   try {
-    const r = await api('/api/spotify/search?q=' + encodeURIComponent(query) + '&limit=8');
-    if (!r.ok) throw new Error(r.error || 'search failed');
-    lastSpotifyResults = r.results || {};
-    renderSpotifyResultsInTab(lastSpotifyResults);
+    const [status] = await Promise.all([
+      apiGet('/api/status'),
+    ]);
+    renderYamaha(status);
   } catch (e) {
-    host.innerHTML = '<span class="muted" style="padding:0.5rem;">Spotify search failed: ' + (e.message || e) + '</span>';
+    setYamahaDot(false);
   }
 }
 
-function renderSpotifyResultsInTab(results) {
-  const host = document.getElementById('lib-list');
-  if (!host) return;
-  host.innerHTML = '';
-  const sections = [
-    ['track',    'Tracks'],
-    ['album',    'Albums'],
-    ['artist',   'Artists'],
-    ['playlist', 'Playlists'],
-  ];
-  let any = false;
-  for (const [kind, label] of sections) {
-    const items = (results[kind] || []).filter(Boolean);
-    if (!items.length) continue;
-    any = true;
-    const h = document.createElement('div');
-    h.className = 'lib-section';
-    h.textContent = label;
-    host.appendChild(h);
-    for (const it of items) {
-      const row = document.createElement('button');
-      row.className = 'lib-item action';
-
-      const thumb = document.createElement('div');
-      thumb.className = 'lib-thumb';
-      if (it.art_url) {
-        const img = document.createElement('img');
-        img.alt = ''; img.src = it.art_url;
-        thumb.appendChild(img);
-      }
-
-      const txt = document.createElement('div');
-      txt.className = 'lib-text';
-      const main = document.createElement('div');
-      main.className = 'lib-main';
-      main.textContent = it.name || '(untitled)';
-      txt.appendChild(main);
-      if (it.subtitle) {
-        const sub = document.createElement('div');
-        sub.className = 'lib-sub';
-        sub.textContent = it.subtitle;
-        txt.appendChild(sub);
-      }
-      const kindEl = document.createElement('span');
-      kindEl.className = 'lib-kind';
-      kindEl.textContent = 'play';
-      txt.appendChild(kindEl);
-
-      row.append(thumb, txt);
-      row.addEventListener('click', () => {
-        if (!it.uri) return;
-        if (kind === 'track') {
-          playFromSpotify({ uris: [it.uri] });
-        } else {
-          playFromSpotify({ context_uri: it.uri });
-        }
-      });
-      host.appendChild(row);
-    }
-  }
-  if (!any) {
-    host.innerHTML = '<span class="muted" style="padding:0.5rem;">No matches.</span>';
-  }
-}
-
-// ----- Spotify device picker modal -----
-function pickSpotifyDeviceModal() {
-  return new Promise(async (resolve) => {
-    let devices = state.spotify.devices || [];
-    try {
-      const d = await api('/api/spotify/devices');
-      if (d.ok && d.devices) devices = d.devices;
-    } catch (e) {}
-    const modal = document.getElementById('sp-device-modal');
-    const list  = document.getElementById('sp-device-modal-list');
-    if (!modal || !list) { resolve(null); return; }
-    list.innerHTML = '';
-    if (!devices.length) {
-      const empty = document.createElement('div');
-      empty.className = 'muted';
-      empty.style.cssText = 'padding:0.85rem;text-align:center;';
-      empty.textContent = 'Spotify reports no available devices right now. Power up the Yamaha, switch its input to Spotify, then retry.';
-      list.appendChild(empty);
-    } else {
-      for (const d of devices) {
-        const row = document.createElement('button');
-        row.type = 'button';
-        row.className = 'modal-device';
-        const left = document.createElement('div');
-        const nm = document.createElement('div');
-        nm.textContent = d.name || '(unnamed)';
-        const meta = document.createElement('div');
-        meta.className = 'modal-device-meta';
-        meta.textContent = [d.type, d.is_active ? 'active' : ''].filter(Boolean).join(' · ');
-        left.append(nm, meta);
-        const hint = document.createElement('span');
-        hint.className = 'lib-kind';
-        hint.textContent = 'pick';
-        hint.style.opacity = '1';
-        row.append(left, hint);
-        row.addEventListener('click', () => {
-          modal.style.display = 'none';
-          resolve(d.id);
-        });
-        list.appendChild(row);
-      }
-    }
-    const close = () => { modal.style.display = 'none'; resolve(null); };
-    document.getElementById('sp-device-modal-close').onclick = close;
-    document.getElementById('sp-device-modal-cancel').onclick = close;
-    modal.style.display = 'flex';
-  });
-}
-
-// ----- Smart play routing -----
-async function playFromLibrary(itemKey) {
-  if (!state.activeZoneId) {
-    flashToast('Pick a Roon zone first.');
-    return;
-  }
+async function loadPresets() {
   try {
-    const r = await api('/api/playback/play-to', {
-      method: 'POST',
-      body: { intent: { kind: 'roon-item', item_key: itemKey }, zone_id: state.activeZoneId },
-    });
-    if (!r.ok) throw new Error(r.error || 'play failed');
-    if (r.source_switched) flashToast('Yamaha switched to ' + r.source_switched + '.');
-    if (r.auto_played === false) {
-      flashToast('Roon didn’t auto-fire a Play action for that item. Try descending into it and clicking the Play option explicitly.');
-    }
-    setTimeout(() => { refreshNowPlaying(); refreshActiveEngine(); }, 600);
-  } catch (e) {
-    flashToast('Couldn’t play that: ' + (e.message || e));
-  }
+    const data = await apiGet('/api/presets');
+    renderPresets(data.presets ?? data);
+  } catch (_) { /* silent */ }
 }
 
-async function playFromSpotify({ context_uri, uris, offset, _retry } = {}) {
-  if (!state.spotify.authorized) {
-    flashToast('Connect Spotify first.');
-    return;
-  }
-  const body = { intent: { kind: 'spotify-uri' } };
-  if (context_uri) body.intent.context_uri = context_uri;
-  if (uris)        body.intent.uris = uris;
-  if (offset)      body.intent.offset = offset;
-  if (state.spotify.selectedDeviceId) body.device_id = state.spotify.selectedDeviceId;
-  let r;
+// ── Queue ────────────────────────────────────────────────────────────────────
+async function pollQueue() {
+  const list = document.getElementById('queue-list');
+  const meta = document.getElementById('queue-meta');
+  if (!list) return;
   try {
-    r = await api('/api/playback/play-to', { method: 'POST', body });
-  } catch (e) {
-    flashToast('Spotify play failed: ' + (e.message || e));
-    return;
-  }
-  if (r.ok) {
-    flashToast('Sent to Yamaha via Spotify Connect.');
-    setTimeout(() => { refreshSpotifyStatus(); refreshActiveEngine(); refreshNowPlaying(); }, 800);
-    return;
-  }
-  if (!_retry && /can't see the Yamaha|doesn't see the Yamaha/i.test(r.error || '')) {
-    const picked = await pickSpotifyDeviceModal();
-    if (picked) {
-      state.spotify.selectedDeviceId = picked;
-      localStorage.setItem(SPOTIFY_TARGET_KEY, picked);
-      return playFromSpotify({ context_uri, uris, offset, _retry: true });
-    }
-    return;
-  }
-  flashToast('Spotify play failed: ' + (r.error || 'unknown'));
-}
-
-async function playFromNetRadioPreset(num) {
-  try {
-    const r = await api('/api/playback/play-to', {
-      method: 'POST',
-      body: { intent: { kind: 'net-radio-preset', preset_num: num } },
-    });
-    if (!r.ok) throw new Error(r.error || 'preset failed');
-    flashToast('Yamaha switched to Net Radio and recalled preset ' + num + '.');
-    setTimeout(() => { refreshStatus(); refreshNowPlaying(); refreshActiveEngine(); }, 600);
-  } catch (e) {
-    flashToast('Preset failed: ' + (e.message || e));
-  }
-}
-
-// ----- Spotify status -----
-async function refreshSpotifyStatus() {
-  if (!state.config.spotify_configured) {
-    state.spotify.authorized = false;
-    renderSpotifyPill();
-    setSpotifyAuthPrompt(true, 'Spotify is not configured. Add the client secret to console/spotify_secret.json and restart.');
-    if (activeLibTab === 'spotify') renderSpotifyLibrary();
-    return;
-  }
-  try {
-    const r = await api('/api/spotify/status');
-    if (!r.ok) {
-      state.spotify.authorized = false;
-      setSpotifyAuthPrompt(true);
-      renderSpotifyPill();
+    const data  = await apiGet('/api/spotify/queue');
+    const items = data.queue ?? [];
+    if (meta) meta.textContent = items.length ? `${items.length} tracks` : 'empty';
+    if (items.length === 0) {
+      list.innerHTML = '<span class="muted">Queue is empty.</span>';
       return;
     }
-    state.spotify.authorized = !!r.authorized;
-    state.config.spotify_authorized = state.spotify.authorized;
-    state.spotify.nowPlaying = r.now_playing || null;
-    state.spotify.devices    = r.devices || [];
-
-    // Extract shuffle/repeat state from now_playing
-    const np = state.spotify.nowPlaying;
-    if (np) {
-      if (typeof np.shuffle_state === 'boolean') {
-        state.spotify.shuffleState = np.shuffle_state;
-      }
-      if (np.repeat_state) {
-        state.spotify.repeatState = np.repeat_state;
-      }
+    list.innerHTML = items.slice(0, 25).map((t, i) =>
+      `<div class="queue-item">
+        <span class="queue-num">${i + 1}</span>
+        <div class="queue-info">
+          <span class="queue-track">${escHtml(t.name ?? t.title ?? '')}</span>
+          <span class="queue-artist">${escHtml((t.artists ?? []).map(a => a.name ?? a).join(', ') || t.artist || '')}</span>
+        </div>
+        <span class="queue-dur">${fmtMs(t.duration_ms ?? 0)}</span>
+      </div>`
+    ).join('');
+  } catch (_) {
+    if (list.innerHTML === '' || list.innerHTML.includes('muted')) {
+      list.innerHTML = '<span class="muted">Queue appears once Spotify is playing.</span>';
     }
-
-    setSpotifyAuthPrompt(!state.spotify.authorized);
-    renderSpotifyPill();
-    renderShuffleRepeat();
-
-    if (activeLibTab === 'spotify') renderSpotifyLibrary();
-  } catch (e) { /* ignore */ }
+  }
 }
 
-async function refreshSpotifyPlaylists() {
-  if (!state.spotify.authorized) return;
+// ── Library ──────────────────────────────────────────────────────────────────
+function setTab(name) {
+  _activeTab = name;
+  document.querySelectorAll('.tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.tab === name);
+  });
+  const list = document.getElementById('lib-list');
+  if (!list) return;
+  const stored = list.dataset['stored_' + name];
+  if (stored) list.innerHTML = stored;
+}
+
+function storeTabContent(name, html) {
+  const list = document.getElementById('lib-list');
+  if (list) list.dataset['stored_' + name] = html;
+}
+
+async function loadPlaylists() {
+  const list = document.getElementById('lib-list');
+  if (!list) return;
+  if (_activeTab === 'playlists') list.innerHTML = '<span class="muted">Loading playlists…</span>';
   try {
-    const r = await api('/api/spotify/playlists?limit=50');
-    if (!r.ok) return;
-    state.spotify.playlists = r.playlists || [];
-    if (activeLibTab === 'spotify' && !lastSpotifyResults) {
-      renderSpotifyPlaylistsInTab();
-    }
-  } catch (e) { /* ignore */ }
-}
-
-function setSpotifyAuthPrompt(show, customMsg) {
-  const el = document.getElementById('sp-auth-prompt');
-  if (!el) return;
-  el.style.display = show ? 'flex' : 'none';
-  if (customMsg) {
-    const p = el.querySelector('p');
-    if (p) p.textContent = customMsg;
+    const data  = await apiGet('/api/spotify/playlists?limit=50');
+    const items = data.playlists ?? data.items ?? [];
+    const html  = items.length === 0
+      ? '<span class="muted">No playlists found.</span>'
+      : items.map(pl =>
+          `<div class="lib-item" data-uri="${escAttr(pl.uri ?? '')}" data-type="playlist">
+            ${pl.art_url ? `<img class="lib-art" src="${escAttr(pl.art_url)}" alt="">` : '<div class="lib-art-placeholder"></div>'}
+            <div class="lib-info">
+              <span class="lib-title">${escHtml(pl.name ?? '')}</span>
+              <span class="lib-sub">${escHtml(pl.tracks != null ? pl.tracks + ' tracks' : (pl.owner ?? ''))}</span>
+            </div>
+          </div>`
+        ).join('');
+    storeTabContent('playlists', html);
+    if (_activeTab === 'playlists') list.innerHTML = html;
+    wireLibItems(list);
+  } catch (e) {
+    if (_activeTab === 'playlists') list.innerHTML = '<span class="muted">Could not load playlists.</span>';
   }
 }
 
-// ----- Up Next: reads from /api/roon/queue -----
-async function refreshUpNext() {
-  const host = document.getElementById('upnext-list');
-  const meta = document.getElementById('upnext-meta');
-  if (!host) return;
-
-  const engine = state.active.engine;
-
-  // Spotify engine: fetch real queue from /api/spotify/queue
-  if (engine === 'spotify') {
-    try {
-      const r = await api('/api/spotify/queue');
-      if (r.ok && r.queue && r.queue.length > 0) {
-        host.innerHTML = '';
-        let i = 1;
-        for (const item of r.queue) {
-          const row = document.createElement('div');
-          row.className = 'queue-item' + (i === 1 ? ' now' : '');
-
-          const num = document.createElement('span');
-          num.className = 'q-num';
-          num.textContent = i === 1 ? '▶' : i;
-
-          const txt = document.createElement('div');
-          txt.className = 'q-text';
-          const main = document.createElement('div');
-          main.className = 'q-main';
-          main.textContent = item.track_name || '(untitled)';
-          txt.appendChild(main);
-          if (item.track_artists) {
-            const sub = document.createElement('div');
-            sub.className = 'q-sub';
-            sub.textContent = item.track_artists + (item.track_album ? ' · ' + item.track_album : '');
-            txt.appendChild(sub);
-          }
-
-          const len = document.createElement('span');
-          len.className = 'q-len';
-          len.textContent = item.track_duration_ms ? fmtTime(item.track_duration_ms / 1000) : '';
-
-          row.append(num, txt, len);
-          host.appendChild(row);
-          i++;
-        }
-        if (meta) meta.textContent = 'spotify · ' + r.queue.length + ' up next';
-      } else {
-        host.innerHTML = '<span class="muted">Queue empty.</span>';
-        if (meta) meta.textContent = 'spotify';
-      }
-    } catch (e) {
-      host.innerHTML = '<span class="muted">Could not load Spotify queue.</span>';
-      if (meta) meta.textContent = 'spotify';
-    }
-    return;
-  }
-
-  // Roon engine: pull from /api/roon/queue
-  if (state.roonState === 'connected' && state.activeZoneId) {
-    try {
-      const r = await api('/api/roon/queue?zone_id=' + encodeURIComponent(state.activeZoneId));
-      if (r.ok && r.queue && r.queue.length) {
-        host.innerHTML = '';
-        let i = 1;
-        for (const item of r.queue) {
-          const row = document.createElement('div');
-          row.className = 'queue-item' + (i === 1 ? ' now' : '');
-
-          const num = document.createElement('span');
-          num.className = 'q-num';
-          num.textContent = i === 1 ? '▶' : i;
-
-          const txt = document.createElement('div');
-          txt.className = 'q-text';
-          const main = document.createElement('div');
-          main.className = 'q-main';
-          main.textContent = item.title || '(untitled)';
-          txt.appendChild(main);
-          if (item.subtitle) {
-            const sub = document.createElement('div');
-            sub.className = 'q-sub';
-            sub.textContent = item.subtitle;
-            txt.appendChild(sub);
-          }
-
-          const len = document.createElement('span');
-          len.className = 'q-len';
-          len.textContent = item.duration ? fmtTime(item.duration) : '';
-
-          row.append(num, txt, len);
-          host.appendChild(row);
-          i++;
-          if (i > 12) break; // cap display at 12 items
-        }
-        if (meta) meta.textContent = 'roon queue (' + r.queue.length + ')';
-        return;
-      }
-    } catch (e) { /* fall through to idle state */ }
-  }
-
-  host.innerHTML = '<span class="muted">Queue lives here once Roon or Spotify is playing.</span>';
-  if (meta) meta.textContent = 'idle';
-}
-
-// ----- Wiring -----
-function wireReceiver() {
-  // v0.7: single power toggle cycles On / Standby
-  const powerToggle = document.getElementById('btn-power-toggle');
-  if (powerToggle) {
-    powerToggle.addEventListener('click', async () => {
-      const p = (state.power || '').toLowerCase();
-      const isOn = p === 'on';
-      const endpoint = isOn ? '/api/power/off' : '/api/power/on';
-      state.power = isOn ? 'standby' : 'on';
-      renderPowerToggle();
-      const r = await api(endpoint, { method: 'POST' });
-      if (r && !r.ok) flashToast('Power toggle failed: ' + (r.error || 'unknown'));
-      refreshStatus();
-    });
+async function doSearch(q) {
+  if (!q) return;
+  setTab('search');
+  const list = document.getElementById('lib-list');
+  if (list) list.innerHTML = '<span class="muted">Searching…</span>';
+  try {
+    const data = await apiGet(`/api/spotify/search?q=${encodeURIComponent(q)}&type=track,album,playlist&limit=20`);
+    // spotify.py search() returns normalized items: {track:[...], album:[...], playlist:[...]}
+    // wrapped by the endpoint as data.results
+    const r = data.results ?? {};
+    const all = [
+      ...(r.playlist ?? []),
+      ...(r.album    ?? []),
+      ...(r.track    ?? []),
+    ];
+    const html = all.length === 0
+      ? '<span class="muted">No results.</span>'
+      : all.map(item => {
+          const img   = item.art_url ?? '';
+          const sub   = item.subtitle ?? '';
+          const kind  = item.kind ?? '';
+          const badge = kind !== 'track' ? `<span class="lib-badge">${escHtml(kind)}</span>` : '';
+          return `<div class="lib-item" data-uri="${escAttr(item.uri ?? '')}" data-type="${escAttr(kind)}">
+            ${img ? `<img class="lib-art" src="${escAttr(img)}" alt="">` : '<div class="lib-art-placeholder"></div>'}
+            <div class="lib-info">
+              <span class="lib-title">${escHtml(item.name ?? '')}${badge}</span>
+              <span class="lib-sub">${escHtml(sub)}</span>
+            </div>
+          </div>`;
+        }).join('');
+    storeTabContent('search', html);
+    if (list) list.innerHTML = html;
+    wireLibItems(list);
+  } catch (e) {
+    if (list) list.innerHTML = `<span class="muted">Search failed: ${escHtml(e.message)}</span>`;
   }
 }
 
-function wireMasterVolume() {
-  const volUp   = document.getElementById('btn-vol-up');
-  const volDown = document.getElementById('btn-vol-down');
-  const muteBtn = document.getElementById('btn-mute');
-
-  if (volUp)   volUp.addEventListener('click',   () => api('/api/volume/up',   { method: 'POST' }).then(r => { if (r && !r.ok) flashToast('Volume up failed: ' + (r.error || 'unknown')); return refreshStatus(); }));
-  if (volDown) volDown.addEventListener('click', () => api('/api/volume/down', { method: 'POST' }).then(r => { if (r && !r.ok) flashToast('Volume down failed: ' + (r.error || 'unknown')); return refreshStatus(); }));
-  if (muteBtn) muteBtn.addEventListener('click', () => api('/api/mute/toggle', { method: 'POST' }).then(r => { if (r && !r.ok) flashToast('Mute failed: ' + (r.error || 'unknown')); return refreshStatus(); }));
-
-  const slider = document.getElementById('vol-slider');
-  if (!slider) return;
-  slider.addEventListener('input', () => {
-    sliderDirty = true;
-    const pctEl = document.getElementById('vol-pct');
-    if (pctEl) pctEl.textContent = pctFromVolume(Number(slider.value)) + '%';
-  });
-  slider.addEventListener('change', async () => {
-    await api('/api/volume/set', { method: 'POST', body: { value: Number(slider.value) } });
-    clearTimeout(sliderDirtyTimer);
-    sliderDirtyTimer = setTimeout(() => { sliderDirty = false; refreshStatus(); }, 400);
-  });
-}
-
-function wireTransport() {
-  for (const b of document.querySelectorAll('[data-tx]')) {
-    b.addEventListener('click', async () => {
-      const action = b.dataset.tx;
-      const engine = state.active.engine;
+function wireLibItems(container) {
+  container?.querySelectorAll('.lib-item').forEach(el => {
+    el.addEventListener('click', async () => {
+      const uri  = el.dataset.uri;
+      const type = el.dataset.type;
+      if (!uri) return;
       try {
-        if (engine === 'spotify' && state.spotify.authorized) {
-          let sp = action;
-          if (action === 'playpause') {
-            const playing = state.spotify.nowPlaying && state.spotify.nowPlaying.is_playing;
-            sp = playing ? 'pause' : 'play';
-          }
-          await api('/api/spotify/playback/' + sp, { method: 'POST', body: {} });
-        } else if (engine === 'roon' && state.roonState === 'connected' && state.activeZoneId) {
-          await api('/api/roon/transport/' + action, {
-            method: 'POST', body: { zone_id: state.activeZoneId },
-          });
-        } else if (state.roonState === 'connected' && state.activeZoneId) {
-          await api('/api/roon/transport/' + action, {
-            method: 'POST', body: { zone_id: state.activeZoneId },
-          });
+        if (type === 'track') {
+          await apiPost('/api/spotify/playback/play', { uris: [uri] });
         } else {
-          const yxc = action === 'playpause' ? 'play_pause' : action;
-          await api('/api/transport/' + yxc, { method: 'POST' });
+          await apiPost('/api/spotify/playback/play', { context_uri: uri });
         }
+        toast('Playing…', 'success', 2000);
+        setTimeout(pollSpotify, 800);
       } catch (e) {
-        flashToast('Transport failed: ' + (e.message || e));
+        toast('Play failed: ' + e.message, 'error');
       }
-      setTimeout(() => { refreshNowPlaying(); refreshActiveEngine(); refreshSpotifyStatus(); }, 400);
     });
-  }
-}
-
-function wireResetLayout() {
-  const btn = document.getElementById('btn-reset-layout');
-  if (!btn) return;
-  btn.addEventListener('click', () => {
-    if (!confirm('Reload the Cockpit?')) return;
-    location.reload();
   });
 }
 
-// ----- Boot -----
-async function loadConfig() {
-  try {
-    const r = await api('/api/config');
-    if (r.ok) {
-      state.config.enabled_sources       = r.enabled_sources || [];
-      state.config.preferred_zones       = r.preferred_zones || [];
-      state.config.net_radio_suggestions = r.net_radio_suggestions || [];
-      state.config.spotify_configured    = !!r.spotify_configured;
-      state.config.spotify_authorized    = !!r.spotify_authorized;
+// ── Wire buttons ─────────────────────────────────────────────────────────────
+function wireButtons() {
+  // Transport — play/pause
+  document.getElementById('btn-playpause')?.addEventListener('click', async () => {
+    try {
+      const action = _spPlaying ? 'pause' : 'play';
+      await apiPost(`/api/spotify/playback/${action}`, {});
+      setTimeout(pollSpotify, 400);
+    } catch (e) { toast('Playback failed: ' + e.message, 'error'); }
+  });
+
+  // Transport — prev/next
+  document.getElementById('btn-prev')?.addEventListener('click', async () => {
+    try { await apiPost('/api/spotify/playback/previous', {}); setTimeout(pollSpotify, 600); }
+    catch (e) { toast('Previous failed: ' + e.message, 'error'); }
+  });
+  document.getElementById('btn-next')?.addEventListener('click', async () => {
+    try { await apiPost('/api/spotify/playback/next', {}); setTimeout(pollSpotify, 600); }
+    catch (e) { toast('Next failed: ' + e.message, 'error'); }
+  });
+
+  // Transport — shuffle
+  document.getElementById('btn-shuffle')?.addEventListener('click', async () => {
+    const btn = document.getElementById('btn-shuffle');
+    const cur = btn?.classList.contains('active') ?? false;
+    try {
+      await apiPost('/api/spotify/playback/shuffle', { state: !cur });
+      btn?.classList.toggle('active', !cur);
+      const lbl = document.getElementById('label-shuffle');
+      if (lbl) lbl.textContent = !cur ? 'Shuffle on' : 'Shuffle off';
+    } catch (e) { toast('Shuffle failed: ' + e.message, 'error'); }
+  });
+
+  // Transport — repeat
+  document.getElementById('btn-repeat')?.addEventListener('click', async () => {
+    const lbl = document.getElementById('label-repeat');
+    const cur = lbl?.textContent ?? 'Repeat off';
+    const next = cur === 'Repeat off' ? 'context' : cur === 'Repeat all' ? 'track' : 'off';
+    try {
+      await apiPost('/api/spotify/playback/repeat', { state: next });
+      const labels = { off: 'Repeat off', context: 'Repeat all', track: 'Repeat one' };
+      if (lbl) lbl.textContent = labels[next];
+      const btn = document.getElementById('btn-repeat');
+      btn?.classList.toggle('active', next !== 'off');
+    } catch (e) { toast('Repeat failed: ' + e.message, 'error'); }
+  });
+
+  // Yamaha — power
+  document.getElementById('btn-power')?.addEventListener('click', async () => {
+    const isOn = !document.getElementById('btn-power')?.classList.contains('off');
+    try {
+      await apiPost(isOn ? '/api/power/off' : '/api/power/on', {});
+      setTimeout(pollYamaha, 600);
+    } catch (e) { toast('Power failed: ' + e.message, 'error'); }
+  });
+
+  // Yamaha — mute
+  document.getElementById('btn-mute')?.addEventListener('click', async () => {
+    try {
+      await apiPost('/api/mute/toggle', {});
+      setTimeout(pollYamaha, 400);
+    } catch (e) { toast('Mute failed: ' + e.message, 'error'); }
+  });
+
+  // Yamaha — volume slider
+  let _volDebounce = null;
+  document.getElementById('vol-slider')?.addEventListener('input', e => {
+    clearTimeout(_volDebounce);
+    const v = parseInt(e.target.value, 10);
+    const vn = document.getElementById('vol-num');
+    if (vn) vn.textContent = v;
+    _volDebounce = setTimeout(async () => {
+      try { await apiPost('/api/volume/set', { value: v }); }
+      catch (err) { toast('Volume failed: ' + err.message, 'error'); }
+    }, 120);
+  });
+
+  // Yamaha — volume buttons
+  document.getElementById('btn-vol-down')?.addEventListener('click', async () => {
+    const slider = document.getElementById('vol-slider');
+    const cur    = parseInt(slider?.value ?? '40', 10);
+    const next   = Math.max(0, cur - 5);
+    try {
+      await apiPost('/api/volume/set', { value: next });
+      if (slider) slider.value = next;
+      const vn = document.getElementById('vol-num');
+      if (vn) vn.textContent = next;
+    } catch (e) { toast('Volume failed: ' + e.message, 'error'); }
+  });
+  document.getElementById('btn-vol-up')?.addEventListener('click', async () => {
+    const slider = document.getElementById('vol-slider');
+    const cur    = parseInt(slider?.value ?? '40', 10);
+    const next   = Math.min(_yamVolMax, cur + 5);
+    try {
+      await apiPost('/api/volume/set', { value: next });
+      if (slider) slider.value = next;
+      const vn = document.getElementById('vol-num');
+      if (vn) vn.textContent = next;
+    } catch (e) { toast('Volume failed: ' + e.message, 'error'); }
+  });
+
+  // Library — search
+  document.getElementById('lib-search-btn')?.addEventListener('click', () => {
+    const q = document.getElementById('lib-q')?.value?.trim();
+    if (q) doSearch(q);
+  });
+  document.getElementById('lib-q')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      const q = e.target.value?.trim();
+      if (q) doSearch(q);
     }
-  } catch (e) { /* ignore */ }
+  });
+
+  // Library — tabs
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => setTab(tab.dataset.tab));
+  });
 }
 
-async function start() {
+// ── Init ─────────────────────────────────────────────────────────────────────
+async function init() {
   startClock();
-  wireTabs();
-  wireLibrary();
-  wireReceiver();
-  wireMasterVolume();
-  wireTransport();
-  wireShuffleRepeat();
-  wireResetLayout();
+  startScrub();
+  wireButtons();
 
-  renderRoonBanner();
-  renderZones();
-  if (activeLibTab !== 'spotify') setLibraryStatus(roonHintForState());
+  // Initial parallel polls
+  await Promise.allSettled([pollSpotify(), pollYamaha(), pollDevices()]);
+  await Promise.allSettled([loadPlaylists(), loadPresets(), pollQueue()]);
 
-  await loadConfig();
-  renderConfigPresets();
-  renderSpotifyPill();
-  renderShuffleRepeat();
-
-  await refreshStatus();
-  await refreshRoonStatus();
-  await refreshActiveEngine();
-  await refreshSpotifyStatus();
-  await refreshSpotifyPlaylists();
-  await refreshNowPlaying();
-  await refreshUpNext();
-  await refreshSystemBootstrap();
-
-  setInterval(refreshStatus,           POLL_STATUS_MS);
-  setInterval(refreshRoonStatus,       POLL_ROON_MS);
-  setInterval(refreshZones,            POLL_ROON_MS * 3);
-  setInterval(refreshActiveEngine,     POLL_ACTIVE_MS);
-  setInterval(refreshSpotifyStatus,    POLL_SPOTIFY_MS);
-  setInterval(refreshNowPlaying,       POLL_STATUS_MS);
-  setInterval(refreshUpNext,           POLL_UPNEXT_MS);
-  setInterval(refreshSystemBootstrap,  POLL_SPOTIFY_MS * 2);  // 8s
+  // Polling intervals
+  setInterval(pollSpotify,  3000);
+  setInterval(pollDevices,  5000);
+  setInterval(pollYamaha,   5000);
+  setInterval(pollQueue,   15000);
 }
 
-start();
+document.addEventListener('DOMContentLoaded', init);

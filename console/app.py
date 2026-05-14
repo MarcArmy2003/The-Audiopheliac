@@ -1,4 +1,4 @@
-"""Audiopheliac Cockpit v0 - local Flask app controlling Yamaha R-N800A.
+"""Audiopheliac Cockpit v0.9 - Spotify + YXC only (Roon removed).
 
 Run with:  python app.py            (foreground, dev)
        or  pythonw launch.pyw       (silent, Chrome --app, production)
@@ -7,7 +7,6 @@ from __future__ import annotations
 
 import json
 import random
-import re
 import threading
 import time
 import uuid
@@ -20,28 +19,20 @@ from flask import Flask, abort, jsonify, render_template, request
 from markupsafe import escape
 
 from yamaha import Yamaha, YamahaError
-from roon import (
-    RoonClient, RoonNotAuthorized, RoonError,
-    windows_service_status, windows_service_start,
-    windows_process_running, nas_ssh_exec,
-)
 from spotify import SpotifyClient, SpotifyConfigError, SpotifyError
 
 
-__version__ = "0.7"
+__version__ = "0.9"
 
 HERE = Path(__file__).resolve().parent
 CONFIG_PATH = HERE / "config.json"
 PLAYLIST_PATH = HERE / "playlist.json"
-ROON_TOKEN_PATH = HERE / "roon_token.json"
 SPOTIFY_TOKEN_PATH = HERE / "spotify_token.json"
 SPOTIFY_SECRET_PATH = HERE / "spotify_secret.json"
 _playlist_lock = threading.Lock()
-_roon_lock     = threading.Lock()
 DEFAULT_CONFIG = {
     "yamaha_ip": "192.168.1.191",
     "yamaha_name": "Yamaha R-N800A (Family Room)",
-    "roon_host": "192.168.1.230",
     "host": "127.0.0.1",
     "port": 5000,
 }
@@ -128,9 +119,6 @@ def save_playlist(items: list[dict[str, Any]]) -> None:
 
 config = load_config()
 yam = Yamaha(host=config["yamaha_ip"])
-roon = RoonClient(token_path=ROON_TOKEN_PATH,
-                  configured_host=config.get("roon_host"))
-roon.start()
 spotify = build_spotify_client(config)
 app = Flask(__name__)
 app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0  # no browser cache for local dev
@@ -144,7 +132,6 @@ SPOTIFY_YAMAHA_HINT_FALLBACKS = ["Yamaha R-N800A", "R-N800A", "Yamaha", "MusicCa
 CSRF_TOKEN = token_urlsafe(32)
 _MUTATING_METHODS = {"POST", "PUT", "PATCH", "DELETE"}
 _ALLOWED_HOSTS = {"127.0.0.1", "localhost"}
-_CONTAINER_NAME_RE = re.compile(r"^[a-zA-Z0-9_.-]{1,64}$")
 
 
 @app.before_request
@@ -199,16 +186,6 @@ def _yamaha_err(e: YamahaError):
     return _err(str(e))
 
 
-@app.errorhandler(RoonNotAuthorized)
-def _roon_unauth(e: RoonNotAuthorized):
-    return jsonify({"ok": False, "error": str(e), "code": "roon_unauthorized"}), 403
-
-
-@app.errorhandler(RoonError)
-def _roon_err(e: RoonError):
-    return _err(str(e))
-
-
 @app.errorhandler(SpotifyError)
 def _spotify_err(e: SpotifyError):
     return _err(str(e))
@@ -217,34 +194,6 @@ def _spotify_err(e: SpotifyError):
 @app.errorhandler(SpotifyConfigError)
 def _spotify_cfg_err(e: SpotifyConfigError):
     return jsonify({"ok": False, "error": str(e), "code": "spotify_unconfigured"}), 503
-
-
-# ---------- Roon client lifecycle helper ----------
-
-def _rebuild_roon_client(*, delete_token: bool = False) -> "RoonClient":
-    """Create a fresh RoonClient, optionally wiping the saved token first.
-
-    The new client is started in a local variable.  Only on a successful
-    ``start()`` call is the module-level ``roon`` global swapped, preventing
-    a half-initialised client from being left in place on failure.
-
-    Serialised by ``_roon_lock`` so that rapid double-clicks or concurrent
-    requests cannot spin up two simultaneous clients.
-
-    Returns the new client so callers can inspect ``.state``.
-    Raises on any failure; the global ``roon`` is untouched if it raises.
-    """
-    global roon
-    with _roon_lock:
-        if delete_token and ROON_TOKEN_PATH.exists():
-            ROON_TOKEN_PATH.unlink()
-        client = RoonClient(
-            token_path=ROON_TOKEN_PATH,
-            configured_host=config.get("roon_host"),
-        )
-        client.start()   # raises on failure — global is untouched until here
-        roon = client    # atomic swap only after successful start
-        return roon
 
 
 # ---------- pages ----------
@@ -267,7 +216,6 @@ def client_config():
     """Subset of config.json that the browser UI needs at startup."""
     return _ok({
         "enabled_sources": config.get("enabled_sources", []),
-        "preferred_zones": config.get("preferred_zones", []),
         "net_radio_suggestions": config.get("net_radio_suggestions", []),
         "device_name": config.get("yamaha_name"),
         "spotify_configured": spotify is not None,
@@ -891,375 +839,7 @@ def playlist_stop():
     return _ok(player.state())
 
 
-# ---------- Roon (library, search, browse, transport) ----------
-
-@app.route("/api/roon/status")
-def roon_status():
-    return _ok(roon.status())
-
-
-@app.post("/api/roon/reconnect")
-def roon_reconnect():
-    """Tear down and re-establish the Roon connection without a Flask
-    restart. Use when zones go empty while the topbar pill still says
-    connected, typically after a Roon Server bounce on the QNAP or a
-    wedged WebSocket session.
-    """
-    try:
-        client = _rebuild_roon_client()
-    except Exception as e:
-        return _err(f"reconnect failed: {e}")
-    return _ok({"state": client.state})
-
-
-@app.post("/api/roon/clear-auth")
-def roon_clear_auth():
-    """Delete the saved Roon extension token and reconnect from scratch.
-    Use when Roon is stuck in 'discovering' or 'error' state because the
-    saved token is stale (e.g. after a Roon Server reinstall or Docker
-    container recreation). After this call, open Roon Remote, go to
-    Settings > Extensions, and enable 'The Audiopheliac Cockpit'.
-    """
-    try:
-        client = _rebuild_roon_client(delete_token=True)
-    except Exception as e:
-        return _err(f"clear-auth failed: {e}")
-    return _ok({"state": client.state, "message": "Token cleared. Approve the extension in Roon Remote > Settings > Extensions."})
-
-
-@app.route("/api/roon/zones")
-def roon_zones():
-    return _ok({"zones": roon.zones()})
-
-
-@app.route("/api/roon/now-playing")
-def roon_now_playing():
-    zone_id = request.args.get("zone_id")
-    if not zone_id:
-        return _err("Missing zone_id", status=400)
-    return _ok({"now_playing": roon.now_playing(zone_id)})
-
-
-@app.route("/api/roon/image")
-def roon_image():
-    image_key = request.args.get("key")
-    size = _clamp_int(request.args.get("size"), default=256, lo=16, hi=2048)
-    if not image_key:
-        return _err("Missing key", status=400)
-    url = roon.image_url(image_key, size=size)
-    return _ok({"url": url})
-
-
-@app.post("/api/roon/browse/root")
-def roon_browse_root():
-    body = request.get_json(silent=True) or {}
-    zone_id = body.get("zone_id")
-    if not zone_id:
-        return _err("Missing zone_id", status=400)
-    return _ok({"list": roon.browse_root(zone_id)})
-
-
-@app.post("/api/roon/browse/descend")
-def roon_browse_descend():
-    body = request.get_json(silent=True) or {}
-    zone_id = body.get("zone_id")
-    item_key = body.get("item_key")
-    if not zone_id or not item_key:
-        return _err("Missing zone_id or item_key", status=400)
-    return _ok({"list": roon.browse_descend(zone_id, item_key)})
-
-
-@app.post("/api/roon/browse/back")
-def roon_browse_back():
-    body = request.get_json(silent=True) or {}
-    zone_id = body.get("zone_id")
-    if not zone_id:
-        return _err("Missing zone_id", status=400)
-    return _ok({"list": roon.browse_back(zone_id)})
-
-
-@app.post("/api/roon/browse/navigate")
-def roon_browse_navigate():
-    """Navigate Roon browse to a named path without playing.
-    Body: { zone_id: str, path: [str, ...] }
-    Returns: { list: <browse_load result> }
-    """
-    data = request.get_json(force=True) or {}
-    zone_id = str(data.get("zone_id") or "").strip()
-    path = data.get("path") or []
-    if not zone_id:
-        return _err("zone_id required")
-    if not isinstance(path, list):
-        return _err("path must be an array of strings")
-    path = [str(s) for s in path if s]
-    with _roon_lock:
-        try:
-            result = roon.browse_path(zone_id, path)
-        except RoonNotAuthorized:
-            return _err("not_authorized")
-        except RoonError as e:
-            return _err(str(e))
-    return _ok({"list": result})
-
-
-@app.route("/api/roon/browse/page")
-def roon_browse_page():
-    offset = _clamp_int(request.args.get("offset"), default=0, lo=0, hi=100000)
-    count = _clamp_int(request.args.get("count"), default=100, lo=1, hi=500)
-    return _ok({"list": roon.browse_page(offset=offset, count=count)})
-
-
-@app.post("/api/roon/search")
-def roon_search():
-    body = request.get_json(silent=True) or {}
-    zone_id = body.get("zone_id")
-    query = (body.get("query") or "").strip()
-    if not zone_id or not query:
-        return _err("Missing zone_id or query", status=400)
-    return _ok({"list": roon.search(zone_id, query)})
-
-
-@app.post("/api/roon/select-action")
-def roon_select_action():
-    body = request.get_json(silent=True) or {}
-    zone_id = body.get("zone_id")
-    item_key = body.get("item_key")
-    if not zone_id or not item_key:
-        return _err("Missing zone_id or item_key", status=400)
-    return _ok({"list": roon.select_action(zone_id, item_key)})
-
-
-@app.post("/api/roon/transport/<action>")
-def roon_transport(action: str):
-    body = request.get_json(silent=True) or {}
-    zone_id = body.get("zone_id")
-    if not zone_id:
-        return _err("Missing zone_id", status=400)
-    roon.transport(zone_id, action)
-    return _ok()
-
-
-@app.route("/api/roon/debug/browse")
-def roon_debug_browse():
-    """Return Roon's raw browse_load at the current cursor for diagnostics."""
-    return _ok({"loaded": roon.debug_browse()})
-
-
-@app.post("/api/roon/zone-volume")
-def roon_zone_volume():
-    """Set absolute volume on a zone's first output.
-
-    Body: { "zone_id": "...", "level": 0-100 }
-    CSRF + Host allowlist enforced by @app.before_request.
-    """
-    body = request.get_json(silent=True) or {}
-    zone_id = body.get("zone_id")
-    if not zone_id:
-        return _err("zone_id required", status=400)
-    raw_level = body.get("level")
-    if raw_level is None:
-        return _err("level required", status=400)
-    level = _clamp_int(raw_level, default=50, lo=0, hi=100)
-    roon.set_zone_volume(zone_id, level)
-    return _ok()
-
-
-@app.route("/api/roon/queue")
-def roon_queue():
-    """Return upcoming queue items for a zone (up to 30).
-
-    Query param: zone_id
-    """
-    zone_id = request.args.get("zone_id", "")
-    if not zone_id:
-        return _err("zone_id required", status=400)
-    items = roon.zone_queue(zone_id)
-    return _ok({"queue": items})
-
-
-@app.post("/api/roon/play-path")
-def roon_play_path():
-    """Walk a name-based path and fire play at the leaf.
-
-    Body: { "zone_id": "...", "path": ["Library", "Albums", "..."] }
-    """
-    body = request.get_json(silent=True) or {}
-    zone_id = body.get("zone_id")
-    path = body.get("path") or []
-    if not zone_id or not path:
-        return _err("Missing zone_id or path", status=400)
-    src = _resolve_yamaha_source_for_zone(zone_id)
-    source_switched = None
-    if src:
-        try:
-            yam.set_input(src)
-            source_switched = src
-            time.sleep(0.4)
-        except YamahaError:
-            pass
-    result = roon.play_path(zone_id, list(path))
-    return _ok({"played": result.get("played"), "source_switched": source_switched})
-
-
-# ---------- system bootstrap (Buckets B, C, E) ----------
-
-ROON_BRIDGE_SERVICE = "Roon Bridge"
-ROON_BRIDGE_USER_MODE_PROCESS = "RAATServer"  # user-mode tray app exe
-
-
-def _roon_server_status() -> dict[str, Any]:
-    """Health check the Roon Server container on the NAS.
-
-    Two strategies in order:
-      1. SSH into the QNAP and run `docker inspect roonserver --format ...`.
-         Requires a configured SSH key (config.roon_server.ssh_key_path).
-      2. Fallback: probe the Roon Core's WebSocket port reachability.
-    """
-    rs_cfg = config.get("roon_server") or {}
-    host = rs_cfg.get("host") or config.get("roon_host") or "192.168.1.230"
-    ssh_user = rs_cfg.get("ssh_user") or "admin"
-    ssh_key = rs_cfg.get("ssh_key_path")
-    container = rs_cfg.get("container_name") or "roonserver"
-    # Codex audit 2026-05-12 LOW-10: validate container name before
-    # interpolating into an SSH command. Trusted-source today, defensive
-    # against future config drift or accidental injection.
-    if not _CONTAINER_NAME_RE.match(container or ""):
-        return {
-            "state": "unknown",
-            "host": host,
-            "container": container,
-            "method": "rejected",
-            "note": "container_name failed validation; expected [A-Za-z0-9_.-]{1,64}",
-        }
-
-    if ssh_key:
-        rc, out, err = nas_ssh_exec(
-            f"{ssh_user}@{host}",
-            ssh_key,
-            f"docker inspect {container} --format '{{{{.State.Running}}}}'",
-            timeout=6.0,
-        )
-        if rc == 0:
-            running = "true" in (out or "").lower()
-            return {
-                "state": "running" if running else "stopped",
-                "host": host,
-                "container": container,
-                "method": "ssh",
-            }
-        # SSH failed; surface why but fall through to reachability probe.
-        ssh_error = (err or "").strip()[:200]
-    else:
-        ssh_error = "ssh_key_path not configured in config.roon_server"
-
-    # Fallback: if the Cockpit's roonapi is already connected, the server is
-    # by definition reachable, even if we can't determine the container state.
-    reachable = roon.state == "connected"
-    return {
-        "state": "running" if reachable else "unknown",
-        "host": host,
-        "container": container,
-        "method": "fallback_reachability",
-        "note": ssh_error,
-    }
-
-
-def _roon_bridge_state() -> dict[str, Any]:
-    """Detect Roon Bridge regardless of install mode.
-
-    Roon Bridge ships in two flavors on Windows:
-      1. Service mode: registers a Windows service named `Roon Bridge`.
-         Cockpit can start it via `sc start`.
-      2. User-mode tray app: runs `RAATServer.exe` under the logged-in
-         user, no service registration. Cockpit can detect via tasklist
-         but cannot auto-start (no service control surface; would need to
-         launch the exe by path, which varies per install).
-
-    Returns: {state: running|stopped|not_installed, mode: service|user_app|none}
-    """
-    svc = windows_service_status(ROON_BRIDGE_SERVICE)
-    if svc == "running":
-        return {"state": "running", "mode": "service", "service_name": ROON_BRIDGE_SERVICE}
-    if svc == "stopped":
-        return {"state": "stopped", "mode": "service", "service_name": ROON_BRIDGE_SERVICE}
-    if svc == "starting":
-        return {"state": "starting", "mode": "service", "service_name": ROON_BRIDGE_SERVICE}
-    # Service not installed; check user-mode tray app process.
-    if windows_process_running(ROON_BRIDGE_USER_MODE_PROCESS):
-        return {"state": "running", "mode": "user_app", "process": ROON_BRIDGE_USER_MODE_PROCESS}
-    return {"state": "not_installed", "mode": "none"}
-
-
-@app.route("/api/system/roon-bridge/status")
-def roon_bridge_status():
-    return _ok(_roon_bridge_state())
-
-
-@app.post("/api/system/roon-bridge/start")
-def roon_bridge_start():
-    s = _roon_bridge_state()
-    if s.get("state") == "running":
-        return _ok({"message": "already running", **s})
-    if s.get("mode") == "user_app":
-        # No service to start. The user-mode app starts at login. We can't
-        # safely launch the tray exe without knowing the install path.
-        return _err(
-            "Roon Bridge is installed as a user-mode tray app, not a Windows "
-            "service. The Cockpit can detect it but cannot auto-start it. "
-            "Open the Bridge tray icon manually, or convert to service mode "
-            "(reinstall and pick the service option).",
-            status=409,
-        )
-    if s.get("mode") == "service":
-        ok, msg = windows_service_start(ROON_BRIDGE_SERVICE)
-        if not ok:
-            return _err(msg, status=502)
-        return _ok({"message": msg, **_roon_bridge_state()})
-    return _err(
-        "Roon Bridge is not installed. Download from roonlabs.com and run "
-        "the installer.",
-        status=503,
-    )
-
-
-@app.route("/api/system/roon-server/status")
-def roon_server_status():
-    return _ok(_roon_server_status())
-
-
-@app.post("/api/system/roon-server/start")
-def roon_server_start():
-    rs_cfg = config.get("roon_server") or {}
-    host = rs_cfg.get("host") or config.get("roon_host") or "192.168.1.230"
-    ssh_user = rs_cfg.get("ssh_user") or "admin"
-    ssh_key = rs_cfg.get("ssh_key_path")
-    container = rs_cfg.get("container_name") or "roonserver"
-    if not _CONTAINER_NAME_RE.match(container or ""):
-        return _err(
-            "container_name failed validation; expected [A-Za-z0-9_.-]{1,64}",
-            status=400,
-        )
-    if not ssh_key:
-        return _err(
-            "Cockpit can't auto-start Roon Server without an SSH key. "
-            "Set config.roon_server.ssh_key_path to the path of an OpenSSH "
-            "private key whose public counterpart is in the QNAP user's "
-            "~/.ssh/authorized_keys.",
-            status=503,
-        )
-    rc, out, err = nas_ssh_exec(
-        f"{ssh_user}@{host}",
-        ssh_key,
-        f"docker start {container}",
-        timeout=10.0,
-    )
-    if rc != 0:
-        return _err(
-            f"docker start failed (rc={rc}): {(err or out).strip()[:300]}",
-            status=502,
-        )
-    return _ok({"message": f"requested start of container {container}"})
-
+# ---------- system bootstrap ----------
 
 @app.route("/api/system/bootstrap")
 def system_bootstrap():
@@ -1276,9 +856,6 @@ def system_bootstrap():
     except YamahaError as e:
         yam_err = str(e)
 
-    bridge_info = _roon_bridge_state()
-    server_info = _roon_server_status()
-
     spotify_state = "unconfigured"
     if spotify is not None:
         spotify_state = "authorized" if spotify.is_authorized() else "unauthorized"
@@ -1289,41 +866,11 @@ def system_bootstrap():
             "host": config.get("yamaha_ip"),
             "error": yam_err,
         },
-        "roon_core": {
-            "state": roon.state,
-            "core_name": roon.core_name,
-            "error": roon.error,
-        },
-        "roon_server": server_info,
-        "roon_bridge": bridge_info,
         "spotify": {"state": spotify_state},
     })
 
 
 # ---------- smart play routing (intent-driven) ----------
-
-def _resolve_yamaha_source_for_zone(zone_id: str | None) -> str | None:
-    """Map a Roon zone to the Yamaha source it implies, if any.
-
-    Naming convention locked 2026-05-12. Only "Family Room — Yamaha"
-    (AirPlay 2 to R-N800A) demands a Yamaha source switch. Other zones
-    route through Chromecast endpoints, the Roon Bridge ASIO target, or
-    a separate AirPlay device (Bose) and the receiver stays out of it.
-    """
-    if not zone_id:
-        return None
-    try:
-        zones = roon.zones()
-    except RoonError:
-        return None
-    zone = next((z for z in zones if z.get("zone_id") == zone_id), None)
-    if not zone:
-        return None
-    name = (zone.get("display_name") or "").lower()
-    if "yamaha" in name and "family room" in name:
-        return "airplay"
-    return None
-
 
 def _find_spotify_yamaha_device(devices: list[dict], hints) -> tuple[str | None, str | None]:
     """Locate the Yamaha receiver in a Spotify devices list.
@@ -1352,55 +899,23 @@ def play_to():
     Body:
       {
         "intent": {
-          "kind": "roon-item" | "spotify-uri" | "net-radio-preset",
-          // roon-item: "item_key"
+          "kind": "spotify-uri" | "net-radio-preset",
           // spotify-uri: "context_uri" or "uris", optional "offset", "position_ms"
           // net-radio-preset: "preset_num"
-        },
-        "zone_id": "..."          // required for roon-item
+        }
       }
 
     Returns:
-      { ok, source_switched: "airplay"|"spotify"|"net_radio"|null,
-        engine: "roon"|"spotify"|"yamaha", warning: "..." }
+      { ok, source_switched: "spotify"|"net_radio"|null,
+        engine: "spotify"|"yamaha", warning: "..." }
     """
     body = request.get_json(silent=True) or {}
     intent = body.get("intent") or {}
     kind = (intent.get("kind") or "").strip()
-    zone_id = body.get("zone_id")
     source_switched: str | None = None
     warning: str | None = None
 
-    if kind == "roon-item":
-        item_key = intent.get("item_key")
-        if not zone_id or not item_key:
-            return _err("Missing zone_id or item_key", status=400)
-        src = _resolve_yamaha_source_for_zone(zone_id)
-        if src:
-            try:
-                yam.set_input(src)
-                source_switched = src
-            except YamahaError as e:
-                warning = f"Roon play continued, Yamaha source switch failed: {e}"
-            else:
-                # Poll the receiver until it confirms the input. Field-test
-                # 2026-05-12: a flat 0.4s sleep was racing the receiver,
-                # AirPlay stream landed on the wrong source -> silence.
-                for _ in range(15):
-                    time.sleep(0.2)
-                    try:
-                        s = yam.status()
-                        if (s.get("input") or "").lower() == src:
-                            break
-                    except YamahaError:
-                        continue
-        # Capture auto-play outcome so the UI can surface silent failures
-        # where the action list descended but Play Now never fired.
-        sa_result = roon.select_action(zone_id, item_key)
-        auto_played = bool(sa_result.get("_auto_played"))
-        engine = "roon"
-
-    elif kind == "spotify-uri":
+    if kind == "spotify-uri":
         sp = _require_spotify()
 
         # Two device-id sources: explicit (from the Cockpit's picker) takes
@@ -1497,10 +1012,6 @@ def play_to():
     payload: dict[str, Any] = {"source_switched": source_switched, "engine": engine}
     if warning:
         payload["warning"] = warning
-    if engine == "roon":
-        # Surface whether the auto-Play-Now heuristic actually fired so
-        # the UI can warn the user instead of silently doing nothing.
-        payload["auto_played"] = locals().get("auto_played", False)
     return _ok(payload)
 
 
@@ -1508,16 +1019,11 @@ def play_to():
 
 @app.route("/api/playback/active")
 def playback_active():
-    """Detect which engine is actually producing sound right now.
+    """Detect which engine is producing sound right now.
 
     Decision tree:
       1. If Yamaha source is "spotify" AND Spotify reports is_playing -> spotify
-      2. If a Roon zone is playing AND zone routes to the Yamaha or any
-         Roon endpoint Gill is listening to -> roon
-      3. Otherwise -> yamaha (whatever YXC says is playing, or idle)
-
-    Used by the Now Playing hub to bind master volume, transport, and
-    metadata to the engine that's actually authoritative.
+      2. Otherwise -> yamaha (whatever YXC says is playing, or idle)
     """
     yam_src = None
     yam_power = None
@@ -1528,7 +1034,6 @@ def playback_active():
     except YamahaError:
         pass
 
-    # Spotify check
     spotify_playing = False
     spotify_device = None
     if spotify is not None and spotify.is_authorized():
@@ -1545,25 +1050,6 @@ def playback_active():
             "yamaha_source": yam_src,
             "yamaha_power": yam_power,
             "spotify_device": spotify_device,
-        })
-
-    # Roon check: any zone in 'playing' state
-    roon_playing_zone = None
-    try:
-        for z in roon.zones():
-            if (z.get("state") or "").lower() == "playing":
-                roon_playing_zone = z
-                break
-    except RoonError:
-        pass
-
-    if roon_playing_zone:
-        return _ok({
-            "engine": "roon",
-            "yamaha_source": yam_src,
-            "yamaha_power": yam_power,
-            "roon_zone": roon_playing_zone.get("display_name"),
-            "roon_zone_id": roon_playing_zone.get("zone_id"),
         })
 
     return _ok({
