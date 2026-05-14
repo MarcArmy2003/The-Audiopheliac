@@ -130,3 +130,9 @@ console/roon_core.json
 console/.venv/
 console/spotify_token.json
 console/spotify_secret.json
+
+# Task Observer meta-skill — private per-project state (S89 install, 2026-05-14)
+# Skill bundle in task-observer/ is upstream CC BY 4.0 and is committed.
+# Logs and staged updates are private observations from this user's sessions.
+/skill-observations/
+/skill-updates/
