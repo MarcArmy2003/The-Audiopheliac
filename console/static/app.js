@@ -302,17 +302,18 @@ function renderInputList() {
 
   for (const name of list) {
     const b = document.createElement('button');
-    b.className = 'input-btn' + (name === state.currentInput ? ' active' : '');
+    b.className = 'source-btn' + (name === state.currentInput ? ' active' : '');
     b.textContent = name.replace(/_/g, ' ');
     b.addEventListener('click', async () => {
-      await api('/api/input', { method: 'POST', body: { name } });
+      const r = await api('/api/input', { method: 'POST', body: { name } });
+      if (r && !r.ok) flashToast('Input switch failed: ' + (r.error || 'unknown'));
       await refreshStatus();
     });
     host.appendChild(b);
   }
   if (filterOn && state.currentInput && !enabled.includes(state.currentInput)) {
     const b = document.createElement('button');
-    b.className = 'input-btn active';
+    b.className = 'source-btn active';
     b.textContent = state.currentInput.replace(/_/g, ' ') + ' *';
     b.title = 'Currently active but not in your enabled-sources filter';
     host.appendChild(b);
@@ -510,6 +511,48 @@ function renderZones() {
 
   if (state.roonState !== 'connected') {
     host.innerHTML = '<span class="muted">' + roonHintForState() + '</span>';
+    // Show reconnect and clear-auth buttons when not connected
+    const btnRow = document.createElement('div');
+    btnRow.style.cssText = 'margin-top:0.5rem;display:flex;gap:0.4rem;flex-wrap:wrap;';
+
+    const reconnBtn = document.createElement('button');
+    reconnBtn.className = 'primary-btn';
+    reconnBtn.textContent = 'Reconnect';
+    reconnBtn.addEventListener('click', async () => {
+      reconnBtn.disabled = true; reconnBtn.textContent = 'Connecting...';
+      try {
+        const r = await api('/api/roon/reconnect', { method: 'POST' });
+        if (!r.ok) throw new Error(r.error || 'reconnect failed');
+        flashToast('Roon reconnect requested.');
+        setTimeout(refreshRoonStatus, 2000);
+        setTimeout(refreshZones, 4000);
+      } catch (e) {
+        flashToast('Reconnect failed: ' + (e.message || e));
+      } finally {
+        reconnBtn.disabled = false; reconnBtn.textContent = 'Reconnect';
+      }
+    });
+
+    const clearBtn = document.createElement('button');
+    clearBtn.className = 'ghost-btn';
+    clearBtn.textContent = 'Clear auth & reconnect';
+    clearBtn.title = 'Deletes the saved Roon token and starts a fresh authorization. Use when stuck in "discovering" or "error" after a Roon Server reinstall.';
+    clearBtn.addEventListener('click', async () => {
+      clearBtn.disabled = true; clearBtn.textContent = 'Clearing...';
+      try {
+        const r = await api('/api/roon/clear-auth', { method: 'POST' });
+        if (!r.ok) throw new Error(r.error || 'clear failed');
+        flashToast('Token cleared. Open Roon Remote → Settings → Extensions and enable The Audiopheliac Cockpit.');
+        setTimeout(refreshRoonStatus, 2000);
+      } catch (e) {
+        flashToast('Clear auth failed: ' + (e.message || e));
+      } finally {
+        clearBtn.disabled = false; clearBtn.textContent = 'Clear auth & reconnect';
+      }
+    });
+
+    btnRow.append(reconnBtn, clearBtn);
+    host.appendChild(btnRow);
     if (meta) meta.textContent = 'offline';
     return;
   }
@@ -1550,7 +1593,8 @@ function wireReceiver() {
       const endpoint = isOn ? '/api/power/off' : '/api/power/on';
       state.power = isOn ? 'standby' : 'on';
       renderPowerToggle();
-      await api(endpoint, { method: 'POST' });
+      const r = await api(endpoint, { method: 'POST' });
+      if (r && !r.ok) flashToast('Power toggle failed: ' + (r.error || 'unknown'));
       refreshStatus();
     });
   }
@@ -1561,9 +1605,9 @@ function wireMasterVolume() {
   const volDown = document.getElementById('btn-vol-down');
   const muteBtn = document.getElementById('btn-mute');
 
-  if (volUp)   volUp.addEventListener('click',   () => api('/api/volume/up',       { method: 'POST' }).then(refreshStatus));
-  if (volDown) volDown.addEventListener('click', () => api('/api/volume/down',     { method: 'POST' }).then(refreshStatus));
-  if (muteBtn) muteBtn.addEventListener('click', () => api('/api/mute/toggle',     { method: 'POST' }).then(refreshStatus));
+  if (volUp)   volUp.addEventListener('click',   () => api('/api/volume/up',   { method: 'POST' }).then(r => { if (r && !r.ok) flashToast('Volume up failed: ' + (r.error || 'unknown')); return refreshStatus(); }));
+  if (volDown) volDown.addEventListener('click', () => api('/api/volume/down', { method: 'POST' }).then(r => { if (r && !r.ok) flashToast('Volume down failed: ' + (r.error || 'unknown')); return refreshStatus(); }));
+  if (muteBtn) muteBtn.addEventListener('click', () => api('/api/mute/toggle', { method: 'POST' }).then(r => { if (r && !r.ok) flashToast('Mute failed: ' + (r.error || 'unknown')); return refreshStatus(); }));
 
   const slider = document.getElementById('vol-slider');
   if (!slider) return;

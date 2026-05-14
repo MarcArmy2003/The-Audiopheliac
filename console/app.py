@@ -130,6 +130,7 @@ roon = RoonClient(token_path=ROON_TOKEN_PATH,
 roon.start()
 spotify = build_spotify_client(config)
 app = Flask(__name__)
+app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0  # no browser cache for local dev
 
 SPOTIFY_YAMAHA_HINT_DEFAULT = "Yamaha R-N800A"
 SPOTIFY_YAMAHA_HINT_FALLBACKS = ["Yamaha R-N800A", "R-N800A", "Yamaha", "MusicCast"]
@@ -875,6 +876,28 @@ def roon_reconnect():
     except Exception as e:
         return _err(f"reconnect failed: {e}")
     return _ok({"state": roon.state})
+
+
+@app.post("/api/roon/clear-auth")
+def roon_clear_auth():
+    """Delete the saved Roon extension token and reconnect from scratch.
+    Use when Roon is stuck in 'discovering' or 'error' state because the
+    saved token is stale (e.g. after a Roon Server reinstall or Docker
+    container recreation). After this call, open Roon Remote, go to
+    Settings > Extensions, and enable 'The Audiopheliac Cockpit'.
+    """
+    global roon
+    try:
+        if ROON_TOKEN_PATH.exists():
+            ROON_TOKEN_PATH.unlink()
+        roon = RoonClient(
+            token_path=ROON_TOKEN_PATH,
+            configured_host=config.get("roon_host"),
+        )
+        roon.start()
+    except Exception as e:
+        return _err(f"clear-auth failed: {e}")
+    return _ok({"state": roon.state, "message": "Token cleared. Approve the extension in Roon Remote > Settings > Extensions."})
 
 
 @app.route("/api/roon/zones")
