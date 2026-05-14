@@ -302,7 +302,7 @@ function renderInputList() {
 
   for (const name of list) {
     const b = document.createElement('button');
-    b.className = 'source-btn' + (name === state.currentInput ? ' active' : '');
+    b.className = 'src-btn' + (name === state.currentInput ? ' active' : '');
     b.textContent = name.replace(/_/g, ' ');
     b.addEventListener('click', async () => {
       const r = await api('/api/input', { method: 'POST', body: { name } });

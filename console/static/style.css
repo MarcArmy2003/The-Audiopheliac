@@ -12,11 +12,15 @@
   /* Brand palette */
   --ink:          #0a0a0b;
   --paper:        #f5f5f7;
-  --paper-dim:    rgba(245, 245, 247, .55);
-  --paper-muted:  rgba(245, 245, 247, .35);
+  --ink-2:        #121214;
+  --ink-3:        #1a1a1e;
+  --paper-dim:    rgba(245, 245, 247, .65);
+  --paper-muted:  rgba(245, 245, 247, .42);
 
   --hairline:     rgba(255, 255, 255, .08);
-  --hairline-2:   rgba(255, 255, 255, .15);
+  --hairline-2:   rgba(255, 255, 255, .14);
+
+  --font-display: 'Unica One', sans-serif;
 
   --sunlamp:  #f8e91f;
   --spring:   #99e257;
@@ -222,22 +226,22 @@ button.topbar-pill:hover { color: var(--paper); }
    --------------------------------------------------------- */
 
 .card {
-  background: rgba(255, 255, 255, .03);
+  background: var(--ink-2);
   border: 1px solid var(--hairline);
   border-radius: var(--radius);
-  overflow: hidden;
 }
 
-.card-head {
+.card-head,
+.card-header {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 0.75rem;
   padding: 0.85rem 1.1rem 0.7rem;
-  border-bottom: 1px solid var(--hairline);
 }
 
-.card-head h2 {
+.card-head h2,
+.card-header h2 {
   font-family: 'Unica One', sans-serif;
   font-size: 0.9rem;
   letter-spacing: .04em;
@@ -257,37 +261,73 @@ button.topbar-pill:hover { color: var(--paper); }
    7. Now Playing card
    --------------------------------------------------------- */
 
-.now-body {
+.now-body,
+.now {
   display: grid;
-  grid-template-columns: 120px 1fr;
-  gap: 1.25rem;
-  padding: 1rem 1.1rem 1.1rem;
+  grid-template-columns: 220px 1fr;
+  gap: 1.5rem;
+  padding: 1rem 1.1rem 1.25rem;
+  align-items: center;
 }
 
-@media (max-width: 600px) { .now-body { grid-template-columns: 1fr; } }
+@media (max-width: 600px) {
+  .now-body, .now { grid-template-columns: 1fr; }
+}
 
+/* Art frame — 220px vinyl mockup with spectrum gradient ring */
+.now-art-frame,
 .now-art-wrap {
   position: relative;
-  width: 120px;
-  height: 120px;
-  border-radius: var(--radius-sm);
+  width: 220px;
+  height: 220px;
+  border-radius: var(--radius);
   overflow: hidden;
   flex-shrink: 0;
-  background: var(--hairline);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: linear-gradient(135deg, var(--signal) 0%, var(--sapphire) 50%, var(--indigo) 100%);
 }
 
+/* Vinyl groove rings */
+.now-art-frame::before,
+.now-art-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 24px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at center,
+    var(--ink)   0%,  var(--ink)   18%,
+    transparent  19%, transparent  22%,
+    var(--ink-2) 23%, var(--ink-2) 24%,
+    transparent  25%, transparent  100%
+  );
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Spindle dot */
+.now-art-frame::after,
+.now-art-wrap::after {
+  content: '';
+  position: absolute;
+  inset: 88px;
+  border-radius: 50%;
+  background: var(--sunlamp);
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Album art img — overlays the vinyl decoration when a track is playing */
 .now-art {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: var(--radius-sm);
   display: none;
+  z-index: 3;
 }
 
-.now-art.loaded { display: block; }
+.now-art.shown { display: block; }
 
 .now-art-placeholder {
   position: absolute;
@@ -295,12 +335,12 @@ button.topbar-pill:hover { color: var(--paper); }
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--ink);
-  border: 1px solid var(--hairline);
-  border-radius: var(--radius-sm);
+  z-index: 0;
 }
 
 .now-art-label {
+  position: relative;
+  z-index: 4;
   font-size: 0.7rem;
   color: var(--paper-muted);
   text-transform: uppercase;
@@ -315,15 +355,26 @@ button.topbar-pill:hover { color: var(--paper); }
 }
 
 .now-track {
-  font-size: 1rem;
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1.05;
   color: var(--paper);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.now-artist,
+.now-artist {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--sunlamp);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .now-album {
   font-size: 0.8rem;
   color: var(--paper-dim);
@@ -371,29 +422,42 @@ button.topbar-pill:hover { color: var(--paper); }
   flex-wrap: wrap;
 }
 
-.tb {
-  background: none;
-  border: none;
+.tb,
+.t-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1px solid var(--hairline-2);
   color: var(--paper-dim);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-size: 1.1rem;
-  padding: 0.35rem 0.5rem;
-  border-radius: var(--radius-sm);
-  transition: color var(--fast), background var(--fast);
+  flex-shrink: 0;
+  transition: color var(--fast), border-color var(--fast), background var(--fast);
 }
 
-.tb:hover { color: var(--paper); background: var(--hairline); }
+.tb:hover,
+.t-btn:hover { border-color: var(--sunlamp); color: var(--sunlamp); }
 
-.tb-primary {
+.tb-primary,
+.t-btn.primary {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
   background: var(--sunlamp);
   color: var(--ink);
-  font-size: 1rem;
-  padding: 0.45rem 0.75rem;
-  border-radius: var(--radius-pill);
-  border: none;
-  font-weight: 600;
+  border: 1px solid var(--sunlamp);
+  font-size: 1.2rem;
 }
 
-.tb-primary:hover { background: var(--spring); }
+.tb-primary:hover,
+.t-btn.primary:hover {
+  background: var(--magenta);
+  border-color: var(--magenta);
+  color: var(--paper);
+}
 
 .t-spacer { flex: 1; }
 
@@ -431,7 +495,8 @@ button.topbar-pill:hover { color: var(--paper); }
   padding: 0.85rem 1rem;
 }
 
-.zone {
+.zone,
+.zone-row {
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
@@ -444,9 +509,11 @@ button.topbar-pill:hover { color: var(--paper); }
   transition: border-color var(--fast), background var(--fast);
 }
 
-.zone:hover { border-color: var(--hairline-2); }
+.zone:hover,
+.zone-row:hover { border-color: var(--hairline-2); }
 
-.zone.active {
+.zone.active,
+.zone-row.active {
   border-color: var(--signal);
   background: linear-gradient(135deg, rgba(65, 217, 154, .07), transparent 70%);
 }
@@ -460,9 +527,20 @@ button.topbar-pill:hover { color: var(--paper); }
   transition: background var(--mid);
 }
 
-.zone.active .zone-led {
+.zone.active .zone-led,
+.zone-row.active .zone-led {
   background: var(--signal);
   box-shadow: 0 0 6px var(--signal);
+}
+
+/* .zone-selector is the clickable button inside .zone-row rendered by JS */
+.zone-selector {
+  display: contents; /* participates in parent grid without creating a new box */
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
 }
 
 .zone-info {
@@ -472,7 +550,8 @@ button.topbar-pill:hover { color: var(--paper); }
   gap: 0.15rem;
 }
 
-.zone-title {
+.zone-title,
+.zone-name {
   font-size: 0.82rem;
   font-weight: 500;
   color: var(--paper);
@@ -481,12 +560,27 @@ button.topbar-pill:hover { color: var(--paper); }
   text-overflow: ellipsis;
 }
 
-.zone-output {
+.zone-output,
+.zone-out {
   font-size: 0.7rem;
   color: var(--paper-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.zone-state {
+  font-size: 0.68rem;
+  color: var(--paper-muted);
+  letter-spacing: .04em;
+  flex-shrink: 0;
+}
+
+.zone-muted-badge {
+  font-size: 0.65rem;
+  color: var(--sunlamp);
+  letter-spacing: .05em;
+  text-transform: uppercase;
 }
 
 .zone-vol {
@@ -604,29 +698,36 @@ button.topbar-pill:hover { color: var(--paper); }
 }
 
 .sources {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
   gap: 0.4rem;
 }
 
-.source-btn {
-  background: none;
-  border: 1px solid var(--hairline-2);
-  color: var(--paper-muted);
-  border-radius: var(--radius-pill);
-  padding: 0.22rem 0.7rem;
-  font-size: 0.75rem;
-  letter-spacing: .04em;
+.source-btn,
+.src-btn {
+  background: transparent;
+  border: 1px solid var(--hairline);
+  color: var(--paper-dim);
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 0.6rem;
+  font-size: 0.82rem;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   transition: all var(--fast);
   cursor: pointer;
 }
 
-.source-btn:hover { color: var(--paper); border-color: var(--paper-muted); }
+.source-btn:hover,
+.src-btn:hover { color: var(--paper); border-color: var(--hairline-2); }
 
-.source-btn.active {
-  color: var(--sunlamp);
+.source-btn.active,
+.src-btn.active {
+  background: var(--sunlamp);
   border-color: var(--sunlamp);
-  background: rgba(248, 233, 31, .06);
+  color: var(--ink);
+  font-weight: 600;
 }
 
 .master-vol {

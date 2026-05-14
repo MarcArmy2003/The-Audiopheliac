@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Unica+One&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=0.7">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=0.7.1">
 </head>
 <body data-yamaha-ip="{{ yamaha_ip }}">
 
@@ -34,12 +34,12 @@
 
     <!-- Now Playing - full-width hero -->
     <section class="card card-now" data-card="now">
-      <header class="card-head">
+      <div class="card-header">
         <h2>Now playing</h2>
         <span class="card-meta" id="now-zone-label">Pick a zone to start</span>
-      </header>
-      <div class="now-body">
-        <div class="now-art-wrap">
+      </div>
+      <div class="now">
+        <div class="now-art-frame">
           <img class="now-art" id="now-art" alt="" />
           <div class="now-art-placeholder" aria-hidden="true">
             <span class="now-art-label" id="now-art-label">Idle</span>
@@ -56,9 +56,9 @@
             <span id="now-total">--:--</span>
           </div>
           <div class="transport">
-            <button class="tb" data-tx="previous" aria-label="Previous">&#x23EE;</button>
-            <button class="tb tb-primary" data-tx="playpause" id="btn-playpause" aria-label="Play / pause">&#x25B6;</button>
-            <button class="tb" data-tx="next" aria-label="Next">&#x23ED;</button>
+            <button class="t-btn" data-tx="previous" aria-label="Previous">&#x23EE;</button>
+            <button class="t-btn primary" data-tx="playpause" id="btn-playpause" aria-label="Play / pause">&#x25B6;</button>
+            <button class="t-btn" data-tx="next" aria-label="Next">&#x23ED;</button>
             <span class="t-spacer"></span>
             <button class="t-toggle" id="btn-shuffle" data-state="off">Shuffle off</button>
             <button class="t-toggle" id="btn-repeat" data-state="off">Repeat off</button>
@@ -71,64 +71,68 @@
       <div class="col col-left">
 
         <section class="card card-zone" data-card="zone">
-          <header class="card-head">
+          <div class="card-header">
             <h2>Roon zones</h2>
             <span class="card-meta" id="zone-meta">checking</span>
-          </header>
+          </div>
           <div class="zones" id="zone-list">
             <span class="muted">Waiting on the Roon Core.</span>
           </div>
         </section>
 
         <section class="card card-yamaha" data-card="yamaha">
-          <header class="card-head">
+          <div class="card-header">
             <h2>Yamaha R-N800A</h2>
             <span class="card-meta" id="yamaha-meta">YXC &middot; 192.168.1.191</span>
-          </header>
+          </div>
 
-          <div class="yamaha-grid">
-            <div class="tile">
-              <span class="tile-label">Power</span>
-              <div class="tile-row">
-                <button class="power" id="btn-power-toggle"><span class="power-dot"></span> <span id="power-state-label">On</span></button>
-                <span class="tile-value" id="power-sub" style="font-size:0.8rem;color:var(--paper-muted);">live</span>
+          <div style="padding: 0 1.1rem;">
+
+            <div class="yamaha-grid">
+              <div class="tile">
+                <span class="tile-label">Power</span>
+                <div class="tile-row">
+                  <button class="power" id="btn-power-toggle"><span class="power-dot"></span> <span id="power-state-label">On</span></button>
+                  <span class="tile-value" id="power-sub" style="font-size:0.8rem;color:var(--paper-muted);">live</span>
+                </div>
+              </div>
+              <div class="tile">
+                <span class="tile-label">Mute</span>
+                <div class="tile-row">
+                  <span class="tile-value" id="mute-state-label">Off</span>
+                  <button class="t-toggle" id="btn-mute">Toggle</button>
+                </div>
               </div>
             </div>
-            <div class="tile">
-              <span class="tile-label">Mute</span>
-              <div class="tile-row">
-                <span class="tile-value" id="mute-state-label">Off</span>
-                <button class="t-toggle" id="btn-mute">Toggle</button>
+
+            <div style="margin-top: 0.9rem;">
+              <span class="tile-label" style="display:block;margin-bottom:0.5rem;">Source</span>
+              <div class="sources" id="input-list">
+                <span class="muted">Loading sources.</span>
               </div>
             </div>
-          </div>
 
-          <div>
-            <span class="tile-label" style="display:block;margin-bottom:0.5rem;">Source</span>
-            <div class="sources" id="input-list">
-              <span class="muted">Loading sources.</span>
+            <div class="master-vol" style="margin-top: 0.9rem;">
+              <label for="vol-slider">Master</label>
+              <button class="icon-btn" id="btn-vol-down" title="Volume down">&minus;</button>
+              <input type="range" id="vol-slider" min="0" max="161" value="40" aria-label="Master volume" />
+              <button class="icon-btn" id="btn-vol-up" title="Volume up">&plus;</button>
+              <span class="master-vol-num" id="vol-pct">--%</span>
             </div>
-          </div>
 
-          <div class="master-vol">
-            <label for="vol-slider">Master</label>
-            <button class="icon-btn" id="btn-vol-down" title="Volume down">&minus;</button>
-            <input type="range" id="vol-slider" min="0" max="161" value="40" aria-label="Master volume" />
-            <button class="icon-btn" id="btn-vol-up" title="Volume up">&plus;</button>
-            <span class="master-vol-num" id="vol-pct">--%</span>
-          </div>
+            <div style="margin-top: 0.9rem; padding-bottom: 1.1rem;">
+              <span class="tile-label" style="display:block;margin-bottom:0.5rem;">Net Radio presets</span>
+              <div class="presets" id="preset-list">
+                <span class="muted">Loading presets.</span>
+              </div>
+              <div class="preset-foot muted">
+                Presets save on the receiver via the MusicCast app. Use the suggestions below to find stations.
+              </div>
+              <div class="suggest-list" id="suggest-list">
+                <span class="muted">Suggestions on the way.</span>
+              </div>
+            </div>
 
-          <div>
-            <span class="tile-label" style="display:block;margin:0.85rem 0 0.5rem;">Net Radio presets</span>
-            <div class="presets" id="preset-list">
-              <span class="muted">Loading presets.</span>
-            </div>
-            <div class="preset-foot muted">
-              Presets save on the receiver via the MusicCast app. Use the suggestions below to find stations.
-            </div>
-            <div class="suggest-list" id="suggest-list">
-              <span class="muted">Suggestions on the way.</span>
-            </div>
           </div>
         </section>
 
@@ -137,39 +141,41 @@
       <div class="col col-right">
 
         <section class="card card-library" data-card="library">
-          <header class="card-head">
+          <div class="card-header">
             <h2>Library</h2>
             <span class="card-meta" id="library-crumb">Roon home</span>
-          </header>
-
-          <div class="search-row">
-            <input type="search" class="search-input" id="lib-q" placeholder="Search artist, album, track, or playlist" />
-            <button class="primary-btn" id="lib-search-btn">Search</button>
           </div>
 
-          <div class="tabs">
-            <button class="tab active" data-tab="roon">Roon</button>
-            <button class="tab" data-tab="spotify">Spotify</button>
-            <span class="tab-spacer"></span>
-            <button class="ghost-btn" id="lib-back">&larr; Back</button>
-            <button class="ghost-btn" id="lib-home">Home</button>
-          </div>
+          <div style="padding: 0 1.1rem 1.1rem;">
+            <div class="search-row">
+              <input type="search" class="search-input" id="lib-q" placeholder="Search artist, album, track, or playlist" />
+              <button class="primary-btn" id="lib-search-btn">Search</button>
+            </div>
 
-          <div class="lib-list" id="lib-list">
-            <span class="muted">Connect Roon to begin browsing.</span>
-          </div>
+            <div class="tabs">
+              <button class="tab active" data-tab="roon">Roon</button>
+              <button class="tab" data-tab="spotify">Spotify</button>
+              <span class="tab-spacer"></span>
+              <button class="ghost-btn" id="lib-back">&larr; Back</button>
+              <button class="ghost-btn" id="lib-home">Home</button>
+            </div>
 
-          <div class="sp-auth-prompt" id="sp-auth-prompt" style="display:none;">
-            <p>Spotify is wired but not authorized yet.</p>
-            <a class="primary-btn" href="/spotify/auth" id="sp-auth-link">Connect Spotify</a>
+            <div class="lib-list" id="lib-list">
+              <span class="muted">Connect Roon to begin browsing.</span>
+            </div>
+
+            <div class="sp-auth-prompt" id="sp-auth-prompt" style="display:none;">
+              <p>Spotify is wired but not authorized yet.</p>
+              <a class="primary-btn" href="/spotify/auth" id="sp-auth-link">Connect Spotify</a>
+            </div>
           </div>
         </section>
 
         <section class="card card-upnext" data-card="upnext">
-          <header class="card-head">
+          <div class="card-header">
             <h2>Up next</h2>
             <span class="card-meta" id="upnext-meta">queue</span>
-          </header>
+          </div>
           <div class="queue-list" id="upnext-list">
             <span class="muted">Queue lives here once Roon or Spotify is playing.</span>
           </div>
@@ -197,6 +203,6 @@
     </div>
   </div>
 
-  <script src="{{ url_for('static', filename='app.js') }}?v=0.7"></script>
+  <script src="{{ url_for('static', filename='app.js') }}?v=0.7.1"></script>
 </body>
 </html>
