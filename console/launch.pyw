@@ -330,23 +330,27 @@ def main() -> None:
         port = int(cfg.get("port", 5000))
         url = f"http://{host}:{port}"
 
-        # 1. Singleton: if Cockpit already running, just (re)open the window.
-        if is_existing_cockpit(host, port):
-            if not open_app_window(url):
-                webbrowser.open(url)
-            return
-
-        # 2. Pre-flight: kick local Roon Bridge (idempotent if already up).
+        # 1. Pre-flight: kick local Roon Bridge (idempotent if already up).
+        #    Done BEFORE the singleton check so that re-clicking the icon
+        #    ensures Bridge is running even when the Cockpit is already
+        #    serving. Without this ordering, a dropped Bridge connection
+        #    is never recovered by clicking the shortcut a second time.
         try:
             ensure_roon_bridge_running()
         except Exception as e:  # noqa: BLE001
             _write_launcher_error("ensure_roon_bridge_running failed", e)
 
-        # 3. Pre-flight: kick NAS Roon Server container if SSH is configured.
+        # 2. Pre-flight: kick NAS Roon Server container if SSH is configured.
         try:
             ensure_roon_server_running(cfg)
         except Exception as e:  # noqa: BLE001
             _write_launcher_error("ensure_roon_server_running failed", e)
+
+        # 3. Singleton: if Cockpit already running, just (re)open the window.
+        if is_existing_cockpit(host, port):
+            if not open_app_window(url):
+                webbrowser.open(url)
+            return
 
         # 4. Schedule post-boot helper (waits for port, warms bootstrap,
         #    opens Chrome). Daemon so it exits with the main thread.
