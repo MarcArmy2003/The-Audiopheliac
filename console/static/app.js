@@ -72,8 +72,8 @@ const state = {
 let sliderDirty = false;
 let sliderDirtyTimer = null;
 
-// Active tab in the Library card: 'roon' or 'spotify'
-let activeLibTab = 'roon';
+// Active tab in the Library card: 'recent'|'albums'|'artists'|'playlists'|'genres'|'spotify'
+let activeLibTab = 'recent';
 // Last Spotify search query rendered in the library tab
 let lastSpotifyResults = null;
 
@@ -91,6 +91,10 @@ function _noticeCsrfStale() {
   flashToast('Cockpit session expired (Flask restarted). Reload the page.');
 }
 
+// api() NEVER throws or rejects.  All network and parse errors are caught and
+// returned as { ok: false, error: string } so callers can use plain .then()
+// chains without a .catch() guard.  Do not change this contract without
+// auditing every call-site.
 async function api(path, opts = {}) {
   const r = await fetch(path, {
     method: opts.method || 'GET',
@@ -380,71 +384,30 @@ async function refreshStatus() {
   }
 }
 
-// ----- Yamaha: presets -----
-async function refreshPresets() {
-  try {
-    const r = await api('/api/presets');
-    const host = document.getElementById('preset-list');
-    if (!host) return;
-    if (!r.ok) {
-      host.innerHTML = '<span class="muted">Presets unavailable right now.</span>';
-      return;
-    }
-    host.innerHTML = '';
-    let any = false;
-    let i = 1;
-    for (const p of r.presets || []) {
-      if (p && p.input && p.input !== 'unknown' && p.text) {
-        const b = document.createElement('button');
-        b.className = 'preset';
-        const num = document.createElement('span');
-        num.className = 'preset-num';
-        num.textContent = 'P' + i;
-        b.append(num, document.createTextNode(p.text));
-        const n = i;
-        b.addEventListener('click', () => playFromNetRadioPreset(n));
-        host.appendChild(b);
-        any = true;
-      }
-      i++;
-    }
-    if (!any) {
-      host.innerHTML = '<span class="muted">No presets saved on the receiver yet. See suggestions below.</span>';
-    }
-  } catch (e) { /* ignore */ }
-}
-
-// ----- Net Radio suggestions -----
-function renderSuggestions() {
-  const host = document.getElementById('suggest-list');
+// ----- Yamaha: Net Radio presets from config (P1-P8) -----
+function renderConfigPresets() {
+  const host = document.getElementById('preset-list');
   if (!host) return;
-  const list = state.config.net_radio_suggestions || [];
-  if (!list.length) {
-    host.innerHTML = '<span class="muted">No suggestions configured.</span>';
-    return;
-  }
   host.innerHTML = '';
-  for (const s of list) {
-    const card = document.createElement('div');
-    card.className = 'suggest-card';
-    const name = document.createElement('div');
-    name.className = 'suggest-name'; name.textContent = s.name;
-    const kind = document.createElement('div');
-    kind.className = 'suggest-kind'; kind.textContent = s.kind || '';
-    const meta = document.createElement('div');
-    meta.className = 'suggest-meta'; meta.textContent = s.city || '';
-    const actions = document.createElement('div');
-    actions.className = 'suggest-actions';
-    const copyName = document.createElement('button');
-    copyName.textContent = 'Copy name';
-    copyName.addEventListener('click', () => copyToClipboard(s.vtuner_search || s.name, copyName));
-    const copyUrl = document.createElement('button');
-    copyUrl.textContent = 'Copy URL';
-    copyUrl.addEventListener('click', () => copyToClipboard(s.stream_url || '', copyUrl));
-    actions.appendChild(copyName);
-    if (s.stream_url) actions.appendChild(copyUrl);
-    card.append(name, kind, meta, actions);
-    host.appendChild(card);
+  const stations = state.config.net_radio_suggestions || [];
+  for (let i = 0; i < 8; i++) {
+    const s = stations[i];
+    const b = document.createElement('button');
+    b.className = 'preset';
+    const num = document.createElement('span');
+    num.className = 'preset-num';
+    num.textContent = 'P' + (i + 1);
+    b.appendChild(num);
+    if (s) {
+      const label = s.vtuner_search || s.name || '';
+      b.appendChild(document.createTextNode(label));
+      const n = i + 1;
+      b.addEventListener('click', () => playFromNetRadioPreset(n));
+    } else {
+      b.appendChild(document.createTextNode('—'));
+      b.disabled = true;
+    }
+    host.appendChild(b);
   }
 }
 
@@ -477,10 +440,10 @@ async function refreshRoonStatus() {
     renderRoonBanner();
     if (prev !== 'connected' && state.roonState === 'connected') {
       await refreshZones();
-      if (activeLibTab === 'roon') await libraryHome();
+      if (activeLibTab !== 'spotify') await navigateToRoonTab(activeLibTab);
     } else if (prev === 'connected' && state.roonState !== 'connected') {
       renderZones();
-      if (activeLibTab === 'roon') setLibraryStatus(roonHintForState());
+      if (activeLibTab !== 'spotify') setLibraryStatus(roonHintForState());
     }
   } catch (e) { /* ignore */ }
 }
@@ -978,24 +941,55 @@ function wireShuffleRepeat() {
 }
 
 // ----- Library: tabs -----
+
+// Roon browse paths for each tab. Each entry is an array of fallback paths
+// tried in order; the first one that returns items wins.
+const ROON_TAB_PATHS = {
+  recent:    [['Recently Played'], ['History']],
+  albums:    [['Library', 'Albums'], ['Albums']],
+  artists:   [['Library', 'Artists'], ['Artists']],
+  playlists: [['Library', 'Playlists'], ['Playlists']],
+  genres:    [['Library', 'Genres'], ['Genres']],
+};
+
+async function navigateToRoonTab(tab) {
+  if (state.roonState !== 'connected') { setLibraryStatus(roonHintForState()); return; }
+  if (!state.activeZoneId) { setLibraryStatus('Pick a Roon zone to start.'); return; }
+  const pathOptions = ROON_TAB_PATHS[tab];
+  if (!pathOptions) return;
+  for (const path of pathOptions) {
+    try {
+      const r = await api('/api/roon/browse/navigate', {
+        method: 'POST',
+        body: { zone_id: state.activeZoneId, path },
+      });
+      if (r.ok && r.list && (r.list.items || []).length > 0) {
+        renderLibraryList(r.list);
+        return;
+      }
+    } catch (_) {}
+  }
+  // Fallback: show root if path not found in this Roon library
+  libraryHome();
+}
+
 function wireTabs() {
   document.querySelectorAll('.tab[data-tab]').forEach((btn) => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', async () => {
       const tab = btn.dataset.tab;
       if (tab === activeLibTab) return;
       activeLibTab = tab;
       document.querySelectorAll('.tab[data-tab]').forEach(b => {
         b.classList.toggle('active', b.dataset.tab === activeLibTab);
       });
-      if (activeLibTab === 'roon') {
-        document.getElementById('lib-back').style.display = '';
-        document.getElementById('lib-home').style.display = '';
-        libraryHome();
-      } else {
-        // Spotify tab: hide Roon nav, show Spotify content
+      if (tab === 'spotify') {
         document.getElementById('lib-back').style.display = 'none';
         document.getElementById('lib-home').style.display = 'none';
         renderSpotifyLibrary();
+      } else {
+        document.getElementById('lib-back').style.display = '';
+        document.getElementById('lib-home').style.display = '';
+        await navigateToRoonTab(tab);
       }
     });
   });
@@ -1043,9 +1037,9 @@ async function librarySearch(query) {
     await spotifySearchInTab(query);
     return;
   }
-  // Roon tab
+  // Roon tabs: navigate or search
   if (!state.activeZoneId) { setLibraryStatus('Pick a Roon zone to start.'); return; }
-  if (!query) { libraryHome(); return; }
+  if (!query) { await navigateToRoonTab(activeLibTab); return; }
   try {
     const r = await api('/api/roon/search', {
       method: 'POST', body: { zone_id: state.activeZoneId, query },
@@ -1056,7 +1050,7 @@ async function librarySearch(query) {
 }
 
 function renderLibraryList(list, opts = {}) {
-  if (activeLibTab !== 'roon') return; // Don't clobber Spotify tab
+  if (activeLibTab === 'spotify') return; // Don't clobber Spotify tab
   libState.list = list || {};
   let items = (list && list.items) || [];
   if (opts.home) {
@@ -1494,45 +1488,52 @@ async function refreshUpNext() {
 
   const engine = state.active.engine;
 
-  // Spotify engine: show current track as "now" and a note
-  if (engine === 'spotify' && state.spotify.nowPlaying) {
-    const sp = state.spotify.nowPlaying;
-    if (sp.track_name) {
-      host.innerHTML = '';
-      const row = document.createElement('div');
-      row.className = 'queue-item now';
+  // Spotify engine: fetch real queue from /api/spotify/queue
+  if (engine === 'spotify') {
+    try {
+      const r = await api('/api/spotify/queue');
+      if (r.ok && r.queue && r.queue.length > 0) {
+        host.innerHTML = '';
+        let i = 1;
+        for (const item of r.queue) {
+          const row = document.createElement('div');
+          row.className = 'queue-item' + (i === 1 ? ' now' : '');
 
-      const num = document.createElement('span');
-      num.className = 'q-num';
-      num.textContent = '▶';
+          const num = document.createElement('span');
+          num.className = 'q-num';
+          num.textContent = i === 1 ? '▶' : i;
 
-      const txt = document.createElement('div');
-      txt.className = 'q-text';
-      const main = document.createElement('div');
-      main.className = 'q-main';
-      main.textContent = sp.track_name;
-      const sub = document.createElement('div');
-      sub.className = 'q-sub';
-      sub.textContent = sp.track_artists || '';
-      txt.append(main, sub);
+          const txt = document.createElement('div');
+          txt.className = 'q-text';
+          const main = document.createElement('div');
+          main.className = 'q-main';
+          main.textContent = item.track_name || '(untitled)';
+          txt.appendChild(main);
+          if (item.track_artists) {
+            const sub = document.createElement('div');
+            sub.className = 'q-sub';
+            sub.textContent = item.track_artists + (item.track_album ? ' · ' + item.track_album : '');
+            txt.appendChild(sub);
+          }
 
-      const len = document.createElement('span');
-      len.className = 'q-len';
-      len.textContent = sp.track_duration_ms
-        ? fmtTime(sp.track_duration_ms / 1000)
-        : '';
+          const len = document.createElement('span');
+          len.className = 'q-len';
+          len.textContent = item.track_duration_ms ? fmtTime(item.track_duration_ms / 1000) : '';
 
-      row.append(num, txt, len);
-      host.appendChild(row);
-
-      const tail = document.createElement('span');
-      tail.className = 'muted';
-      tail.style.cssText = 'padding:0.5rem 0.55rem;font-size:0.78rem;';
-      tail.textContent = 'Spotify decides what plays next from the album or playlist context.';
-      host.appendChild(tail);
+          row.append(num, txt, len);
+          host.appendChild(row);
+          i++;
+        }
+        if (meta) meta.textContent = 'spotify · ' + r.queue.length + ' up next';
+      } else {
+        host.innerHTML = '<span class="muted">Queue empty.</span>';
+        if (meta) meta.textContent = 'spotify';
+      }
+    } catch (e) {
+      host.innerHTML = '<span class="muted">Could not load Spotify queue.</span>';
       if (meta) meta.textContent = 'spotify';
-      return;
     }
+    return;
   }
 
   // Roon engine: pull from /api/roon/queue
@@ -1691,15 +1692,14 @@ async function start() {
 
   renderRoonBanner();
   renderZones();
-  if (activeLibTab === 'roon') setLibraryStatus(roonHintForState());
+  if (activeLibTab !== 'spotify') setLibraryStatus(roonHintForState());
 
   await loadConfig();
-  renderSuggestions();
+  renderConfigPresets();
   renderSpotifyPill();
   renderShuffleRepeat();
 
   await refreshStatus();
-  await refreshPresets();
   await refreshRoonStatus();
   await refreshActiveEngine();
   await refreshSpotifyStatus();

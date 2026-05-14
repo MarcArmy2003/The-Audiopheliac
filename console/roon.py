@@ -294,6 +294,37 @@ class RoonClient:
     def browse_page(self, offset: int = 0, count: int = 100) -> dict[str, Any]:
         return self._browse_load(offset=offset, count=count)
 
+    def browse_path(self, zone_id: str, segments: list[str]) -> dict[str, Any]:
+        """Navigate Roon browse hierarchy by segment names without playing.
+
+        Walks from root through each named segment (case-insensitive).
+        Returns the browse_load result at the destination.
+        Returns {} if any segment is not found or segments list is empty.
+        Does NOT play anything.
+        """
+        if not segments:
+            return {}
+        # Start at root; load up to 200 items to cover all top-level entries.
+        self._browse_browse({
+            "hierarchy": "browse",
+            "pop_all": True,
+            "zone_or_output_id": zone_id,
+        })
+        result = self._browse_load(count=200)
+        for seg in segments:
+            items = result.get("items") or []
+            match = next(
+                (it for it in items
+                 if (it.get("title") or "").strip().lower() == seg.strip().lower()),
+                None,
+            )
+            if not match or not match.get("item_key"):
+                return {}  # segment not found at this level
+            result = self.browse_descend(zone_id, match["item_key"])
+            if not result:
+                return {}
+        return result
+
     def search(self, zone_id: str, query: str) -> dict[str, Any]:
         """Roon full-library search.
 

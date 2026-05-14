@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Unica+One&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v=0.7.1">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v={{ version }}">
 </head>
 <body data-yamaha-ip="{{ yamaha_ip }}">
 
@@ -16,7 +16,7 @@
     <img class="topbar-mark" src="{{ url_for('static', filename='audiopheliac-mark.jpg') }}" alt="" aria-hidden="true" />
     <div class="brand-titles">
       <div class="mark">The Audiopheliac</div>
-      <div class="brand-sub">Cockpit &middot; v0.7</div>
+      <div class="brand-sub">Cockpit &middot; v{{ version }}</div>
     </div>
     <div class="device" id="device-name">{{ device_name }}</div>
     <div class="topbar-state">
@@ -126,10 +126,7 @@
                 <span class="muted">Presets loading.</span>
               </div>
               <div class="preset-foot muted">
-                Presets save on the receiver via the MusicCast app. Use the suggestions below to find stations.
-              </div>
-              <div class="suggest-list" id="suggest-list">
-                <span class="muted">Station suggestions loading.</span>
+                Order matches MusicCast slots P1&ndash;P8. Save in the MusicCast app to activate.
               </div>
             </div>
 
@@ -153,7 +150,11 @@
             </div>
 
             <div class="tabs">
-              <button class="tab active" data-tab="roon">Roon</button>
+              <button class="tab active" data-tab="recent">Recent</button>
+              <button class="tab" data-tab="albums">Albums</button>
+              <button class="tab" data-tab="artists">Artists</button>
+              <button class="tab" data-tab="playlists">Playlists</button>
+              <button class="tab" data-tab="genres">Genres</button>
               <button class="tab" data-tab="spotify">Spotify</button>
               <span class="tab-spacer"></span>
               <button class="ghost-btn" id="lib-back">&larr; Back</button>

@@ -28,6 +28,8 @@ from roon import (
 from spotify import SpotifyClient, SpotifyConfigError, SpotifyError
 
 
+__version__ = "0.7"
+
 HERE = Path(__file__).resolve().parent
 CONFIG_PATH = HERE / "config.json"
 PLAYLIST_PATH = HERE / "playlist.json"
@@ -35,6 +37,7 @@ ROON_TOKEN_PATH = HERE / "roon_token.json"
 SPOTIFY_TOKEN_PATH = HERE / "spotify_token.json"
 SPOTIFY_SECRET_PATH = HERE / "spotify_secret.json"
 _playlist_lock = threading.Lock()
+_roon_lock     = threading.Lock()
 DEFAULT_CONFIG = {
     "yamaha_ip": "192.168.1.191",
     "yamaha_name": "Yamaha R-N800A (Family Room)",
@@ -216,6 +219,34 @@ def _spotify_cfg_err(e: SpotifyConfigError):
     return jsonify({"ok": False, "error": str(e), "code": "spotify_unconfigured"}), 503
 
 
+# ---------- Roon client lifecycle helper ----------
+
+def _rebuild_roon_client(*, delete_token: bool = False) -> "RoonClient":
+    """Create a fresh RoonClient, optionally wiping the saved token first.
+
+    The new client is started in a local variable.  Only on a successful
+    ``start()`` call is the module-level ``roon`` global swapped, preventing
+    a half-initialised client from being left in place on failure.
+
+    Serialised by ``_roon_lock`` so that rapid double-clicks or concurrent
+    requests cannot spin up two simultaneous clients.
+
+    Returns the new client so callers can inspect ``.state``.
+    Raises on any failure; the global ``roon`` is untouched if it raises.
+    """
+    global roon
+    with _roon_lock:
+        if delete_token and ROON_TOKEN_PATH.exists():
+            ROON_TOKEN_PATH.unlink()
+        client = RoonClient(
+            token_path=ROON_TOKEN_PATH,
+            configured_host=config.get("roon_host"),
+        )
+        client.start()   # raises on failure — global is untouched until here
+        roon = client    # atomic swap only after successful start
+        return roon
+
+
 # ---------- pages ----------
 
 @app.route("/")
@@ -225,6 +256,7 @@ def index():
         device_name=config["yamaha_name"],
         yamaha_ip=config["yamaha_ip"],
         csrf_token=CSRF_TOKEN,
+        version=__version__,
     )
 
 
@@ -391,6 +423,13 @@ def spotify_playlists():
     sp = _require_spotify()
     limit = _clamp_int(request.args.get("limit"), default=50, lo=1, hi=200)
     return _ok({"playlists": sp.playlists(limit=limit)})
+
+
+@app.route("/api/spotify/queue")
+def spotify_queue():
+    """Return the Spotify playback queue (up to 20 upcoming tracks)."""
+    sp = _require_spotify()
+    return _ok(sp.queue())
 
 
 # ---------- state ----------
@@ -866,16 +905,11 @@ def roon_reconnect():
     connected, typically after a Roon Server bounce on the QNAP or a
     wedged WebSocket session.
     """
-    global roon
     try:
-        roon = RoonClient(
-            token_path=ROON_TOKEN_PATH,
-            configured_host=config.get("roon_host"),
-        )
-        roon.start()
+        client = _rebuild_roon_client()
     except Exception as e:
         return _err(f"reconnect failed: {e}")
-    return _ok({"state": roon.state})
+    return _ok({"state": client.state})
 
 
 @app.post("/api/roon/clear-auth")
@@ -886,18 +920,11 @@ def roon_clear_auth():
     container recreation). After this call, open Roon Remote, go to
     Settings > Extensions, and enable 'The Audiopheliac Cockpit'.
     """
-    global roon
     try:
-        if ROON_TOKEN_PATH.exists():
-            ROON_TOKEN_PATH.unlink()
-        roon = RoonClient(
-            token_path=ROON_TOKEN_PATH,
-            configured_host=config.get("roon_host"),
-        )
-        roon.start()
+        client = _rebuild_roon_client(delete_token=True)
     except Exception as e:
         return _err(f"clear-auth failed: {e}")
-    return _ok({"state": roon.state, "message": "Token cleared. Approve the extension in Roon Remote > Settings > Extensions."})
+    return _ok({"state": client.state, "message": "Token cleared. Approve the extension in Roon Remote > Settings > Extensions."})
 
 
 @app.route("/api/roon/zones")
@@ -949,6 +976,30 @@ def roon_browse_back():
     if not zone_id:
         return _err("Missing zone_id", status=400)
     return _ok({"list": roon.browse_back(zone_id)})
+
+
+@app.post("/api/roon/browse/navigate")
+def roon_browse_navigate():
+    """Navigate Roon browse to a named path without playing.
+    Body: { zone_id: str, path: [str, ...] }
+    Returns: { list: <browse_load result> }
+    """
+    data = request.get_json(force=True) or {}
+    zone_id = str(data.get("zone_id") or "").strip()
+    path = data.get("path") or []
+    if not zone_id:
+        return _err("zone_id required")
+    if not isinstance(path, list):
+        return _err("path must be an array of strings")
+    path = [str(s) for s in path if s]
+    with _roon_lock:
+        try:
+            result = roon.browse_path(zone_id, path)
+        except RoonNotAuthorized:
+            return _err("not_authorized")
+        except RoonError as e:
+            return _err(str(e))
+    return _ok({"list": result})
 
 
 @app.route("/api/roon/browse/page")

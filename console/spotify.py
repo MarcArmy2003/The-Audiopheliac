@@ -290,3 +290,23 @@ class SpotifyClient:
             if not items:
                 break
         return out
+
+    def queue(self) -> dict[str, Any]:
+        """Return up to 20 upcoming tracks in the Spotify playback queue."""
+        try:
+            result = self._call("queue") or {}
+        except SpotifyError:
+            return {"queue": []}
+        items = []
+        for t in result.get("queue") or []:
+            if not t or t.get("type") != "track":
+                continue
+            artists = ", ".join(a.get("name", "") for a in (t.get("artists") or []))
+            items.append({
+                "track_name": t.get("name") or "",
+                "track_artists": artists,
+                "track_duration_ms": t.get("duration_ms") or 0,
+                "track_uri": t.get("uri") or "",
+                "track_album": (t.get("album") or {}).get("name") or "",
+            })
+        return {"queue": items}
