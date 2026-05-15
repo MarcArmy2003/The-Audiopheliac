@@ -5,6 +5,7 @@ Run with:  python app.py            (foreground, dev)
 """
 from __future__ import annotations
 
+import ipaddress
 import json
 import random
 import threading
@@ -14,6 +15,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from secrets import token_urlsafe
 from typing import Any
+from urllib.parse import urlparse
 
 from flask import Flask, abort, jsonify, render_template, request
 from markupsafe import escape
@@ -134,14 +136,29 @@ _MUTATING_METHODS = {"POST", "PUT", "PATCH", "DELETE"}
 _ALLOWED_HOSTS = {"127.0.0.1", "localhost"}
 
 
+def _is_lan_ip(addr: str) -> bool:
+    """True for RFC-1918 private addresses (non-loopback)."""
+    try:
+        ip = ipaddress.ip_address(addr)
+        return ip.is_private and not ip.is_loopback
+    except ValueError:
+        return False
+
+
 @app.before_request
 def protect_local_control_surface():
     """Enforce loopback Host header on all requests, Origin allowlist and
     CSRF token on mutating methods. Defense against DNS rebinding and
-    cross-site form submissions targeting the Cockpit."""
+    cross-site form submissions targeting the Cockpit.
+
+    When config host is 0.0.0.0 (LAN mode), RFC-1918 LAN IPs are also
+    admitted so phones and tablets on the same network can reach the UI.
+    """
     host = (request.host or "").split(":", 1)[0].lower()
+    lan_mode = config.get("host") == "0.0.0.0"
     if host not in _ALLOWED_HOSTS:
-        abort(403)
+        if not (lan_mode and _is_lan_ip(host)):
+            abort(403)
     if request.method in _MUTATING_METHODS:
         port = int(config.get("port", 5000))
         allowed_origins = {
@@ -149,6 +166,13 @@ def protect_local_control_surface():
             f"http://localhost:{port}",
         }
         origin = request.headers.get("Origin")
+        if lan_mode and origin:
+            try:
+                oh = urlparse(origin).hostname or ""
+                if _is_lan_ip(oh):
+                    allowed_origins.add(origin)
+            except Exception:
+                pass
         if origin and origin not in allowed_origins:
             abort(403)
         if request.headers.get("X-Cockpit-CSRF") != CSRF_TOKEN:
