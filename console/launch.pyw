@@ -328,7 +328,9 @@ def main() -> None:
         cfg = load_config()
         host = cfg.get("host", "127.0.0.1")
         port = int(cfg.get("port", 5000))
-        url = f"http://{host}:{port}"
+        # 0.0.0.0 is Flask's bind address; the browser always connects via loopback.
+        connect_host = "127.0.0.1" if host == "0.0.0.0" else host
+        url = f"http://{connect_host}:{port}"
 
         # 1. Pre-flight: kick local Roon Bridge (idempotent if already up).
         #    Done BEFORE the singleton check so that re-clicking the icon
@@ -347,7 +349,7 @@ def main() -> None:
             _write_launcher_error("ensure_roon_server_running failed", e)
 
         # 3. Singleton: if Cockpit already running, just (re)open the window.
-        if is_existing_cockpit(host, port):
+        if is_existing_cockpit(connect_host, port):
             if not open_app_window(url):
                 webbrowser.open(url)
             return
@@ -355,7 +357,7 @@ def main() -> None:
         # 4. Schedule post-boot helper (waits for port, warms bootstrap,
         #    opens Chrome). Daemon so it exits with the main thread.
         t = threading.Thread(
-            target=_post_boot, args=(host, port, url), daemon=True
+            target=_post_boot, args=(connect_host, port, url), daemon=True
         )
         t.start()
 
