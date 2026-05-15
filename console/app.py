@@ -329,16 +329,81 @@ def spotify_playback(action: str):
 
 @app.post("/api/spotify/play-track")
 def spotify_play_track():
-    """Play a single track by URI. Prevents Spotify radio/autoplay mode."""
-    _require_csrf()
+    """Play specific tracks by URI. Avoids Spotify radio/context mode."""
     sp = _require_spotify()
-    body = request.get_json(silent=True) or {}
-    track_uri = body.get("track_uri")
-    device_id = body.get("device_id")
-    if not track_uri:
-        return _err("track_uri required", 400)
-    sp.play(device_id=device_id, uris=[track_uri])
+    data = request.get_json(silent=True) or {}
+    uris = data.get("uris") or []
+    device_id = str(data.get("device_id") or "").strip() or None
+    if not uris:
+        return _err("uris required", 400)
+    sp.play(uris=uris, device_id=device_id)
     return _ok()
+
+
+@app.post("/api/spotify/queue-track")
+def spotify_queue_track():
+    sp = _require_spotify()
+    data = request.get_json(silent=True) or {}
+    uri = str(data.get("uri") or "").strip()
+    device_id = str(data.get("device_id") or "").strip() or None
+    if not uri:
+        return _err("uri required", 400)
+    sp._call("add_to_queue", uri, device_id=device_id)
+    return _ok()
+
+
+@app.route("/api/spotify/albums")
+def spotify_albums():
+    sp = _require_spotify()
+    result = sp._call("current_user_saved_albums", limit=50) or {}
+    albums = []
+    for item in (result.get("items") or []):
+        alb = item.get("album") or {}
+        images = alb.get("images") or []
+        art = images[0]["url"] if images else None
+        artists = ", ".join(a.get("name", "") for a in (alb.get("artists") or []))
+        albums.append({
+            "id": alb.get("id"),
+            "uri": alb.get("uri"),
+            "name": alb.get("name"),
+            "artist": artists,
+            "art_url": art,
+            "total_tracks": alb.get("total_tracks"),
+            "release_date": (alb.get("release_date") or "")[:4],
+        })
+    return _ok({"albums": albums})
+
+
+@app.route("/api/spotify/album/<album_id>")
+def spotify_album(album_id: str):
+    sp = _require_spotify()
+    alb = sp._call("album", album_id) or {}
+    images = alb.get("images") or []
+    art = images[0]["url"] if images else None
+    artists = ", ".join(a.get("name", "") for a in (alb.get("artists") or []))
+    tracks_result = sp._call("album_tracks", album_id, limit=50) or {}
+    tracks = []
+    for t in (tracks_result.get("items") or []):
+        tracks.append({
+            "id": t.get("id"),
+            "uri": t.get("uri"),
+            "name": t.get("name"),
+            "duration_ms": t.get("duration_ms"),
+            "track_number": t.get("track_number"),
+            "explicit": t.get("explicit"),
+        })
+    return _ok({
+        "album": {
+            "id": alb.get("id"),
+            "uri": alb.get("uri"),
+            "name": alb.get("name"),
+            "artist": artists,
+            "art_url": art,
+            "total_tracks": alb.get("total_tracks"),
+            "release_date": (alb.get("release_date") or "")[:4],
+        },
+        "tracks": tracks,
+    })
 
 
 @app.post("/api/spotify/volume")
@@ -1071,6 +1136,49 @@ def playback_active():
         "yamaha_source": yam_src,
         "yamaha_power": yam_power,
     })
+
+
+# ---------- MinimServer (DLNA via Yamaha YXC proxy) ----------
+
+@app.route("/api/miniserver/status")
+def miniserver_status():
+    import requests as _req
+    try:
+        r = _req.get("http://192.168.1.230:9790/", timeout=2)
+        return _ok({"reachable": r.status_code < 500})
+    except Exception:
+        return _ok({"reachable": False})
+
+
+@app.route("/api/miniserver/browse")
+def miniserver_browse():
+    index = _clamp_int(request.args.get("index"), default=0, lo=0, hi=100000)
+    size = _clamp_int(request.args.get("size"), default=8, lo=1, hi=8)
+    data = yam.list_info("server", index, size)
+    return _ok({"list": data})
+
+
+@app.post("/api/miniserver/select")
+def miniserver_select():
+    body = request.get_json(silent=True) or {}
+    idx = _clamp_int(body.get("index"), default=0, lo=0, hi=7)
+    yam.list_select(idx, action="select")
+    return _ok()
+
+
+@app.post("/api/miniserver/play")
+def miniserver_play():
+    body = request.get_json(silent=True) or {}
+    idx = _clamp_int(body.get("index"), default=0, lo=0, hi=7)
+    yam.set_input("server")
+    yam.list_select(idx, action="play")
+    return _ok()
+
+
+@app.post("/api/miniserver/back")
+def miniserver_back():
+    yam.list_return()
+    return _ok()
 
 
 if __name__ == "__main__":

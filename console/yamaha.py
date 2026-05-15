@@ -135,6 +135,14 @@ class Yamaha:
         # Steps back up one menu layer.
         return self._get(f"/netusb/setListControl?type=return&zone={self.zone}")
 
+    def get_server_list(self, index: int = 0, size: int = 8) -> dict:
+        """Convenience wrapper: browse the UPnP/DLNA Server source."""
+        return self.list_info("server", index, size)
+
+    def play_server_item(self, index: int) -> None:
+        """Play the item at page-position `index` from the current server list."""
+        self.list_select(index, action="play")
+
     # ---------- tone (receiver EQ: bass and treble shelves) ----------
 
     def set_tone(self, kind: str, value: int) -> dict:

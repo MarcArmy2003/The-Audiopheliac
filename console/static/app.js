@@ -14,6 +14,10 @@ let _yamVolMax   = 161;
 let _activeTab   = 'playlists';
 let _toastDedup  = {};
 let _scrubRaf    = null;
+let _activeLibSource = 'spotify';  // 'spotify' | 'minimserver' | 'netradio'
+let _libHistory      = [];          // breadcrumb stack
+let _currentAlbumId  = null;
+let _minimStatus     = false;
 
 // ── Utilities ────────────────────────────────────────────────────────────────
 function escHtml(s) {
@@ -424,8 +428,17 @@ function setTab(name) {
   });
   const list = document.getElementById('lib-list');
   if (!list) return;
-  const stored = list.dataset['stored_' + name];
-  if (stored) list.innerHTML = stored;
+
+  if (name === 'albums' && _activeLibSource === 'spotify') {
+    loadSpotifyAlbums();
+  } else if (name === 'artists') {
+    list.innerHTML = '<span class="muted">Artist browsing coming in v1.1. Use Search to find by artist.</span>';
+  } else if (name === 'tracks') {
+    list.innerHTML = '<span class="muted">Use Search to find specific tracks.</span>';
+  } else {
+    const stored = list.dataset['stored_' + name];
+    if (stored) list.innerHTML = stored;
+  }
 }
 
 function storeTabContent(name, html) {
@@ -465,33 +478,11 @@ async function doSearch(q) {
   const list = document.getElementById('lib-list');
   if (list) list.innerHTML = '<span class="muted">Searching…</span>';
   try {
-    const data = await apiGet(`/api/spotify/search?q=${encodeURIComponent(q)}&type=track,album,playlist&limit=20`);
-    // spotify.py search() returns normalized items: {track:[...], album:[...], playlist:[...]}
+    const data = await apiGet(`/api/spotify/search?q=${encodeURIComponent(q)}&type=track,album,artist,playlist&limit=20`);
+    // spotify.py search() returns normalized items: {track:[...], album:[...], artist:[...], playlist:[...]}
     // wrapped by the endpoint as data.results
     const r = data.results ?? {};
-    const all = [
-      ...(r.playlist ?? []),
-      ...(r.album    ?? []),
-      ...(r.track    ?? []),
-    ];
-    const html = all.length === 0
-      ? '<span class="muted">No results.</span>'
-      : all.map(item => {
-          const img   = item.art_url ?? '';
-          const sub   = item.subtitle ?? '';
-          const kind  = item.kind ?? '';
-          const badge = kind !== 'track' ? `<span class="lib-badge">${escHtml(kind)}</span>` : '';
-          return `<div class="lib-item" data-uri="${escAttr(item.uri ?? '')}" data-type="${escAttr(kind)}">
-            ${img ? `<img class="lib-art" src="${escAttr(img)}" alt="">` : '<div class="lib-art-placeholder"></div>'}
-            <div class="lib-info">
-              <span class="lib-title">${escHtml(item.name ?? '')}${badge}</span>
-              <span class="lib-sub">${escHtml(sub)}</span>
-            </div>
-          </div>`;
-        }).join('');
-    storeTabContent('search', html);
-    if (list) list.innerHTML = html;
-    wireLibItems(list);
+    renderSearchResults(r);
   } catch (e) {
     if (list) list.innerHTML = `<span class="muted">Search failed: ${escHtml(e.message)}</span>`;
   }
@@ -505,12 +496,16 @@ function wireLibItems(container) {
       if (!uri) return;
       try {
         if (type === 'track') {
-          await apiPost('/api/spotify/playback/play', { uris: [uri] });
+          await apiPost('/api/spotify/play-track', { uris: [uri], device_id: _spDeviceId || undefined });
+          toast('Playing…', 'success', 2000);
+          setTimeout(pollSpotify, 800);
+        } else if (type === 'album') {
+          navigateAlbum(el.dataset.albumId || uri.split(':').pop());
         } else {
           await apiPost('/api/spotify/playback/play', { context_uri: uri });
+          toast('Playing…', 'success', 2000);
+          setTimeout(pollSpotify, 800);
         }
-        toast('Playing…', 'success', 2000);
-        setTimeout(pollSpotify, 800);
       } catch (e) {
         toast('Play failed: ' + e.message, 'error');
       }
@@ -637,15 +632,371 @@ function wireButtons() {
   });
 }
 
+// ── MinimServer status ────────────────────────────────────────────────────────────────────
+async function checkMinimServer() {
+  try {
+    const data = await apiGet('/api/miniserver/status');
+    _minimStatus = !!data.reachable;
+  } catch (_) {
+    _minimStatus = false;
+  }
+  const dot = document.getElementById('dot-miniserver');
+  if (dot) {
+    dot.style.background = _minimStatus ? 'var(--signal)' : 'var(--paper-muted)';
+    dot.style.boxShadow  = _minimStatus ? '0 0 6px var(--signal)' : 'none';
+  }
+}
+
+// ── Library source switcher ───────────────────────────────────────────────────
+function wireLibSourceTabs() {
+  document.querySelectorAll('.lib-source-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const src = btn.dataset.source;
+      document.querySelectorAll('.lib-source-tab').forEach(b =>
+        b.classList.toggle('active', b.dataset.source === src)
+      );
+      setLibSource(src);
+    });
+  });
+}
+
+function setLibSource(src) {
+  _activeLibSource = src;
+  _libHistory = [];
+  _currentAlbumId = null;
+
+  const libList    = document.getElementById('lib-list');
+  const detail     = document.getElementById('lib-album-detail');
+  const breadcrumb = document.getElementById('lib-breadcrumb');
+  const tabsRow    = document.querySelector('.tabs');
+  const searchRow  = document.querySelector('.search-row');
+  const libMeta    = document.getElementById('library-meta');
+
+  // Hide album detail, clear breadcrumb
+  if (detail) detail.style.display = 'none';
+  if (breadcrumb) { breadcrumb.style.display = 'none'; breadcrumb.innerHTML = ''; }
+
+  if (src === 'spotify') {
+    if (libMeta) libMeta.textContent = 'Spotify';
+    if (tabsRow) tabsRow.style.display = '';
+    if (searchRow) searchRow.style.display = '';
+    setTab('playlists');
+    loadPlaylists();
+  } else if (src === 'minimserver') {
+    if (libMeta) libMeta.textContent = 'MinimServer';
+    if (tabsRow) tabsRow.style.display = 'none';
+    if (searchRow) searchRow.style.display = 'none';
+    if (libList) libList.innerHTML = '<span class="muted">Loading library…</span>';
+    browseMinimServer(0);
+  } else if (src === 'netradio') {
+    if (libMeta) libMeta.textContent = 'Net Radio';
+    if (tabsRow) tabsRow.style.display = 'none';
+    if (searchRow) searchRow.style.display = 'none';
+    if (libList) {
+      libList.innerHTML = '<div id="preset-list"><span class="muted">Loading presets…</span></div>';
+      loadPresets();
+    }
+  }
+}
+
+// ── Spotify albums ────────────────────────────────────────────────────────────
+async function loadSpotifyAlbums() {
+  const list = document.getElementById('lib-list');
+  if (!list) return;
+  list.innerHTML = '<span class="muted">Loading albums…</span>';
+  try {
+    const data = await apiGet('/api/spotify/albums');
+    const albums = data.albums ?? [];
+    if (albums.length === 0) {
+      list.innerHTML = '<span class="muted">No saved albums.</span>';
+      return;
+    }
+    renderAlbumGrid(albums, list);
+  } catch (e) {
+    list.innerHTML = `<span class="muted">Could not load albums: ${escHtml(e.message)}</span>`;
+  }
+}
+
+function renderAlbumGrid(albums, container) {
+  const grid = document.createElement('div');
+  grid.className = 'album-grid';
+  grid.innerHTML = albums.map(alb =>
+    `<div class="album-card" data-album-id="${escAttr(alb.id ?? '')}" data-uri="${escAttr(alb.uri ?? '')}">
+      <div class="album-card-art">
+        ${alb.art_url ? `<img src="${escAttr(alb.art_url)}" alt="" loading="lazy">` : ''}
+      </div>
+      <div class="album-card-name">${escHtml(alb.name ?? '')}</div>
+      <div class="album-card-sub">${escHtml(alb.artist ?? '')}${alb.release_date ? ' · ' + escHtml(alb.release_date) : ''}</div>
+    </div>`
+  ).join('');
+  container.innerHTML = '';
+  container.appendChild(grid);
+  grid.querySelectorAll('.album-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const id = card.dataset.albumId;
+      if (id) navigateAlbum(id);
+    });
+  });
+}
+
+async function navigateAlbum(albumId) {
+  _currentAlbumId = albumId;
+  _libHistory.push({ type: 'albumgrid', label: 'Albums' });
+
+  const list   = document.getElementById('lib-list');
+  const detail = document.getElementById('lib-album-detail');
+  const bc     = document.getElementById('lib-breadcrumb');
+
+  if (list)   list.style.display = 'none';
+  if (detail) detail.style.display = '';
+  if (detail) detail.innerHTML = '<span class="muted">Loading…</span>';
+  if (bc) { bc.style.display = ''; renderBreadcrumb(['Albums', '…'], bc); }
+
+  try {
+    const data = await apiGet(`/api/spotify/album/${encodeURIComponent(albumId)}`);
+    renderAlbumDetail(data.album, data.tracks ?? [], detail);
+    if (bc) renderBreadcrumb(['Albums', data.album?.name ?? ''], bc);
+  } catch (e) {
+    if (detail) detail.innerHTML = `<span class="muted">Failed: ${escHtml(e.message)}</span>`;
+  }
+}
+
+function renderAlbumDetail(album, tracks, container) {
+  const artHtml = album.art_url
+    ? `<img src="${escAttr(album.art_url)}" alt="" style="width:80px;height:80px;border-radius:4px;object-fit:cover;">`
+    : `<div style="width:80px;height:80px;border-radius:4px;background:linear-gradient(135deg,var(--indigo),var(--magenta));"></div>`;
+
+  const header = `
+    <div style="display:flex;gap:1rem;align-items:flex-start;margin-bottom:1rem;">
+      ${artHtml}
+      <div>
+        <div style="font-size:1.1rem;font-weight:600;color:var(--paper);">${escHtml(album.name ?? '')}</div>
+        <div style="font-size:0.85rem;color:var(--paper-muted);">${escHtml(album.artist ?? '')}${album.release_date ? ' · ' + escHtml(album.release_date) : ''}${album.total_tracks ? ' · ' + album.total_tracks + ' tracks' : ''}</div>
+        <button class="primary-btn" style="margin-top:0.6rem;padding:0.4rem 0.9rem;font-size:0.82rem;" data-play-all="${escAttr(album.uri ?? '')}">&#9654; Play All</button>
+      </div>
+    </div>`;
+
+  const trackRows = tracks.map((t, i) => `
+    <div class="track-item" data-uri="${escAttr(t.uri ?? '')}" data-index="${i}">
+      <span class="track-num">${t.track_number ?? (i + 1)}</span>
+      <div class="track-info">
+        <div class="track-name">${escHtml(t.name ?? '')}</div>
+      </div>
+      <span class="track-dur">${fmtMs(t.duration_ms ?? 0)}</span>
+      <div style="display:flex;gap:0.3rem;">
+        <button class="track-play-btn" data-uri="${escAttr(t.uri ?? '')}" title="Play">&#9654;</button>
+        <button class="track-queue-btn" data-uri="${escAttr(t.uri ?? '')}" title="Add to queue">+</button>
+      </div>
+    </div>`
+  ).join('');
+
+  container.innerHTML = header + `<div>${trackRows}</div>`;
+
+  // Wire play-all
+  container.querySelector('[data-play-all]')?.addEventListener('click', async (e) => {
+    const uri = e.currentTarget.dataset.playAll;
+    try {
+      await apiPost('/api/spotify/playback/play', { context_uri: uri });
+      toast('Playing album…', 'success', 2000);
+      setTimeout(pollSpotify, 800);
+    } catch (err) { toast('Play failed: ' + err.message, 'error'); }
+  });
+
+  // Wire per-track play
+  container.querySelectorAll('.track-play-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const uri = btn.dataset.uri;
+      try {
+        await apiPost('/api/spotify/play-track', { uris: [uri], device_id: _spDeviceId || undefined });
+        toast('Playing…', 'success', 2000);
+        setTimeout(pollSpotify, 800);
+      } catch (err) { toast('Play failed: ' + err.message, 'error'); }
+    });
+  });
+
+  // Wire per-track queue
+  container.querySelectorAll('.track-queue-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const uri = btn.dataset.uri;
+      try {
+        await apiPost('/api/spotify/queue-track', { uri, device_id: _spDeviceId || undefined });
+        toast('Added to queue', 'success', 2000);
+      } catch (err) { toast('Queue failed: ' + err.message, 'error'); }
+    });
+  });
+}
+
+function renderBreadcrumb(crumbs, container) {
+  if (!container) return;
+  container.innerHTML = crumbs.map((c, i) => {
+    const isCurrent = i === crumbs.length - 1;
+    if (isCurrent) return `<span class="breadcrumb-item current">${escHtml(c)}</span>`;
+    return `<span class="breadcrumb-item" data-index="${i}">${escHtml(c)}</span><span class="breadcrumb-sep">›</span>`;
+  }).join('');
+  container.querySelectorAll('.breadcrumb-item:not(.current)').forEach(el => {
+    el.addEventListener('click', () => navigateBack());
+  });
+}
+
+function navigateBack() {
+  const list   = document.getElementById('lib-list');
+  const detail = document.getElementById('lib-album-detail');
+  const bc     = document.getElementById('lib-breadcrumb');
+  _libHistory.pop();
+  _currentAlbumId = null;
+  if (detail) { detail.style.display = 'none'; detail.innerHTML = ''; }
+  if (list) list.style.display = '';
+  if (bc) { bc.style.display = 'none'; bc.innerHTML = ''; }
+}
+
+// ── Search results (4-section) ────────────────────────────────────────────────
+function renderSearchResults(r) {
+  const list = document.getElementById('lib-list');
+  if (!list) return;
+
+  const tracks    = r.track    ?? [];
+  const albums    = r.album    ?? [];
+  const artists   = r.artist   ?? [];
+  const playlists = r.playlist ?? [];
+
+  if (!tracks.length && !albums.length && !artists.length && !playlists.length) {
+    list.innerHTML = '<span class="muted">No results.</span>';
+    return;
+  }
+
+  let html = '';
+
+  if (albums.length) {
+    html += `<div class="lib-results-section">Albums</div>`;
+    html += `<div class="album-grid search-albums">`;
+    html += albums.map(alb =>
+      `<div class="album-card" data-album-id="${escAttr(alb.id ?? alb.uri?.split(':').pop() ?? '')}" data-uri="${escAttr(alb.uri ?? '')}">
+        <div class="album-card-art">
+          ${alb.art_url ? `<img src="${escAttr(alb.art_url)}" alt="" loading="lazy">` : ''}
+        </div>
+        <div class="album-card-name">${escHtml(alb.name ?? '')}</div>
+        <div class="album-card-sub">${escHtml(alb.subtitle ?? alb.artist ?? '')}</div>
+      </div>`
+    ).join('') + `</div>`;
+  }
+
+  if (tracks.length) {
+    html += `<div class="lib-results-section">Tracks</div>`;
+    html += tracks.map(t =>
+      `<div class="lib-item" data-uri="${escAttr(t.uri ?? '')}" data-type="track">
+        ${t.art_url ? `<img class="lib-art" src="${escAttr(t.art_url)}" alt="">` : '<div class="lib-art-placeholder"></div>'}
+        <div class="lib-info">
+          <span class="lib-title">${escHtml(t.name ?? '')}</span>
+          <span class="lib-sub">${escHtml(t.subtitle ?? t.artist ?? '')}</span>
+        </div>
+      </div>`
+    ).join('');
+  }
+
+  if (artists.length) {
+    html += `<div class="lib-results-section">Artists</div>`;
+    html += artists.map(a =>
+      `<div class="lib-item" data-uri="${escAttr(a.uri ?? '')}" data-type="artist">
+        ${a.art_url ? `<img class="lib-art" src="${escAttr(a.art_url)}" alt="">` : '<div class="lib-art-placeholder"></div>'}
+        <div class="lib-info">
+          <span class="lib-title">${escHtml(a.name ?? '')}</span>
+          <span class="lib-sub">Artist</span>
+        </div>
+      </div>`
+    ).join('');
+  }
+
+  if (playlists.length) {
+    html += `<div class="lib-results-section">Playlists</div>`;
+    html += playlists.map(pl =>
+      `<div class="lib-item" data-uri="${escAttr(pl.uri ?? '')}" data-type="playlist">
+        ${pl.art_url ? `<img class="lib-art" src="${escAttr(pl.art_url)}" alt="">` : '<div class="lib-art-placeholder"></div>'}
+        <div class="lib-info">
+          <span class="lib-title">${escHtml(pl.name ?? '')}</span>
+          <span class="lib-sub">${escHtml(pl.subtitle ?? '')}</span>
+        </div>
+      </div>`
+    ).join('');
+  }
+
+  list.innerHTML = html;
+
+  // Wire album grid clicks
+  list.querySelectorAll('.album-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const id = card.dataset.albumId;
+      if (id) navigateAlbum(id);
+    });
+  });
+
+  // Wire lib-item clicks
+  wireLibItems(list);
+}
+
+// ── MinimServer browser ───────────────────────────────────────────────────────
+async function browseMinimServer(index) {
+  const list = document.getElementById('lib-list');
+  if (!list) return;
+  list.innerHTML = '<span class="muted">Loading…</span>';
+  try {
+    const data = await apiGet(`/api/miniserver/browse?index=${index}&size=8`);
+    const items = data.list?.items ?? [];
+    const total = data.list?.total_num ?? 0;
+    const menu  = data.list?.menu_name ?? 'Library';
+
+    if (items.length === 0) {
+      list.innerHTML = '<span class="muted">Empty.</span>';
+      return;
+    }
+
+    list.innerHTML = items.map((item, i) => {
+      const isContainer = item.attribute === 'container' || item.container;
+      const icon = isContainer ? '📁' : '🎵';
+      return `<div class="lib-item minim-item" data-index="${i}" data-container="${isContainer ? '1' : '0'}">
+        <span class="lib-art-placeholder" style="font-size:1.2rem;display:flex;align-items:center;justify-content:center;">${icon}</span>
+        <div class="lib-info">
+          <span class="lib-title">${escHtml(item.text ?? item.title ?? '')}</span>
+          <span class="lib-sub">${isContainer ? 'Folder' : 'Track'}</span>
+        </div>
+      </div>`;
+    }).join('');
+
+    list.querySelectorAll('.minim-item').forEach(el => {
+      el.addEventListener('click', async () => {
+        const idx = parseInt(el.dataset.index, 10);
+        const isContainer = el.dataset.container === '1';
+        try {
+          if (isContainer) {
+            await apiPost('/api/miniserver/select', { index: idx });
+            browseMinimServer(0);
+          } else {
+            await apiPost('/api/miniserver/play', { index: idx });
+            toast('Playing…', 'success', 2000);
+            setTimeout(pollYamaha, 800);
+          }
+        } catch (e) {
+          toast('Failed: ' + e.message, 'error');
+        }
+      });
+    });
+  } catch (e) {
+    list.innerHTML = `<span class="muted">Browse failed: ${escHtml(e.message)}</span>`;
+  }
+}
+
 // ── Init ─────────────────────────────────────────────────────────────────────
 async function init() {
   startClock();
   startScrub();
   wireButtons();
+  wireLibSourceTabs();
+  checkMinimServer();
 
   // Initial parallel polls
   await Promise.allSettled([pollSpotify(), pollYamaha(), pollDevices()]);
-  await Promise.allSettled([loadPlaylists(), loadPresets(), pollQueue()]);
+  await Promise.allSettled([loadPlaylists(), pollQueue()]);
 
   // Polling intervals
   setInterval(pollSpotify,  3000);
