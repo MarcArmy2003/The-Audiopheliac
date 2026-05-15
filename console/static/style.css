@@ -60,9 +60,10 @@ html, body {
 }
 
 .mark-wrap {
-  width: 56px;
-  height: 56px;
+  width: 44px;
+  height: 44px;
   flex: none;
+  overflow: hidden;
 }
 
 .brand-titles {
@@ -535,7 +536,7 @@ html, body {
   gap: 0.4rem;
 }
 
-.src-btn {
+.src-btn, .source-btn {
   background: transparent;
   border: 1px solid var(--hairline);
   color: var(--paper-dim);
@@ -549,9 +550,9 @@ html, body {
   transition: border-color 120ms, color 120ms, background 120ms;
 }
 
-.src-btn:hover { border-color: var(--sunlamp); color: var(--sunlamp); }
+.src-btn:hover, .source-btn:hover { border-color: var(--sunlamp); color: var(--sunlamp); }
 
-.src-btn.active {
+.src-btn.active, .source-btn.active {
   background: var(--sunlamp);
   border-color: var(--sunlamp);
   color: var(--ink);

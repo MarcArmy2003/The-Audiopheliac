@@ -327,6 +327,20 @@ def spotify_playback(action: str):
     return _ok()
 
 
+@app.post("/api/spotify/play-track")
+def spotify_play_track():
+    """Play a single track by URI. Prevents Spotify radio/autoplay mode."""
+    _require_csrf()
+    sp = _require_spotify()
+    body = request.get_json(silent=True) or {}
+    track_uri = body.get("track_uri")
+    device_id = body.get("device_id")
+    if not track_uri:
+        return _err("track_uri required", 400)
+    sp.play(device_id=device_id, uris=[track_uri])
+    return _ok()
+
+
 @app.post("/api/spotify/volume")
 def spotify_volume():
     sp = _require_spotify()
