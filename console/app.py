@@ -22,6 +22,8 @@ from markupsafe import escape
 
 from yamaha import Yamaha, YamahaError
 from spotify import SpotifyClient, SpotifyConfigError, SpotifyError
+import minimserver
+from minimserver import MinimServerError, MediaServer
 
 
 __version__ = "0.9"
@@ -218,6 +220,11 @@ def _spotify_err(e: SpotifyError):
 @app.errorhandler(SpotifyConfigError)
 def _spotify_cfg_err(e: SpotifyConfigError):
     return jsonify({"ok": False, "error": str(e), "code": "spotify_unconfigured"}), 503
+
+
+@app.errorhandler(MinimServerError)
+def _minim_err(e: MinimServerError):
+    return _err(str(e))
 
 
 # ---------- pages ----------
@@ -721,6 +728,227 @@ def browse_select():
 @app.post("/api/browse/back")
 def browse_back():
     yam.list_return()
+    return _ok()
+
+
+# ---------- MinimServer (direct DLNA, source-uniform library) -------------
+# These routes talk DLNA over SOAP directly to MinimServer and push track
+# URIs to the Yamaha as a UPnP MediaRenderer. They do not go through YXC
+# for library browse, which means they bypass the 8-items-per-page cap and
+# expose real search (ContentDirectory:Search) that YXC does not support.
+# Playback handoff: SetAVTransportURI + Play on the renderer. The
+# /api/miniserver/play handler ensures the Yamaha is on input=server before
+# pushing the URI so the renderer accepts the transport command.
+
+@app.route("/api/miniserver/discover")
+def miniserver_discover():
+    """Force SSDP re-discovery; return the current device map."""
+    force = request.args.get("force", "1").lower() not in ("0", "false", "no")
+    devs = minimserver.discover(force=force)
+    serialized = {
+        udn: {
+            "friendly_name": d.friendly_name,
+            "manufacturer": d.manufacturer,
+            "model_name": d.model_name,
+            "device_type": d.device_type,
+            "udn": d.udn,
+            "location": d.location,
+            "base_url": d.base_url,
+            "services": [s.service_type for s in d.services.values()],
+        } for udn, d in devs.items()
+    }
+    return _ok({"devices": serialized, "status": minimserver.status_snapshot()})
+
+
+@app.route("/api/miniserver/status")
+def miniserver_status():
+    """Quick state report: is MinimServer + Yamaha reachable as UPnP?"""
+    return _ok(minimserver.status_snapshot())
+
+
+def _require_media_server() -> "MediaServer":
+    dev = minimserver.media_server()
+    if dev is None:
+        raise MinimServerError(
+            "no MediaServer discovered on the LAN. "
+            "Confirm MinimServer is running on the QNAP and try /api/miniserver/discover?force=1."
+        )
+    return MediaServer(dev)
+
+
+@app.route("/api/miniserver/browse")
+def miniserver_browse():
+    """Browse a container on the MediaServer.
+
+    Query params:
+      id     — object ID (default '0' = root)
+      start  — pagination start (default 0)
+      count  — pagination size (default 200, max 1000)
+      sort   — SortCriteria (default '' = server default)
+      meta   — if '1', return metadata for the object itself instead of children
+    """
+    ms = _require_media_server()
+    object_id = request.args.get("id", "0")
+    start = _clamp_int(request.args.get("start"), default=0, lo=0, hi=100000)
+    count = _clamp_int(request.args.get("count"), default=200, lo=1, hi=1000)
+    sort = request.args.get("sort", "")
+    browse_flag = ("BrowseMetadata"
+                   if request.args.get("meta") == "1"
+                   else "BrowseDirectChildren")
+    result = ms.browse(object_id=object_id, browse_flag=browse_flag,
+                       start=start, count=count, sort=sort)
+    return _ok(result)
+
+
+@app.route("/api/miniserver/search")
+def miniserver_search():
+    """Search the MediaServer's ContentDirectory.
+
+    Two modes:
+      - Advanced: pass `criteria=<UPnP expression>` directly.
+        e.g. criteria=dc:title contains "shaboozey"
+      - Simple: pass `q=<query>` and an optional `kind=track|album|artist|all`.
+        The Cockpit builds the criteria for you.
+
+    Returns DIDL-Lite items flattened to {kind, id, title, artist, album,
+    art_url, track_uri, duration_ms, ...}. Frontend groups by upnp_class
+    or kind to surface artists/albums/tracks/playlists separately.
+    """
+    ms = _require_media_server()
+    container_id = request.args.get("container_id", "0")
+    start = _clamp_int(request.args.get("start"), default=0, lo=0, hi=100000)
+    count = _clamp_int(request.args.get("count"), default=200, lo=1, hi=1000)
+    sort = request.args.get("sort", "")
+
+    criteria = request.args.get("criteria", "").strip()
+    if not criteria:
+        q = (request.args.get("q") or "").strip()
+        if not q:
+            return _ok({"items": [], "returned": 0, "total_matches": 0,
+                        "update_id": 0, "criteria": ""})
+        kind = (request.args.get("kind") or "all").lower()
+        criteria = _build_search_criteria(q, kind)
+
+    result = ms.search(container_id=container_id, criteria=criteria,
+                       start=start, count=count, sort=sort)
+    # Drop raw_didl from the JSON payload to keep responses lean.
+    result.pop("raw_didl", None)
+    result["criteria"] = criteria
+    return _ok(result)
+
+
+def _build_search_criteria(q: str, kind: str) -> str:
+    """Construct a UPnP search expression from a simple query + kind hint.
+
+    `kind` is one of: track, album, artist, playlist, all. Unknown kinds
+    fall back to 'all'.
+
+    Compound matching across dc:title, upnp:artist, upnp:album, dc:creator
+    so that searches by artist name find the artist's tracks/albums even
+    when the artist name does not appear in dc:title. (MinimServer
+    advertises all four properties via GetSearchCapabilities; verified
+    on 2026-05-18.) Playlists keep title-only because they rarely carry
+    artist/album metadata.
+    """
+    qe = q.replace('"', '\\"')
+    # Compound predicate: match if the query appears in any of the four
+    # common music-metadata properties.
+    any_match = (f'(dc:title contains "{qe}" '
+                 f'or upnp:artist contains "{qe}" '
+                 f'or upnp:album contains "{qe}" '
+                 f'or dc:creator contains "{qe}")')
+    title_match = f'dc:title contains "{qe}"'
+
+    if kind == "track":
+        cls = 'object.item.audioItem'
+        return f'(upnp:class derivedfrom "{cls}") and {any_match}'
+    if kind == "album":
+        cls = 'object.container.album'
+        # Albums typically carry upnp:artist on the container itself.
+        return (f'(upnp:class derivedfrom "{cls}") '
+                f'and (dc:title contains "{qe}" '
+                f'or upnp:artist contains "{qe}")')
+    if kind == "artist":
+        cls = 'object.container.person.musicArtist'
+        # Artists match by container title; some servers also expose upnp:artist.
+        return (f'(upnp:class derivedfrom "{cls}") '
+                f'and ({title_match} or upnp:artist contains "{qe}")')
+    if kind == "playlist":
+        cls = 'object.container.playlistContainer'
+        return f'(upnp:class derivedfrom "{cls}") and ({title_match})'
+    # all: compound match across containers + items, no class restriction
+    return any_match
+
+
+@app.route("/api/miniserver/search-capabilities")
+def miniserver_search_caps():
+    """Report the properties supported by the server's Search action.
+
+    Useful when iterating on search-criteria construction; some servers
+    do not honor every UPnP property.
+    """
+    ms = _require_media_server()
+    return _ok({"capabilities": ms.get_search_capabilities()})
+
+
+@app.post("/api/miniserver/play")
+def miniserver_play():
+    """Push a track URI to the Yamaha as MediaRenderer and start playback.
+
+    Body:
+      track_uri      (required) the DLNA HTTP URL from a Browse/Search item
+      didl_metadata  (optional) the DIDL-Lite XML for the item; helps the
+                     renderer display title/artist/art
+      ensure_server_input (optional, default true) call YXC to switch the
+                     Yamaha to input=server before pushing the URI
+
+    Returns {renderer, renderer_udn, track_uri}.
+    """
+    data = request.get_json(silent=True) or {}
+    track_uri = (data.get("track_uri") or "").strip()
+    if not track_uri:
+        return _err("track_uri is required", status=400)
+    didl = data.get("didl_metadata") or ""
+    ensure_input = data.get("ensure_server_input", True)
+
+    # The Yamaha only accepts AVTransport commands when it's on its DLNA
+    # input. Switching first is cheap and avoids a confusing "uri loaded
+    # but nothing plays" failure mode.
+    if ensure_input:
+        try:
+            yam.set_input("server")
+        except YamahaError:
+            # Surface but don't block: some renderers accept the call without
+            # the explicit input swap; let the renderer respond.
+            pass
+
+    result = minimserver.play_track(
+        track_uri=track_uri,
+        didl_metadata=didl,
+        renderer_hint=data.get("renderer_hint", "Yamaha"),
+    )
+    return _ok(result)
+
+
+@app.post("/api/miniserver/stop")
+def miniserver_stop():
+    """Stop renderer playback (Yamaha)."""
+    dev = minimserver.media_renderer(friendly_name_hint="Yamaha")
+    if dev is None:
+        return _err("no MediaRenderer found", status=503)
+    from minimserver import MediaRenderer
+    MediaRenderer(dev).stop()
+    return _ok()
+
+
+@app.post("/api/miniserver/pause")
+def miniserver_pause():
+    """Pause renderer playback (Yamaha)."""
+    dev = minimserver.media_renderer(friendly_name_hint="Yamaha")
+    if dev is None:
+        return _err("no MediaRenderer found", status=503)
+    from minimserver import MediaRenderer
+    MediaRenderer(dev).pause()
     return _ok()
 
 
@@ -1253,49 +1481,6 @@ def playback_active():
         "yamaha_source": yam_src,
         "yamaha_power": yam_power,
     })
-
-
-# ---------- MinimServer (DLNA via Yamaha YXC proxy) ----------
-
-@app.route("/api/miniserver/status")
-def miniserver_status():
-    import requests as _req
-    try:
-        r = _req.get("http://192.168.1.230:9790/", timeout=2)
-        return _ok({"reachable": r.status_code < 500})
-    except Exception:
-        return _ok({"reachable": False})
-
-
-@app.route("/api/miniserver/browse")
-def miniserver_browse():
-    index = _clamp_int(request.args.get("index"), default=0, lo=0, hi=100000)
-    size = _clamp_int(request.args.get("size"), default=8, lo=1, hi=8)
-    data = yam.list_info("server", index, size)
-    return _ok({"list": data})
-
-
-@app.post("/api/miniserver/select")
-def miniserver_select():
-    body = request.get_json(silent=True) or {}
-    idx = _clamp_int(body.get("index"), default=0, lo=0, hi=7)
-    yam.list_select(idx, action="select")
-    return _ok()
-
-
-@app.post("/api/miniserver/play")
-def miniserver_play():
-    body = request.get_json(silent=True) or {}
-    idx = _clamp_int(body.get("index"), default=0, lo=0, hi=7)
-    yam.set_input("server")
-    yam.list_select(idx, action="play")
-    return _ok()
-
-
-@app.post("/api/miniserver/back")
-def miniserver_back():
-    yam.list_return()
-    return _ok()
 
 
 if __name__ == "__main__":

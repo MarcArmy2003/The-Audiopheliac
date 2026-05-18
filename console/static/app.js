@@ -480,6 +480,13 @@ async function loadPlaylists() {
 
 async function doSearch(q) {
   if (!q) return;
+  // Dispatch by active library source. Search-row is source-uniform from
+  // the user's POV (same input box, same Search button) but the backend
+  // differs per source.
+  if (_activeLibSource === 'minimserver') {
+    return searchMinimServer(q, 'all');
+  }
+  // Default: Spotify (existing behavior).
   setTab('search');
   const list = document.getElementById('lib-list');
   if (list) list.innerHTML = '<span class="muted">Searching…</span>';
@@ -663,10 +670,15 @@ function wireButtons() {
 }
 
 // ── MinimServer status ────────────────────────────────────────────────────────────────────
+// Status shape from /api/miniserver/status (new in v0.9.x DLNA refactor):
+//   { state: "ready"|"server_only"|"renderer_only"|"unavailable",
+//     media_server: {friendly_name, ...} | null,
+//     media_renderer: {friendly_name, ...} | null }
+// "ready" = MinimServer AND Yamaha both discovered and reachable as UPnP.
 async function checkMinimServer() {
   try {
     const data = await apiGet('/api/miniserver/status');
-    _minimStatus = !!data.reachable;
+    _minimStatus = data.state === 'ready';
   } catch (_) {
     _minimStatus = false;
   }
@@ -714,10 +726,12 @@ function setLibSource(src) {
     loadPlaylists();
   } else if (src === 'minimserver') {
     if (libMeta) libMeta.textContent = 'MinimServer';
-    if (tabsRow) tabsRow.style.display = 'none';
-    if (searchRow) searchRow.style.display = 'none';
+    // Search row stays visible — MinimServer search is source-uniform with Spotify.
+    if (searchRow) searchRow.style.display = '';
+    // Keep the kind tabs visible so the user can filter results by track/album/artist.
+    if (tabsRow) tabsRow.style.display = '';
     if (libList) libList.innerHTML = '<span class="muted">Loading library…</span>';
-    browseMinimServer(0);
+    browseMinimServer('0', []);  // root container, empty breadcrumb
   } else if (src === 'netradio') {
     if (libMeta) libMeta.textContent = 'Net Radio';
     if (tabsRow) tabsRow.style.display = 'none';
@@ -965,54 +979,141 @@ function renderSearchResults(r) {
   wireLibItems(list);
 }
 
-// ── MinimServer browser ───────────────────────────────────────────────────────
-async function browseMinimServer(index) {
+// ── MinimServer browser (direct DLNA) ─────────────────────────────────────────
+// Browses MinimServer via SOAP ContentDirectory through the backend at
+// /api/miniserver/browse. Item shape from the backend:
+//   { kind: "container"|"item", id: "<dlna-object-id>", title, artist,
+//     album, art_url, track_uri, duration_ms, upnp_class, child_count }
+// Navigation uses opaque DLNA object IDs (strings, often slash-separated
+// paths like "0/Music/Albums/..."), not numeric indices. Breadcrumb is
+// tracked client-side as a stack of {id, title} for back-navigation.
+
+async function browseMinimServer(objectId, breadcrumb) {
   const list = document.getElementById('lib-list');
+  const crumbEl = document.getElementById('lib-breadcrumb');
   if (!list) return;
   list.innerHTML = '<span class="muted">Loading…</span>';
-  try {
-    const data = await apiGet(`/api/miniserver/browse?index=${index}&size=8`);
-    const items = data.list?.items ?? [];
-    const total = data.list?.total_num ?? 0;
-    const menu  = data.list?.menu_name ?? 'Library';
 
+  // Update breadcrumb UI
+  if (crumbEl) {
+    if (breadcrumb && breadcrumb.length > 0) {
+      crumbEl.style.display = '';
+      crumbEl.innerHTML = breadcrumb.map((c, i) => {
+        const isLast = i === breadcrumb.length - 1;
+        return isLast
+          ? `<span class="crumb crumb-current">${escHtml(c.title)}</span>`
+          : `<span class="crumb crumb-link" data-depth="${i}">${escHtml(c.title)}</span>`;
+      }).join(' / ');
+      // Wire breadcrumb links
+      crumbEl.querySelectorAll('.crumb-link').forEach(el => {
+        el.addEventListener('click', () => {
+          const depth = parseInt(el.dataset.depth, 10);
+          const trimmed = breadcrumb.slice(0, depth + 1);
+          const target = trimmed[trimmed.length - 1];
+          browseMinimServer(target.id, trimmed);
+        });
+      });
+    } else {
+      crumbEl.style.display = 'none';
+      crumbEl.innerHTML = '';
+    }
+  }
+
+  try {
+    const data = await apiGet(
+      `/api/miniserver/browse?id=${encodeURIComponent(objectId)}&count=200`
+    );
+    const items = data.items ?? [];
     if (items.length === 0) {
-      list.innerHTML = '<span class="muted">Empty.</span>';
+      list.innerHTML = '<span class="muted">Empty container.</span>';
       return;
     }
-
-    list.innerHTML = items.map((item, i) => {
-      const isContainer = item.attribute === 'container' || item.container;
-      const icon = isContainer ? '📁' : '🎵';
-      return `<div class="lib-item minim-item" data-index="${i}" data-container="${isContainer ? '1' : '0'}">
-        <span class="lib-art-placeholder" style="font-size:1.2rem;display:flex;align-items:center;justify-content:center;">${icon}</span>
-        <div class="lib-info">
-          <span class="lib-title">${escHtml(item.text ?? item.title ?? '')}</span>
-          <span class="lib-sub">${isContainer ? 'Folder' : 'Track'}</span>
-        </div>
-      </div>`;
-    }).join('');
-
-    list.querySelectorAll('.minim-item').forEach(el => {
-      el.addEventListener('click', async () => {
-        const idx = parseInt(el.dataset.index, 10);
-        const isContainer = el.dataset.container === '1';
-        try {
-          if (isContainer) {
-            await apiPost('/api/miniserver/select', { index: idx });
-            browseMinimServer(0);
-          } else {
-            await apiPost('/api/miniserver/play', { index: idx });
-            toast('Playing…', 'success', 2000);
-            setTimeout(pollYamaha, 800);
-          }
-        } catch (e) {
-          toast('Failed: ' + e.message, 'error');
-        }
-      });
-    });
+    list.innerHTML = renderMinimItems(items);
+    wireMinimItems(list, breadcrumb || []);
   } catch (e) {
     list.innerHTML = `<span class="muted">Browse failed: ${escHtml(e.message)}</span>`;
+  }
+}
+
+function renderMinimItems(items) {
+  return items.map((it) => {
+    const isContainer = it.kind === 'container';
+    const id = it.id ?? '';
+    const title = it.title ?? '';
+    const sub = isContainer
+      ? `Folder${it.child_count != null ? ' · ' + it.child_count + ' items' : ''}`
+      : [it.artist, it.album, it.duration_ms ? fmtMs(it.duration_ms) : null]
+          .filter(Boolean).join(' · ');
+    const art = it.art_url
+      ? `<img class="lib-art" src="${escAttr(it.art_url)}" alt="">`
+      : `<div class="lib-art-placeholder">${isContainer ? '📁' : '🎵'}</div>`;
+    const playableAttrs = isContainer
+      ? ''
+      : ` data-track-uri="${escAttr(it.track_uri ?? '')}" data-duration-ms="${it.duration_ms ?? ''}"`;
+    return `<div class="lib-item minim-item"
+                 data-id="${escAttr(id)}"
+                 data-title="${escAttr(title)}"
+                 data-container="${isContainer ? '1' : '0'}"${playableAttrs}>
+      ${art}
+      <div class="lib-info">
+        <span class="lib-title">${escHtml(title)}</span>
+        <span class="lib-sub">${escHtml(sub)}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function wireMinimItems(listEl, breadcrumb) {
+  listEl.querySelectorAll('.minim-item').forEach(el => {
+    el.addEventListener('click', async () => {
+      const isContainer = el.dataset.container === '1';
+      const id = el.dataset.id;
+      const title = el.dataset.title;
+      if (isContainer) {
+        const nextCrumb = breadcrumb.concat([{ id, title }]);
+        browseMinimServer(id, nextCrumb);
+      } else {
+        const trackUri = el.dataset.trackUri;
+        if (!trackUri) {
+          toast('Track has no playable URI', 'error');
+          return;
+        }
+        try {
+          await apiPost('/api/miniserver/play', { track_uri: trackUri });
+          toast(`Playing ${title}`, 'success', 2000);
+          setTimeout(pollYamaha, 800);
+        } catch (e) {
+          toast('Play failed: ' + e.message, 'error');
+        }
+      }
+    });
+  });
+}
+
+// ── MinimServer search ────────────────────────────────────────────────────────
+// Hits /api/miniserver/search?q=...&kind=all. Backend builds the UPnP
+// search expression. Result shape is the same flat item list as browse.
+async function searchMinimServer(q, kind = 'all') {
+  const list = document.getElementById('lib-list');
+  const crumbEl = document.getElementById('lib-breadcrumb');
+  if (!list) return;
+  list.innerHTML = '<span class="muted">Searching…</span>';
+  if (crumbEl) {
+    crumbEl.style.display = '';
+    crumbEl.innerHTML = `<span class="crumb crumb-current">Search: ${escHtml(q)}</span>`;
+  }
+  try {
+    const url = `/api/miniserver/search?q=${encodeURIComponent(q)}&kind=${encodeURIComponent(kind)}&count=100`;
+    const data = await apiGet(url);
+    const items = data.items ?? [];
+    if (items.length === 0) {
+      list.innerHTML = '<span class="muted">No matches.</span>';
+      return;
+    }
+    list.innerHTML = renderMinimItems(items);
+    wireMinimItems(list, []);  // search results have no breadcrumb context
+  } catch (e) {
+    list.innerHTML = `<span class="muted">Search failed: ${escHtml(e.message)}</span>`;
   }
 }
 
