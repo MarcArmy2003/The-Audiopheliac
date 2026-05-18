@@ -1,10 +1,12 @@
 # Software Package Configuration Profile - Roon
 
+> **DEPRECATED 2026-05-18.** Roon trial was cancelled before the subscription kicked in. Roon did not meet The Audiopheliac's playback purposes and is officially out. This profile is retained as historical archive only; do NOT use it as a guide for current setup or troubleshooting. The active library/playback path is MinimServer (UPnP/DLNA) serving `\\NAS87828E\Music` to the R-N800A. See `CLAUDE.md` §HISTORY entry dated 2026-05-18 for the rationale and §HARDWARE for the current media-server posture. The Roon Docker container, Bridge service, Remote app, and `console/roon.py` integration in the Cockpit are queued for explicit removal under the OPEN ACTION ITEMS table in CLAUDE.md.
+
 **Package:** Roon (Server + Bridge + Remote)
 **Owner:** Gillon "Gill" Marchetti (MarcArmy2003)
 **Profile version:** 2026.05.1
 **Last reviewed:** 2026-05-11
-**Status:** Trial (free 14-day; subscription begins 2026-05-25 at $149.88/yr unless cancelled)
+**Status:** DEPRECATED 2026-05-18 (trial cancelled; not subscribed; footprint queued for removal)
 
 ---
 

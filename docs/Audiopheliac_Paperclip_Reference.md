@@ -1,5 +1,7 @@
 # Paperclip Reference — The Audiopheliac
 
+> **DEPRECATED 2026-05-18.** Paperclip is no longer part of The Audiopheliac's active workflow. This document is retained as historical platform-mechanics archive only. It is NOT a guide to current Audiopheliac workflow. The active workflow is Cowork + Rafa with the dual-write close record (Slack `#theaudiopheliac` + `docs/daily_log.md`). See `CLAUDE.md` §PAPERCLIP SURFACE for the deprecation notice and §HISTORY entry dated 2026-05-18 for the rationale. Do not draft Rafa CLI prompts based on the protocols documented below; they are not in effect.
+
 **Scope:** The Audiopheliac ONLY. Audiopheliac-specific revision derived from the VAL cross-project reference (`C:\Users\gillo\Veteran Analytics LLC\Paperclip_Reference.md`).
 
 > **Distinct file.** This document is the Audiopheliac-applicable revision. It lives at `C:\Users\gillo\The-Audiopheliac\docs\Audiopheliac_Paperclip_Reference.md`. Do NOT confuse with the VAL parent at `C:\Users\gillo\Veteran Analytics LLC\Paperclip_Reference.md`, which covers VeteranAnalytics.com + VeteranIntel.org operational specifics. When platform-mechanics content drifts between the two files, the canonical source for both is the official paperclip.ing documentation, not either of these caches.

@@ -24,7 +24,7 @@ The Audiopheliac is Gill Marchetti's lifestyle brand at the intersection of audi
 **Motto:** "Rock 'n' roll. Deal with it." — after Bret Easton Ellis, *The Rules of Attraction* (Gill's paraphrase; not verbatim — intentionally kept)
 **Persona:** Enthusiastic, witty, unflinchingly honest.
 **Tone:** Direct, technically precise, conversational. Explain the why behind every recommendation.
-**Companion project:** `The Audiopheliac | Studio Assistant` on claude.ai is available for research, copy iteration, and exploratory prompting while Cowork is processing. It is not part of the production workflow and does not relay, review, or gate any deliverables. Cowork is the primary development surface and executes all work it is capable of directly. Rafa handles only what Cowork cannot reach: localhost (paperclip API), Windows-native PowerShell, and Cloudflare deployments.
+**Companion project:** `The Audiopheliac | Studio Assistant` on claude.ai is available for research, copy iteration, and exploratory prompting while Cowork is processing. It is not part of the production workflow and does not relay, review, or gate any deliverables. Cowork is the primary development surface and executes all work it is capable of directly. Rafa handles only what Cowork cannot reach: Windows-native PowerShell on GDMARCHE, Cockpit/Flask localhost work on GDMARCHE, and Cloudflare deployments.
 
 ---
 
@@ -62,40 +62,35 @@ All tools listed in `permissions.allow` run without prompting Gill for approval.
 
 ### Operational routing — who runs what
 
-Cowork drafts; Rafa executes anything that touches the running stack on GDMARCHE; the Audiopheliac Operator paperclip agent (when hired) absorbs the recurring slice. The table below is the default routing for ops that come up frequently; treat it as the lane discipline for this project specifically.
+Cowork drafts; Rafa executes anything that touches the running stack on GDMARCHE. The table below is the default routing for ops that come up frequently; treat it as the lane discipline for this project specifically.
 
-| Operation | Lane today | Lane once Operator agent exists |
-|---|---|---|
-| Edit `console/config.json` (preferred_zones, enabled_sources, net_radio_suggestions, IPs, etc.) | Rafa | Operator |
-| Cockpit Flask process lifecycle (start, stop, restart) | Rafa | Operator |
-| Run any of `automation/*.py` (music_indexer, spotify_pull, spotify_local_match, spotify_gap_report) | Rafa | Operator (and likely a recurring routine) |
-| Restart Roon Server container on QNAP (SSH + docker compose) | Rafa | Operator if granted SSH; otherwise stays with Rafa |
-| Edit `.gitignore`, `automation/`, `console/static/`, `console/templates/`, `console/*.py` | Cowork drafts → Rafa commits / restarts if process is affected | Operator drafts and commits when adapter has file tools |
-| Touch `site/` Astro source files | Cowork directly (hot reload picks up changes) | Cowork directly |
-| Astro `npm install`, `npm run build`, `npm audit`, `wrangler pages deploy` | Rafa | Operator if granted Node toolchain; otherwise Rafa |
-| Brand voice guidelines, design philosophy, brand docs under `docs/brand/`, mockups under `_dev/01_brand/` | Cowork directly | Cowork directly |
-| CLAUDE.md surgical edits | Cowork directly | Cowork directly |
-| Doc updates downstream of an ops change (e.g. signal map after a Roon rename, software profiles after a version bump) | Cowork drafts → Rafa applies in the same prompt that runs the ops change | Operator |
-| Git stage, commit, push to origin/main | Rafa | Operator (file paperclip approval gate for force pushes per PAPERCLIP SURFACE §approval gates) |
-| Slack canvas updates at session close | Cowork (Cowork has the Slack MCP) | Cowork remains |
-| Paperclip ticket reads / writes | Rafa (only surface with localhost reach) | Operator agents post directly; Cowork still drafts comments via Rafa bridge |
-| Canva brand kit operations | Cowork (Cowork has the Canva MCP) | Cowork remains |
-| YXC probes / direct calls to `http://192.168.1.191/YamahaExtendedControl/v1/` | Rafa | Operator |
-| Roon UI configuration (zone naming, output enabling, account settings) | Gill (Roon Remote desktop app, manual) | Gill — paperclip cannot drive the Roon Remote UI |
-| MusicCast app configuration (Net Radio preset save, source enable/disable, MusicCast Linking) | Gill (iOS app, manual) | Gill — same reason as Roon |
+| Operation | Lane |
+|---|---|
+| Edit `console/config.json` (preferred_zones, enabled_sources, net_radio_suggestions, IPs, etc.) | Rafa |
+| Cockpit Flask process lifecycle (start, stop, restart) | Rafa |
+| Run any of `automation/*.py` (music_indexer, spotify_pull, spotify_local_match, spotify_gap_report) | Rafa |
+| Edit `.gitignore`, `automation/`, `console/static/`, `console/templates/`, `console/*.py` | Cowork drafts → Rafa commits / restarts if process is affected |
+| Touch `site/` Astro source files | Cowork directly (hot reload picks up changes) |
+| Astro `npm install`, `npm run build`, `npm audit`, `wrangler pages deploy` | Rafa |
+| Brand voice guidelines, design philosophy, brand docs under `docs/brand/`, mockups under `_dev/01_brand/` | Cowork directly |
+| CLAUDE.md surgical edits | Cowork directly |
+| Doc updates downstream of an ops change (e.g. signal map after a hardware swap, software profiles after a version bump) | Cowork drafts → Rafa applies in the same prompt that runs the ops change |
+| Git stage, commit, push to origin/main | Rafa |
+| Slack channel posts + canvas updates at session close | Cowork (Cowork has the Slack MCP) |
+| Canva brand kit operations | Cowork (Cowork has the Canva MCP) |
+| YXC probes / direct calls to `http://192.168.1.191/YamahaExtendedControl/v1/` | Rafa |
+| MusicCast app configuration (Net Radio preset save, source enable/disable, MusicCast Linking) | Gill (iOS app, manual) |
 
-**Lane discipline note:** anything that requires the Roon Remote app or the MusicCast iOS app stays with Gill regardless of which agent exists — those are walled-garden UIs with no API surface. Cowork's job there is to draft the walkthrough; Gill's job is to click through it. When the Operator exists, Cowork still drafts; Operator becomes the persistent record-keeper for which steps were done when.
+**Lane discipline note:** anything that requires the MusicCast iOS app stays with Gill — it is a walled-garden UI with no API surface. Cowork's job there is to draft the walkthrough; Gill's job is to click through it.
 
-**Default Rafa prompt shape** for Cockpit / Roon / Yamaha ops tasks:
+**Default Rafa prompt shape** for Cockpit / Yamaha ops tasks:
 
 1. State the working directory: `C:\Users\gillo\The-Audiopheliac`.
 2. State the shell: PowerShell.
 3. State the scope in numbered steps with concrete file paths and exact expected JSON edits or commands.
 4. Provide an Acceptance block — observable state that proves the task ran.
 5. Provide an Out-of-Scope block — what NOT to touch.
-6. Close with: post a brief note to Slack canvas `F0AU7FEMA7M` (channel `#theaudiopheliac`, ID `C0AUH2RLZ41`) and surface tag `Rafa`. Always include the channel ID explicitly — the VAL CLAUDE.md at `C:\Users\gillo\CLAUDE.md` loads in the same session and contains `C0AUU3PLJGP` (#val_dev); without an explicit ID, Rafa may post to the wrong channel.
-
-When the Audiopheliac Operator paperclip agent exists, the same prompt shape can be filed as a paperclip issue assigned to Operator. Operator picks it up, runs it, posts work products to the issue, transitions to `done`. Cowork drafts the issue body; Rafa files it via `POST /api/issues` until Cowork gains direct paperclip reach.
+6. Close with: post a brief note to Slack channel `#theaudiopheliac` (ID `C0AUH2RLZ41`) and surface tag `Rafa`. Always include the channel ID explicitly — the VAL CLAUDE.md at `C:\Users\gillo\CLAUDE.md` loads in the same session and contains `C0AUU3PLJGP` (#val_dev); without an explicit ID, Rafa may post to the wrong channel.
 
 ---
 
@@ -115,6 +110,16 @@ D:\The Audiopheliac\
   Audacity\               Audacity working files
   BonusPresets\           Additional preset packs
   DisplayProfiles\        Monitor layout configs (MultiMonitorTool)
+  Creative Studio\        Creative workspace — songs, samples, integrations
+    01_Songs\
+      Published Masters\  Final WAV archives for published songs
+      Discarded Versions\ Retained alternates and unpublished versions
+      Family Fun Songs\   Personal/family-use tracks
+      Splice Samples\     Splice sample library (relocated from NAS music library)
+      User Library\       Ableton User Library component (relocated from NAS music library)
+    09_Integrations\
+      Suno\
+        style_prompts\    Finalized Suno style prompt files per song (see Song Archive Protocol)
 ```
 The D: drive is the second internal drive on GDMARCHE (original factory drive, swapped when C: was upgraded to Samsung 990 PRO NVMe). It is synced to the NAS via QSync. Project code, CLAUDE.md, and documentation live on C:, not D:.
 
@@ -148,8 +153,7 @@ The D: drive is the second internal drive on GDMARCHE (original factory drive, s
 - **Established:** 2026-05-07
 - **UNC equivalent:** `\\NAS87828E\Music\The Audiopheliac\` (M: maps to `\\NAS87828E\Music`, confirmed 2026-05-09).
 - **Note:** M: is a mapped drive. Verify mapping is live before scripts target it; fall back to the UNC above when off-mapping.
-- **Albums:**
-  - `First Tracks/` — Suno-generated music (WAV + MP3 side by side). Early experiments and first production efforts. Spotify Local Files pointed here for MP3 indexing (WAVs not indexed by Spotify, format limitation).
+- **Structure:** Flat (no album subdirectories as of 2026-05-15). All Suno-produced tracks stored directly at `M:\The Audiopheliac\` as MP3s for streaming. WAV masters for published songs are archived at `D:\The Audiopheliac\Creative Studio\01_Songs\Published Masters\`. Alternate and unpublished versions are at `\Discarded Versions\`.
 
 ---
 
@@ -229,8 +233,8 @@ The D: drive is the second internal drive on GDMARCHE (original factory drive, s
 - Drives: WD Red Plus 12TB + 10TB | balance-alb trunking across 2x 2.5GbE
 - Passive 5GbE switch (QNAP QSW-1105-5T) between router and both NAS ports
 - **Media servers installed:**
-  - MinimServer (fallback role) — serving `\\NAS87828E\Music` to R-N800A via UPnP/DLNA. Confirmed working. Retained as fallback if Roon trial does not convert.
-  - Roon Server (Docker, primary) — `ghcr.io/roonlabs/roonserver:latest` running in Container Station at `/share/Container/RoonServer/`. Replaced the failed 2023 community QPKG (cangerie/RoonServer_QNAP_Installer) on 2026-05-11. Trial active until 2026-05-25, auto-renews to $149.88/yr unless cancelled. Library scan complete (13,450 tracks indexed). See `docs/software/Roon.md` for the full deploy spec, container config, and runbook.
+  - MinimServer (primary, 2026-05-18) — serving `\\NAS87828E\Music` to R-N800A via UPnP/DLNA. Confirmed working. Promoted back to primary after Roon trial was cancelled.
+  - Roon Server — **DEPRECATED 2026-05-18.** Trial cancelled before subscription kicked in; Roon did not meet Audiopheliac's playback purposes. Docker container at `/share/Container/RoonServer/` and the `ghcr.io/roonlabs/roonserver:latest` image may still be on disk pending explicit removal. See HISTORY entry dated 2026-05-18 for the rationale.
 
 ### Network
 - Spectrum SAX2V1R router (192.168.1.1)
@@ -294,9 +298,6 @@ unavailable until a replacement interface with ADC is sourced.
 
 ### Lanai
 ```
-Roon Lanai - TV Chromecast (192.168.1.239)
-  > Lanai TV speakers (primary Roon endpoint, 2026-05-12)
-
 1Mii RX
   > Schiit SYS Input 1
 
@@ -311,16 +312,7 @@ Samsung UN65U7900F (eARC)
   > Bose 3-2-1 Series II TV 1 Input
 ```
 
-Note: Samsung UN65U7900F has no optical out. J-Tech JTECH-AE4KA handles eARC audio extraction and feeds the Bose TV 1 input directly. Schiit SYS switches between whole-house audio (1Mii RX) and karaoke (Singing Machine), feeding the Bose AUX input. Bose source selection handles TV vs AUX natively on the unit. The Roon Chromecast endpoint at 192.168.1.239 is the primary Lanai listening path as of 2026-05-12; the 1Mii wireless route is retained as the secondary/legacy path downstream of `Family Room — Yamaha`.
-
-### Master Bedroom
-```
-Roon Cast / AirPlay 2
-  > Master Bedroom TV (192.168.1.154)
-  > Master Bedroom TV speakers
-```
-
-Note: TV exposes Chromecast and AirPlay 2 on the same hardware (192.168.1.154). Both protocols appear as Roon zones; either is addressable. Added 2026-05-12 as part of the seven-zone Roon rename pass.
+Note: Samsung UN65U7900F has no optical out. J-Tech JTECH-AE4KA handles eARC audio extraction and feeds the Bose TV 1 input directly. Schiit SYS switches between whole-house audio (1Mii RX) and karaoke (Singing Machine), feeding the Bose AUX input. Bose source selection handles TV vs AUX natively on the unit. The 1Mii wireless route downstream of `Family Room — Yamaha PRE OUT > Rolls MB15b > 1Mii TX` is the active Lanai listening path as of 2026-05-18. The Lanai TV (192.168.1.239) retains Chromecast capability if needed but is not actively routed under the current MinimServer-primary architecture.
 
 ### Garage
 ```
@@ -373,13 +365,7 @@ C:\Users\gillo\The-Audiopheliac   (live repo — edit here)
   App path: `C:\Users\gillo\AppData\Local\Packages\SpotifyAB.SpotifyMusic_zpdnekdrzrea0\LocalState\Spotify\`
   Network path: Streamed from GDMARCHE to Yamaha R-N800A
   Profile: `docs/software/Spotify.md`
-- **Roon (library + playback brain):** Server in Docker on NAS, Bridge as Windows service on GDMARCHE, Remote desktop app on GDMARCHE.
-  - Bridge paths (confirmed 2026-05-13): supervisor `C:\Users\gillo\AppData\Local\RoonBridge\Application\RoonBridge.exe`, audio daemon `C:\Users\gillo\AppData\Local\RoonBridge\Application\RAATServer.exe`. The binary is named `RoonBridge.exe`, not `Bridge.exe`.
-  - Remote app path: `C:\Users\gillo\AppData\Local\Roon\Application\Roon.exe` (not running at idle; launch to access Settings/Audio).
-  - Server image: `ghcr.io/roonlabs/roonserver:latest` (production, 2.66 build 1658). Compose at `/share/Container/RoonServer/docker-compose.yml`.
-  - Two zones: "The Audiopheliac Library" (AirPlay 2 to R-N800A, Family Room) and AIR HUB ASIO (via Bridge, Studio).
-  - Trial expires 2026-05-25. Subscription $149.88/yr unless cancelled.
-  - Profile: `docs/software/Roon.md`
+- **Roon — DEPRECATED 2026-05-18.** Trial cancelled before subscription kicked in; Roon did not meet playback purposes. Server (Docker on NAS), Bridge (Windows service on GDMARCHE), and Remote (desktop app on GDMARCHE) may still be present on disk pending explicit removal. Profile retained as historical archive at `docs/software/Roon.md`. See HISTORY entry dated 2026-05-18 for rationale. **MinimServer is the active library/playback path** (UPnP/DLNA serving `\\NAS87828E\Music` to the R-N800A).
 - **Yamaha R-N800A (YXC API):** Receiver-side controls (power, volume, mute, source, transport, Net Radio presets) via the unauthenticated YXC HTTP/JSON API at `http://192.168.1.191/YamahaExtendedControl/v1/`. Tone control and Pure Direct are NOT exposed by this firmware (verified 2026-05-11 via direct probes); front panel only. Profile: `docs/software/Yamaha-RN800A.md`
 - **Default script location:** `C:\Scripts` unless a project folder already exists
 
@@ -396,14 +382,14 @@ automation/         All executable scripts. No outputs, no configs.
   spotify_local_match.py
   spotify_gap_report.py
 
-console/            Audiopheliac Cockpit v0.2 (Roon-backed local control panel)
-  app.py            Flask routes (YXC + Roon)
+console/            Audiopheliac Cockpit (local control panel; Roon integration pending removal — see OPEN ACTION ITEMS)
+  app.py            Flask routes (YXC; Roon endpoints to be stripped)
   yamaha.py         YXC HTTP/JSON client
-  roon.py           Roon API extension client (wraps roonapi)
+  roon.py           Roon API extension client — TO BE REMOVED (Roon deprecated 2026-05-18)
   launch.pyw        Silent launcher (pythonw + Chrome --app)
   Create-Shortcut.ps1   Desktop shortcut generator
-  config.json       yamaha_ip, roon_host, host, port (config; safe to commit)
-  requirements.txt  flask, requests, roonapi
+  config.json       yamaha_ip, host, port (roon_host / preferred_zones to be removed)
+  requirements.txt  flask, requests (roonapi to be removed)
   static/           style.css (Nashville Midnight), app.js (UI controller)
   templates/        index.html
   README.md         Install, run, extension auth, troubleshooting
@@ -489,7 +475,7 @@ python automation\spotify_gap_report.py
 ```
 
 **Indexer exclusion rules** (in `config/music_sources.json`):
-- `excluded_path_segments: ["_Archive"]` — skips any path containing `_Archive` as a folder segment. Rule is dormant (the `_Archive\Suno_Bounces\` folder under `\\NAS87828E\Music` was emptied when WAVs moved to `First Tracks\`). Retain the rule; revisit after Roon evaluation determines final folder architecture.
+- `excluded_path_segments: ["_Archive"]` — skips any path containing `_Archive` as a folder segment. Rule is dormant. Retain; revisit after library architecture settles.
 
 **Note:** The indexer must run from GDMARCHE (Windows host) because it scans `\\NAS87828E\Music` via UNC. Cannot run from Cowork sandbox.
 
@@ -536,7 +522,7 @@ python automation\spotify_gap_report.py
 | Brand discovery report | `outputs/audiopheliac_brand_discovery_report.md` |
 | Brand voice analysis (/market brand) | `outputs/BRAND-VOICE.md` |
 | Competitor / web qualitative scan | `outputs/WEB-SCAN.md` |
-| Brand rework paperclip-shaped plan | `_dev/03_decision-log/brand_rework_plan_v1.md` |
+| Brand rework plan v1 (issue-by-issue format) | `_dev/03_decision-log/brand_rework_plan_v1.md` |
 | Session close summary | `_dev/04_progress/session_close_2026_05_11_brand_rework.md` |
 | Nashville Midnight archive index | `_dev/99_archive/nashville_midnight_sub_brand/README.md` |
 | Canonical mark structural approximation (SVG, do NOT use as asset) | `_dev/01_brand/canonical_mark_rebuild_v0.svg` |
@@ -584,7 +570,7 @@ Once Gill confirms a song is finalized (lyrics, style, exclusions, and a generat
 **Lyrics file:** `C:\Users\gillo\The-Audiopheliac\Suno\lyrics\[Song-Title].md`
 Contents: full lyrics with section tags as used in Suno.
 
-**Prompt file:** `C:\Users\gillo\The-Audiopheliac\Suno\prompts\[Song-Title].md`
+**Prompt file:** `D:\The Audiopheliac\Creative Studio\09_Integrations\Suno\style_prompts\[Song-Title].md`
 Contents: the Final Output Template block — Song Title, Style field, Exclude Styles, Weirdness %, Style Influence %, and any iteration notes (v1/v2/v3 lessons if applicable).
 
 **Naming convention:** Use the song title, spaces replaced with hyphens, title case. Example: `Sweet-Tyla-Jean.md`.
@@ -633,12 +619,13 @@ Create the `lyrics/` and `prompts/` subdirectories under `Suno/` if they do not 
 | Clean up D:\The Audiopheliac\The-Audiopheliac\ stale files after Robocopy is running | Monitor — extras retained (QSync layer); review after several nightly runs |
 | Remove remaining VALOR worktree: GitHub Clones\The-Audiopheliac\tender-wright-900476 | Complete |
 | Canva brand kit kAHGkHrcJYU: paste Full Spectrum palette + fonts into Canva UI (asset uploads complete, see `_dev/01_brand/canva_brand_kit_paste_sheet.md`) | Open — manual UI work |
-| Suno "First Tracks": early experiments, library indexed | Active |
-| Re-run music_indexer.py from GDMARCHE (Rafa) to pick up First Tracks rename | Pending — index currently stale (0 tracks after sandbox misfire) |
-| Roon Server: trial activated, Docker deploy on QNAP complete, library scanned (13,450 tracks), two zones live | Complete |
-| Roon subscription decision (auto-renews 2026-05-25 at $149.88/yr unless cancelled) | Pending |
-| Roon: schedule weekly DB backup to `/RoonBackups` once trial decision is made | Open |
-| Audiopheliac Cockpit v0.2 (console/) — YXC + Roon integrated, library + zones + transport functional | Complete |
+| Music library reorganized (flat structure, WAVs to D:\Creative Studio\01_Songs\, MP3s in M:\) — re-run music_indexer.py from GDMARCHE to rebuild index | Pending |
+| Roon Server: trial activated, Docker deploy on QNAP complete, library scanned (13,450 tracks), two zones live | Complete (then deprecated 2026-05-18 — trial cancelled) |
+| Roon subscription decision (auto-renews 2026-05-25 at $149.88/yr unless cancelled) | Complete — trial cancelled before subscription |
+| Roon: schedule weekly DB backup to `/RoonBackups` once trial decision is made | Closed — Roon out (2026-05-18) |
+| Roon footprint removal: stop Docker container at `/share/Container/RoonServer/`, remove `ghcr.io/roonlabs/roonserver:latest` image, uninstall Roon Bridge service from GDMARCHE, uninstall Roon Remote desktop app from GDMARCHE, clear `roon_token.json` cache | Open (Rafa lane) |
+| Cockpit Roon-integration removal: drop `console/roon.py`, remove Roon endpoints from `console/app.py`, remove Roon UI elements from `console/static/app.js` + `console/templates/index.html` + `console/static/style.css`, remove `roon_host` / `preferred_zones` from `console/config.json`, drop `roonapi` from `console/requirements.txt`, revalidate Flask app boots cleanly | Open (Rafa lane) |
+| Audiopheliac Cockpit v0.2 (console/) — YXC + Roon integrated, library + zones + transport functional | Complete (then Roon integration deprecated 2026-05-18; YXC + library tabs against MinimServer remain) |
 | Cockpit: rename one of the two "The Audiopheliac Library" zones to disambiguate (recommend AirPlay → "Family Room", AIR HUB ASIO → "Studio") | Complete (2026-05-12) — superseded by the seven-zone rename pass (`Family Room — Yamaha` / `— Bose` / `— Shield` / `— TV`, `Studio · AIR HUB`, `Lanai - TV`, `Master Bedroom`); Cockpit `preferred_zones` locked to the four room prefixes |
 | Cockpit UI: port `console/static/style.css` from Nashville Midnight to Full Spectrum (mockup at `_dev/01_brand/cockpit_redesign_mockup.html`) | Complete (2026-05-12) — palette ported in-place; HTML layout restructure deferred |
 | Signal map update (MusicCast/MinimServer confirmation) | Pending Gill playback test |
@@ -757,8 +744,8 @@ Exit with /produce or /studio. See Suno Production Environment > Integration Not
 - **Confirm before any destructive operation:** shell commands, firmware flashes, file deletions, driver uninstalls.
 - **Mark firmware procedures with risk level:** [LOW], [MODERATE], or [HIGH].
 - **Search all sources before declaring information absent.** Premature conclusions about data unavailability are a known failure mode in this project.
-- **Flag software-profile updates proactively.** When working in or with any software application related to The Audiopheliac (Spotify, Ableton Live, Audacity, Suno, MinimServer, Roon, MusicCast Controller, Discogs CLI, NirSoft SoundVolumeView, M-Audio AIR Hub Control Panel, vendor utilities, etc.), or when changing the configuration of an existing application, Cowork must flag Gill that the corresponding profile at `docs/software/<Package>.md` should be updated. If no profile exists for the package yet, flag that one should be created from `docs/software/_TEMPLATE.md`. This applies to: setting changes, version upgrades, account or credential changes, signal-chain or pipeline integration changes, new automation that depends on the package, and any troubleshooting outcome worth durable capture. The flag is mandatory; Gill decides whether to act on it during the current session or queue it.
-- **Do not collapse Audiopheliac scope to solo/hobby framing.** The Audiopheliac is a lifestyle brand build with monetization paths active or in flight (see IDENTITY AND ROLE). When planning operations, governance, architecture, or paperclip use, reflect the full scope: content production, AI integrations, affiliate revenue, music releases, possible storefront, possible sponsorships. The hardware and signal chain are credibility foundation, not the project boundary.
+- **Flag software-profile updates proactively.** When working in or with any software application related to The Audiopheliac (Spotify, Ableton Live, Audacity, Suno, MinimServer, MusicCast Controller, Discogs CLI, NirSoft SoundVolumeView, M-Audio AIR Hub Control Panel, vendor utilities, etc.), or when changing the configuration of an existing application, Cowork must flag Gill that the corresponding profile at `docs/software/<Package>.md` should be updated. If no profile exists for the package yet, flag that one should be created from `docs/software/_TEMPLATE.md`. This applies to: setting changes, version upgrades, account or credential changes, signal-chain or pipeline integration changes, new automation that depends on the package, and any troubleshooting outcome worth durable capture. The flag is mandatory; Gill decides whether to act on it during the current session or queue it.
+- **Do not collapse Audiopheliac scope to solo/hobby framing.** The Audiopheliac is a lifestyle brand build with monetization paths active or in flight (see IDENTITY AND ROLE). When planning operations, governance, or architecture, reflect the full scope: content production, AI integrations, affiliate revenue, music releases, possible storefront, possible sponsorships. The hardware and signal chain are credibility foundation, not the project boundary.
 
 ---
 
@@ -773,16 +760,15 @@ Exit with /produce or /studio. See Suno Production Environment > Integration Not
 
 ## CROSS-SURFACE ARCHITECTURE
 
-**Lane discipline: Cowork executes directly; Rafa for localhost/deploy only; Paperclip for governance. No relay through Chat.**
+**Lane discipline: Cowork executes directly; Rafa for localhost/deploy only. No relay through Chat.**
 
-Cowork does the work. Rafa is invoked only when the task requires localhost access (paperclip API), Windows-native PowerShell, or Cloudflare deployments. If a larger task bundles Rafa-dependent steps with Cowork-capable steps, Rafa may handle the full series to avoid context-switching overhead. Studio Assistant (Chat) is not in the workflow chain.
+Cowork does the work. Rafa is invoked only when the task requires Windows-native PowerShell on GDMARCHE, Cockpit/Flask localhost work on GDMARCHE, or Cloudflare deployments. If a larger task bundles Rafa-dependent steps with Cowork-capable steps, Rafa may handle the full series to avoid context-switching overhead. Studio Assistant (Chat) is not in the workflow chain.
 
 | Surface | Persona/Tool | Role |
 |---|---|---|
-| Cowork | Audiopheliac (this CLAUDE.md governs behavior) | Primary development surface. File ops, docs, Python automation, git staging and commit, session state, Slack canvas management, MCP operations (Slack, GitHub, Ableton Knowledge). Delegates to Rafa only for localhost, PS5.1, or deploy. |
-| CLI | **Rafa** | Localhost access (paperclip REST API at `http://localhost:3100`), Windows-native PowerShell, Cloudflare Pages deployments. Reports back to Cowork. Does not independently scope work. |
+| Cowork | Audiopheliac (this CLAUDE.md governs behavior) | Primary development surface. File ops, docs, Python automation, git staging and commit, session state, Slack channel + canvas management, MCP operations (Slack, GitHub, Ableton Knowledge). Delegates to Rafa only for localhost, PowerShell, or deploy. |
+| CLI | **Rafa** | Windows-native PowerShell execution on GDMARCHE, Cockpit/Flask localhost work on GDMARCHE, Cloudflare Pages deployments. Reports back to Cowork. Does not independently scope work. |
 | Chat | **Studio Assistant** (claude.ai project) | Optional sidebar. Research, copy iteration, exploratory prompts. **Not a workflow participant.** Does not relay work to Cowork or Rafa, does not review or gate deliverables. Gill uses it when convenient, not as a handoff point. |
-| Paperclip | **The Audiopheliac company** (agents pending, not yet created) | Orchestration, ticketed work, governance, immutable audit log, cost control, scheduled routines. Local instance at `http://localhost:3100`. Reachable only via Rafa from non-CLI surfaces. See PAPERCLIP SURFACE. |
 
 **Anti-pattern (do not repeat):** Relaying decisions, action items, or state through Chat to Cowork or vice versa. If information originates in a Chat session, Gill pastes it into the Cowork conversation directly. No "phone tag" between surfaces.
 
@@ -794,19 +780,18 @@ Cowork does the work. Rafa is invoked only when the task requires localhost acce
 **Required at start of every session. Execute before any other action.**
 
 1. Read this CLAUDE.md (sole persistent instruction source per COWORK OPERATING CONSTRAINTS)
-2. Read Slack canvas "The Audiopheliac - Session Development Log" (F0AU7FEMA7M): most recent entries for last action, blockers, in-flight work
-3. Read on-disk state files relevant to active work (e.g., `data/library_index/library_index.json`, `data/manifests/spotify_local_matches.json`, `Suno/suno_my_taste_draft.md`) as scoped by the task
-4. Read paperclip inbox via Rafa bridge: fetch open Audiopheliac-company issues, blocking approvals, last-touched issue. Cowork drafts a Rafa CLI prompt; Rafa runs `Invoke-RestMethod 'http://localhost:3100/api/agents/me/inbox-lite'` and reports back; Cowork parses. Skip with a note if Audiopheliac paperclip company does not yet exist (see PAPERCLIP SURFACE setup status).
-5. Output status block (paperclip line included, see format below)
+2. Read Slack channel #theaudiopheliac (channel ID `C0AUH2RLZ41`): most recent messages for last action, blockers, in-flight work. The Session Development Log canvas (F0AU7FEMA7M) may also be consulted as legacy reference; daily_log.md is primary for prior session detail.
+3. Read `docs/daily_log.md` last entries for the durable archive view of recent sessions (per the hybrid logging charter, this is the archive of record)
+4. Read on-disk state files relevant to active work (e.g., `data/library_index/library_index.json`, `data/manifests/spotify_local_matches.json`, `Suno/suno_my_taste_draft.md`) as scoped by the task
+5. Output status block (see format below)
 6. Proceed with session work
 
 **Status block format:**
 ```
 AUDIOPHELIAC SESSION-INIT, [YYYY-MM-DD]
-Last action: [one-line from canvas or "first session of day"]
+Last action: [one-line from #theaudiopheliac or daily_log.md, or "first session of day"]
 Active: [top in-flight item or "none"]
 Blockers: [list or "none"]
-Paperclip: [N] open issues | [M] awaiting approval | last touched: [issue ID or "none" or "company not yet created"]
 Ready.
 ```
 
@@ -823,7 +808,7 @@ Run at any context compaction, natural pause point, or when Gill requests a sync
 2. Refresh any in-flight on-disk state. If a session brief convention is later established at `handoffs/` (not currently in use), refresh it here. Flag as setup if cross-surface alignment becomes a recurring need
 3. Rafa (if triggered) refreshes any in-flight on-disk state owned by automation (e.g., partial run of `automation/spotify_local_match.py` outputs)
 
-**Logs and issue trackers:** Not updated mid-session. Slack canvas updates and paperclip ticket transitions happen at SESSION-CLOSE only.
+**Logs and durable archive:** Not updated mid-session. The `docs/daily_log.md` append and the session-close Slack post happen at SESSION-CLOSE only.
 
 ---
 
@@ -843,39 +828,35 @@ Run at any context compaction, natural pause point, or when Gill requests a sync
 - Run `git config user.name` before committing, correct if it returns wrong value
 - No `Co-Authored-By: Claude` trailer
 
-**Step 3, Update Slack Canvas:**
-- Add a new timestamped session entry to "The Audiopheliac - Session Development Log" (F0AU7FEMA7M): work done, commits, decisions, corrections, next actions
-- Convention: prepend new entries at top so the canvas reads newest-first. Verify against current canvas style on first close, adapt if existing convention is append-style
+**Step 3, Dual-Write Close Record (charter 2026-05-18):**
 
-**Step 3b, Update Paperclip via Rafa bridge:**
-For any paperclip issue touched this session (skip entirely if Audiopheliac paperclip company does not yet exist):
-- Cowork drafts a closing comment per issue: what was done, links to canvas / commits, next action for the assignee
-- Rafa posts via `POST /api/issues/<id>/comments`
-- Update issue status (`in_progress` > `in_review` or `done`) per actual completion state
-- Ensure approval state is current. Do not leave stale "awaiting approval" if Gill approved verbally
-- Spot-check Costs page for any agent that exceeded its soft warn threshold this session
-- If new sub-issues were created mid-session, confirm scope and assignment before close
+Per the #theaudiopheliac channel charter (hybrid logging architecture, Option C), every session-close writes BOTH a Slack close summary AND a durable archive entry. Neither alone is sufficient.
 
-**Step 4, Report to Gill:** Confirm all steps complete. List anything that failed and why.
+- *3a, Slack channel post (live signal):* Post a session close summary to channel #theaudiopheliac (channel ID `C0AUH2RLZ41`) as a channel message. Include: session date, work done, commits, decisions, corrections, next actions. Always include the channel ID explicitly when delegating to Rafa; the VAL CLAUDE.md loads in the same session and contains `C0AUU3PLJGP` (#val_dev). Without an explicit ID, the wrong channel gets the post.
+- *3b, daily_log.md append (durable archive of record):* Append a timestamped entry to the Audiopheliac-only daily log at `C:\Users\gillo\The-Audiopheliac\docs\daily_log.md` (repo-relative: `docs/daily_log.md`). This file is dedicated to The Audiopheliac. It is NOT shared with `valor-core/docs/daily_log.md` (VAL), nor with any VeteranIntel.org daily log. Each product maintains its own log; do not write Audiopheliac entries into a VAL or VI log under any circumstance, and do not pull VAL or VI entries into this one. **Append-only. Never overwrite. Never merge with prior entries.** Format mirrors valor-core: a section header (`## Session [N] — [YYYY-MM-DD]`) followed by bullets covering work done, commits (with short SHAs), decisions, corrections, next actions. This file is grep-able, git-versioned, and audit-ready. It is the archive of record, not the Slack channel.
+- *3c, Pre-close verification (dual-write contract enforcement):* Before reporting session complete, verify both writes landed. For daily_log.md: line-count diff before/after the append (`wc -l docs/daily_log.md` or equivalent) — confirm the line count grew by the expected amount. Slack alone has historically silently absorbed the close signal while the GitHub append dropped out; the verification step exists specifically to catch that failure mode.
+- *3d, Session Development Log canvas (legacy):* The canvas at `F0AU7FEMA7M` ("The Audiopheliac - Session Development Log") is the legacy session log under the pre-charter architecture. Under the new contract, daily_log.md is primary. The canvas may continue to receive entries for continuity if Gill chooses, but it is no longer load-bearing. Flag for explicit retirement decision once the daily_log pattern is established.
+- *3e, Scope lock:* Do not cross-write Audiopheliac session content into `#val_dev`, `#veteranintel-handoffs`, or any other VeteranAnalytics / VeteranIntel channel. Do not cross-write into valor-core's `daily_log.md` or any other product's daily_log. Per the channel charter, products stay separate. If a session legitimately touched multiple products, split the close summary by product and write each to its own surface.
+
+**Step 4, Report to Gill:** Confirm all steps complete, including the line-count verification on `docs/daily_log.md` (Step 3c). List anything that failed and why.
 
 ---
 
 ## SESSION TRIGGER WORDS
 
-Universal trigger words to standardize SESSION-INIT, MID-SESSION SYNC, and SESSION-CLOSE across production surfaces (Cowork / Rafa / Paperclip agents). Honored by every surface that runs against this CLAUDE.md. Studio Assistant may honor triggers if Gill uses it, but it is not a production surface.
+Universal trigger words to standardize SESSION-INIT, MID-SESSION SYNC, and SESSION-CLOSE across production surfaces (Cowork / Rafa). Honored by every surface that runs against this CLAUDE.md. Studio Assistant may honor triggers if Gill uses it, but it is not a production surface.
 
 | Trigger | Surfaces | Maps to | Action |
 |---|---|---|---|
-| `audio:open` (or `open`) | Cowork, Rafa, Paperclip agents | SESSION-INIT PROTOCOL | Read CLAUDE.md + Slack canvas + on-disk state + paperclip inbox; output status block; ready to work |
+| `audio:open` (or `open`) | Cowork, Rafa | SESSION-INIT PROTOCOL | Read CLAUDE.md + Slack #theaudiopheliac + `docs/daily_log.md` + on-disk state; output status block; ready to work |
 | `audio:sync` (or `sync`) | Cowork, Rafa | MID-SESSION SYNC PROTOCOL | Post mid-session status to `#theaudiopheliac`; refresh any in-flight on-disk state |
-| `audio:close` (or `close`) | Cowork + Rafa (Cowork orchestrates) | SESSION-CLOSE PROTOCOL | Update docs; commit; update canvas; update paperclip; report |
+| `audio:close` (or `close`) | Cowork + Rafa (Cowork orchestrates) | SESSION-CLOSE PROTOCOL | Update docs; commit; dual-write close record (Slack #theaudiopheliac + `docs/daily_log.md` append, line-count verified); report |
 
 **Recognition rules:**
 
 - Match is case-insensitive. `AUDIO:OPEN`, `audio:Open`, `open session`, and `Open` all trigger. Phrase tolerance > exactness.
 - The un-prefixed forms (`open` / `sync` / `close`) only fire inside this Audiopheliac workspace. Outside, use the project-prefixed form (e.g., `vi:open` for VeteranIntel, `val:open` for VeteranAnalytics).
 - All surfaces stop whatever they are doing and run the named protocol when one of these triggers appears in a user message. No "let me finish this first."
-- Paperclip agents recognize the trigger when Gill posts it in an issue chat, agent runs the protocol on its next heartbeat.
 
 **Cross-project consistency:** Same trigger pattern (`<project>:open`, `:sync`, `:close`) is being adopted across all Veteran Analytics LLC project folders and Gill's personal projects. The prefix changes per project, `audio:` for The Audiopheliac, `vi:` for VeteranIntel, `val:` for VeteranAnalytics, etc., but the protocol shape is identical in form.
 
@@ -887,137 +868,32 @@ Universal trigger words to standardize SESSION-INIT, MID-SESSION SYNC, and SESSI
 - Mode triggers `/woodshed`, `/produce`, `/studio` (see MODE CONTRACTS) are independent of session triggers and may be used inline during a session.
 - General-purpose plugin slash commands (e.g., `/diagnose-why-work-stopped`) may be invoked inline as needed.
 
-**Paperclip slash commands available locally** (via paperclip skills installed in Claude Desktop config): `/paperclip`, `/paperclip-converting-plans-to-tasks`, `/paperclip-create-agent`, `/paperclip-create-plugin`, `/paperclip-dev`. Reachable from Rafa or from a paperclip agent's runtime. Cowork can ask Rafa to invoke them but cannot invoke them directly from Cowork.
-
 ---
 
-## PAPERCLIP SURFACE
+## PAPERCLIP SURFACE — DEPRECATED 2026-05-18
 
-Orchestration + governance + audit. Third production surface alongside Cowork and Rafa (CLI). Studio Assistant (Chat) is a sidebar, not a production surface.
+Paperclip was deprecated and fully removed from active Audiopheliac workflow on 2026-05-18. The Audiopheliac runs on Cowork + Rafa only. The dual-write close record (Slack `#theaudiopheliac` for live signal + `docs/daily_log.md` for durable archive) is the operating contract; see SESSION-CLOSE PROTOCOL.
 
-**What it is:** Open-source orchestration platform running locally. Models a "company" with org chart, agents, goals, tasks, heartbeats, budgets, governance, approvals, routines, plugins, secrets, and an immutable audit log. Every mutating action is recorded. Single deployment can run multiple companies with full data isolation.
+**State of the retired paperclip footprint:**
 
-**Local instance details:**
+- The Audiopheliac paperclip company (id `821ef660-0041-4ef6-a911-adb1ba038e15`, prefix `THE`, created 2026-05-06) is retired. THE-1 (baseline, closed 2026-05-08) was the only ticket that ever existed under the prefix. No active issues to migrate.
+- The local paperclip installation at `C:\Users\gillo\paperclip\` remains on disk but is not part of any session protocol. No `pnpm dev`, no heartbeat, no inbox reads, no ticket writes.
+- The legacy reference doc at `docs/Audiopheliac_Paperclip_Reference.md` is retained as platform-mechanics archive only. It is NOT a guide to current Audiopheliac workflow.
+- Paperclip slash commands (`/paperclip`, `/paperclip-converting-plans-to-tasks`, `/paperclip-create-agent`, `/paperclip-create-plugin`, `/paperclip-dev`) may still be loaded in Rafa's runtime via Claude Desktop config but are not invoked by any Audiopheliac session protocol.
 
-| Item | Value |
-|---|---|
-| Repo / install location | `C:\Users\gillo\paperclip\` |
-| API base | `http://localhost:3100/api` |
-| UI | `http://localhost:3100` |
-| Database | Embedded PGlite (auto-created in dev, no `DATABASE_URL` needed) |
-| Process management | `pnpm dev` from repo root |
-| Telemetry | Default ON, disable with `PAPERCLIP_TELEMETRY_DISABLED=1` if needed |
+**Approval-gate replacement for destructive operations:**
 
-**Companies and agents (current):**
+The first-90-days approval-gate language is retired with paperclip, but the underlying caution is not. Destructive operations still require explicit Gill confirmation in-session before Rafa proceeds. Specifically: NAS file deletions of more than 10 files or any folder, git history rewrites / force-pushes to `main`, Cloudflare Pages production deploys, Spotify/Discogs/Suno token rotation, firmware flashes marked [MODERATE] or [HIGH], DAW project file overwrites, and any new cost-bearing automation. Gill confirms verbally in chat; Cowork does not infer consent.
 
-| Company | Agents | Purpose |
-|---|---|---|
-| The Audiopheliac | Audiopheliac Operator (pending) | Dedicated company for Audiopheliac work (signal chain engineering, vinyl/Spotify/Discogs sync, Suno production, website ops). Data isolation from Veteran Analytics LLC products. Company id: `821ef660-0041-4ef6-a911-adb1ba038e15`. Issue prefix: `THE` (locked at creation, see invariant below). Brand color: `#7a1f2b`. Created: 2026-05-06. |
-
-**Setup status:** The Audiopheliac paperclip company exists (id `821ef660-0041-4ef6-a911-adb1ba038e15`, prefix `THE`, color `#7a1f2b`, created 2026-05-06). Initial agent "Audiopheliac Operator" not yet created; paperclip read/write at session boundaries remains gated until the agent exists. First open issue: `THE-1` (baseline closed 2026-05-08).
-
-**Invariant (paperclip prefix lock):** The Audiopheliac company prefix `THE` is locked at creation. Do not attempt to rename. PATCHing `issuePrefix` after issues exist is silently ignored by the API (intentional server-side invariant). Do not direct-edit PGlite. Do not delete and recreate. Issue keys must stay sticky.
-
-**Network reachability, critical constraint:**
-
-- **Cowork cannot reach `localhost:3100`.** Cowork sandbox is a Linux container without access to the host's network. All paperclip reads and writes go through Rafa.
-- **Studio Assistant (Chat) cannot reach paperclip** and is not in the production workflow regardless.
-- **Rafa (CLI) hits paperclip directly**, `Invoke-RestMethod -Uri 'http://localhost:3100/api/...'` works natively from PowerShell.
-- **Paperclip's own agents** call out to MCPs and tools per their adapter config, not bound by Cowork's sandbox.
-
-**Lane discipline:**
-
-```
-Cowork  > executes work directly; delegates to Rafa for localhost/deploy only
-   |                                          |
-   +---- paperclip reads/writes via Rafa ─────+──>  Paperclip (governance + audit)
-                                                           |
-                                                           v
-                                         Audiopheliac agent runs heartbeats,
-                                         picks up tickets, posts work products
-```
-
-**SESSION-INIT integration (referenced from SESSION-INIT PROTOCOL):**
-
-- Cowork drafts a Rafa CLI prompt to fetch paperclip state. Standard payload:
-  - `GET /api/agents/me/inbox-lite`, compact view of agent assignments
-  - `GET /api/companies/<id>/issues?status=todo,in_progress,in_review,blocked`, open work
-  - `GET /api/issues/<id>` for any in_review item with pending approval
-- Rafa runs the prompt, returns JSON to Cowork
-- Cowork parses and includes `Paperclip:` line in the SESSION-INIT status block
-- Cost telemetry not required at SESSION-INIT, surface only at SESSION-CLOSE or when troubleshooting
-
-**SESSION-CLOSE integration (referenced from SESSION-CLOSE PROTOCOL Step 3b):**
-
-- For every issue touched this session, Cowork drafts a closing comment
-- Rafa posts via `POST /api/issues/<id>/comments`
-- Issue status transitioned per actual completion: `in_progress` to `in_review` (awaiting Gill) or `done` (verified complete)
-- Approvals processed through Inbox if any are stale-awaiting
-
-**Approval gate discipline (first 90 days):**
-
-Until the loop is fully trusted, **destructive operations** running under any Audiopheliac-company agent MUST go through paperclip approval gates. Specifically:
-
-- File deletions on NAS (`\\NAS87828E\The Audiopheliac\`), more than 10 files OR any folder
-- Git history rewrites or force-pushes to `main`
-- Cloudflare Pages production deploys (`wrangler pages deploy --branch=main`)
-- Spotify, Discogs, or Suno API token rotation
-- Firmware flashes marked [MODERATE] or [HIGH] (per BEHAVIORAL RULES; [LOW] does not require paperclip gating)
-- DAW project file overwrites, never silently overwrite a `.als`
-- Adding cost-bearing routines (e.g., scheduled Suno or Spotify API calls if MCP wrappers are adopted)
-
-Approval gates are NOT optional during this trust-building phase. Gill is the board, he approves via paperclip UI (Inbox > Approvals).
-
-**Cost discipline:**
-
-- Each agent has a budget envelope. **Audiopheliac Operator default (when created): $50/month soft warn, $100/month hard stop.** Calibrate after one week of real cost telemetry.
-- Routine-driven agents (no LLM call per heartbeat unless work found) get smaller budgets, $10/month soft / $25/month hard typical.
-- Paperclip auto-pauses agents that hit hard stops.
-- Suno credits are NOT tracked through paperclip. Suno is browser-based and pre-paid via the Premier Annual subscription. Only LLM token spend by paperclip-managed agents is tracked here.
-
-**What does NOT belong in paperclip (anti-patterns):**
-
-- Synchronous human-driven dev work, stays on Cowork
-- Conversational interactions, paperclip is for ticketed work, not chat
-- Cross-company contamination, every entity is company-scoped, honor it
-- Recreating Cowork's job, Cowork handles human-driven dev, paperclip handles async, scheduled, agent-driven recurring work. Complementary, not redundant.
-- Granting paperclip agents elevated host-level permissions, each agent should have minimum-scope tooling
-
-**Cross-platform hand-off discipline (no document duplication):**
-
-| Document type | Canonical home | Who writes |
-|---|---|---|
-| Per-issue agent activity log | Paperclip's Activity tab | Audiopheliac Operator (auto, when active) |
-| Human-decision session log | Slack canvas "The Audiopheliac - Session Development Log" (F0AU7FEMA7M) | Cowork (at SESSION-CLOSE) |
-| In-flight on-disk state | `data/` outputs from automation pipeline | Cowork or Rafa (per pipeline) |
-| Behavioral corrections | THIS CLAUDE.md (sole persistent instruction source per COWORK OPERATING CONSTRAINTS) | Cowork (rare, deliberate updates) |
-| Cost telemetry | Paperclip Costs page | Paperclip (auto) |
-
-These do not duplicate each other. Each has its lane.
-
-**Paperclip primitives reference:**
-
-- **Issue / Ticket:** atomic unit of work. Single-assignee. Atomic checkout.
-- **Project:** grouping of related issues.
-- **Goal:** higher-level objective, issues trace back to a goal.
-- **Routine:** recurring scheduled task (cron / webhook / API trigger). Each execution creates a tracked issue.
-- **Heartbeat:** scheduled wakeup that fires the assigned agent.
-- **Approval gate:** board-level approval required before action proceeds.
-- **Audit log:** immutable record of all mutating actions, cost events, approvals, comments, work products.
-
-**What we are not yet using (will adopt as the loop matures):**
-
-- The Audiopheliac company itself, must be created first
-- Routines (strong candidates: nightly `music_indexer.py + spotify_pull.py + spotify_local_match.py + spotify_gap_report.py` pipeline; weekly Discogs collection sync when Discogs integration ships; Robocopy `C:\Users\gillo\The-Audiopheliac` > `D:\The Audiopheliac\The-Audiopheliac\` if reframed as routine-managed)
-- Plugins (out-of-process workers, custom tool exposure)
-- Multiple Human Users (currently solo, Gill is the only board member)
-- Cross-company orchestration (waiting on additional company creation)
-
-**Paperclip skills available locally** (installed via Claude Desktop config): `paperclip`, `paperclip-converting-plans-to-tasks`, `paperclip-create-agent`, `paperclip-create-plugin`, `paperclip-dev`. Loaded into Rafa's runtime, Cowork invokes them via Rafa CLI prompts. Reference: https://paperclip.ing/docs/
+See HISTORY entry dated 2026-05-18 for the full deprecation rationale.
 
 ---
 
 ## HISTORY
+
+**2026-05-18 (Roon trial cancelled; Roon officially out; MinimServer back as primary):** Gill cancelled the Roon trial before the auto-renew subscription ($149.88/yr) kicked in. Roon did not meet The Audiopheliac's playback purposes — the value proposition did not justify the recurring cost. Roon is officially out of the active stack. Cleanup pass through CLAUDE.md updated: HARDWARE NAS media-servers list (MinimServer promoted back to primary with the 2026-05-18 date stamp; Roon Server entry replaced with a DEPRECATED notice naming the trial-cancellation rationale and flagging the Docker container at `/share/Container/RoonServer/` + the `ghcr.io/roonlabs/roonserver:latest` image as on-disk pending explicit removal); SIGNAL CHAIN MAP Lanai block (removed the "Roon Lanai - TV Chromecast (192.168.1.239)" primary path; restored the 1Mii RX > Schiit SYS > Bose AUX route as the active Lanai listening path downstream of `Family Room — Yamaha PRE OUT > Rolls MB15b > 1Mii TX`; Lanai TV Chromecast retained as capability-not-actively-routed); SIGNAL CHAIN MAP Master Bedroom block (removed entirely — the room is no longer an actively-addressable zone under MinimServer-primary; TV at 192.168.1.154 retains Chromecast / AirPlay 2 capability if a future re-routing is wanted); SOFTWARE AND DAW ENVIRONMENT (Roon bullet replaced with a DEPRECATED notice that points back to HISTORY and confirms MinimServer is the active library/playback path); PROJECT FOLDER STRUCTURE `console/` block (annotated to mark Roon integration as "pending removal"); BEHAVIORAL RULES software-profile-update list (dropped Roon from the in-scope-package enumeration); RAFA operational routing table (dropped the "Restart Roon Server container on QNAP" row, dropped the "Roon UI configuration" row, updated the doc-update-downstream example from "Roon rename" to "hardware swap", removed the "Roon Remote app" reference from the lane-discipline note, and changed the Default Rafa prompt-shape header from "Cockpit / Roon / Yamaha" to "Cockpit / Yamaha"); OPEN ACTION ITEMS table (closed the Roon subscription decision, closed the Roon DB backup item, marked the Roon-Server-trial item complete-then-deprecated, opened a new Roon footprint removal item flagged Rafa-lane covering the Docker container stop + image removal + Bridge uninstall + Remote uninstall + `roon_token.json` cache clear, and opened a separate Cockpit Roon-integration removal item flagged Rafa-lane covering `console/roon.py` deletion, Roon endpoint removal from `console/app.py`, Roon UI removal from `console/static/app.js` + `console/templates/index.html` + `console/static/style.css`, removal of `roon_host` / `preferred_zones` from `console/config.json`, and `roonapi` removal from `console/requirements.txt` with a clean Flask boot revalidation). The `docs/software/Roon.md` profile got a top-of-file DEPRECATED banner and the Status line was updated; the profile body is retained as historical archive. The Roon HISTORY entries from 2026-05-11 (Roon pivot + Cockpit v0.2), 2026-05-12 (zone lock + preferred_zones), and 2026-05-13 (Cockpit audio fix — ghost zone rebind) remain unchanged as historical record. Active library/playback substrate going forward: MinimServer serving `\\NAS87828E\Music` to the R-N800A via UPnP/DLNA, with Yamaha YXC controls intact and the Cockpit (post-cleanup) running on YXC + MinimServer browse only.
+
+**2026-05-18 (paperclip deprecated and removed from active workflow):** Paperclip is fully out of The Audiopheliac's workflow. Cleanup pass through CLAUDE.md stripped paperclip from: IDENTITY AND ROLE companion-project description (Rafa's reach no longer references paperclip API), RAFA operational routing table (dropped the "Lane once Operator agent exists" column entirely; removed the dedicated paperclip-ticket row; collapsed conditional language in Roon/Astro/Cockpit rows), the Default Rafa prompt-shape closing paragraph about Operator filing issues, the BEHAVIORAL RULES scope-lock language (replaced "operations, governance, architecture, or paperclip use" with "operations, governance, or architecture"), CROSS-SURFACE ARCHITECTURE (Paperclip row removed from surface table; lane-discipline header simplified to "Cowork executes; Rafa for localhost/deploy"; Rafa's role rewritten to PowerShell on GDMARCHE + Cockpit/Flask localhost + Cloudflare deploys), SESSION-INIT PROTOCOL (former Step 4 paperclip-inbox-via-Rafa read removed; status block "Paperclip:" line dropped; daily_log.md read added as Step 3 per the hybrid logging charter), MID-SESSION SYNC PROTOCOL (replaced "paperclip ticket transitions" with "docs/daily_log.md append"), SESSION-CLOSE PROTOCOL (former Step 4 paperclip-update-via-Rafa block removed in full; Report promoted to Step 4), SESSION TRIGGER WORDS (Paperclip-agents surface removed from table and recognition rules; "Paperclip slash commands available locally" adjunct removed), and the entire PAPERCLIP SURFACE section (replaced with a deprecation notice that names the retired footprint). The Audiopheliac paperclip company (id `821ef660-0041-4ef6-a911-adb1ba038e15`, prefix `THE`, created 2026-05-06) is retired; THE-1 baseline was closed 2026-05-08 and is the only ticket that ever existed under the prefix, so no open issues to migrate. The local paperclip installation at `C:\Users\gillo\paperclip\` and the reference doc at `docs/Audiopheliac_Paperclip_Reference.md` remain on disk as historical artifacts only; neither is load-bearing for current workflow. Auto-memory entries for paperclip lane discipline and paperclip local dev are removed in the same pass. Active workflow going forward: Cowork + Rafa only, with the dual-write close record (Slack `#theaudiopheliac` live signal + `docs/daily_log.md` durable archive, line-count verified) as the operating contract per the 2026-05-18 channel charter.
 
 **2026-05-13 (Cockpit audio fix — ghost zone rebind, AIR Hub confirmed live):** Diagnosed and resolved the root cause of silent playback from the Cockpit's "Studio · AIR HUB" zone. Root cause: the zone was bound to the Focusrite Scarlett Solo output descriptor at creation time; when Scarlett failed 2026-05-11 and the M-Audio AIR Hub replaced it, Bridge re-enumerated a new output entity with a different ID. The saved zone accepted transport commands (returned `{"ok": true}`) but could not move audio — seek_position never advanced. Identified the ghost zone (zone_id `160141bdcc8e52a9362cc2201451d2ff5ef1`, outputs pointing to dead Scarlett) and the real AIR Hub output (zone_id `1601719ffefb1f01317269556ac2fcb99790`, outputs: [] — not yet enabled). Fix executed in Roon Settings > Audio: ghost zone disabled/deleted; real AIR Hub output enabled; Device Setup confirmed (Unidentified device / M-Audio AIR HUB ASIO, No MQA, Fixed volume, 0ms resync). AIR Hub zone confirmed connected in Roon. Additional fixes committed this session: (1) `console/roon.py` APPINFO `website` field changed from `"https://theaudiopheliac.com"` to `"http://127.0.0.1:5000"` (was causing Roon to show broken extension link). (2) `console/launch.pyw` Bridge pre-start candidate list corrected — was searching for `Bridge.exe` at wrong paths; GDMARCHE uses `RoonBridge.exe` at `%LOCALAPPDATA%\RoonBridge\Application\RoonBridge.exe`. (3) CLAUDE.md HARDWARE / SOFTWARE sections updated with confirmed Bridge binary paths: supervisor `C:\Users\gillo\AppData\Local\RoonBridge\Application\RoonBridge.exe`, audio daemon `C:\Users\gillo\AppData\Local\RoonBridge\Application\RAATServer.exe`, Remote app `C:\Users\gillo\AppData\Local\Roon\Application\Roon.exe`. Pending from this session: zone rename to "Studio · AIR HUB" (Roon UI, Gill), Roon Bridge update 2.60 → 2.66 (installer `RoonBridgeInstaller64.exe` downloaded, not yet run), git commit for roon.py + launch.pyw + CLAUDE.md changes (Rafa), Focusrite software uninstall (deferred until Cockpit audio verified).
 
