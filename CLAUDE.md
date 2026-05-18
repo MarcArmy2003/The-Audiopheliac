@@ -382,14 +382,14 @@ automation/         All executable scripts. No outputs, no configs.
   spotify_local_match.py
   spotify_gap_report.py
 
-console/            Audiopheliac Cockpit (local control panel; Roon integration pending removal — see OPEN ACTION ITEMS)
-  app.py            Flask routes (YXC; Roon endpoints to be stripped)
-  yamaha.py         YXC HTTP/JSON client
-  roon.py           Roon API extension client — TO BE REMOVED (Roon deprecated 2026-05-18)
-  launch.pyw        Silent launcher (pythonw + Chrome --app)
+console/            Audiopheliac Cockpit v0.9 (Spotify + YXC local control panel)
+  app.py            Flask routes (Spotify Web API + YXC; library browse via YXC server input)
+  yamaha.py         YXC HTTP/JSON client (Yamaha R-N800A)
+  spotify.py        Spotify Web API client (spotipy wrapper; server-side OAuth)
+  launch.pyw        Silent launcher (pythonw + Chrome --app); singleton anchor = cockpit_version
   Create-Shortcut.ps1   Desktop shortcut generator
-  config.json       yamaha_ip, host, port (roon_host / preferred_zones to be removed)
-  requirements.txt  flask, requests (roonapi to be removed)
+  config.json       yamaha_ip, host, port, enabled_sources, net_radio_suggestions, spotify {client_id, redirect_uri}
+  requirements.txt  flask, requests, spotipy
   static/           style.css (Nashville Midnight), app.js (UI controller)
   templates/        index.html
   README.md         Install, run, extension auth, troubleshooting
@@ -624,7 +624,8 @@ Create the `lyrics/` and `prompts/` subdirectories under `Suno/` if they do not 
 | Roon subscription decision (auto-renews 2026-05-25 at $149.88/yr unless cancelled) | Complete — trial cancelled before subscription |
 | Roon: schedule weekly DB backup to `/RoonBackups` once trial decision is made | Closed — Roon out (2026-05-18) |
 | Roon footprint removal: stop Docker container at `/share/Container/RoonServer/`, remove `ghcr.io/roonlabs/roonserver:latest` image, uninstall Roon Bridge service from GDMARCHE, uninstall Roon Remote desktop app from GDMARCHE, clear `roon_token.json` cache | Open (Rafa lane) |
-| Cockpit Roon-integration removal: drop `console/roon.py`, remove Roon endpoints from `console/app.py`, remove Roon UI elements from `console/static/app.js` + `console/templates/index.html` + `console/static/style.css`, remove `roon_host` / `preferred_zones` from `console/config.json`, drop `roonapi` from `console/requirements.txt`, revalidate Flask app boots cleanly | Open (Rafa lane) |
+| Cockpit Roon-integration removal: drop `console/roon.py`, remove Roon endpoints from `console/app.py`, remove Roon UI elements from `console/static/app.js` + `console/templates/index.html` + `console/static/style.css`, remove `roon_host` / `preferred_zones` from `console/config.json`, drop `roonapi` from `console/requirements.txt`, revalidate Flask app boots cleanly | Complete (Phase A, 2026-05-18) |
+| Cockpit launcher singleton anchor fix: launch.pyw `is_existing_cockpit` was checking for `preferred_zones` in /api/config (broken since v0.9 dropped that field; SO_REUSEADDR masked the bind collision so every shortcut click silently spawned a second Flask). Replaced anchor with `cockpit_version` exposed by /api/config | Complete (Phase A, 2026-05-18) |
 | Audiopheliac Cockpit v0.2 (console/) — YXC + Roon integrated, library + zones + transport functional | Complete (then Roon integration deprecated 2026-05-18; YXC + library tabs against MinimServer remain) |
 | Cockpit: rename one of the two "The Audiopheliac Library" zones to disambiguate (recommend AirPlay → "Family Room", AIR HUB ASIO → "Studio") | Complete (2026-05-12) — superseded by the seven-zone rename pass (`Family Room — Yamaha` / `— Bose` / `— Shield` / `— TV`, `Studio · AIR HUB`, `Lanai - TV`, `Master Bedroom`); Cockpit `preferred_zones` locked to the four room prefixes |
 | Cockpit UI: port `console/static/style.css` from Nashville Midnight to Full Spectrum (mockup at `_dev/01_brand/cockpit_redesign_mockup.html`) | Complete (2026-05-12) — palette ported in-place; HTML layout restructure deferred |

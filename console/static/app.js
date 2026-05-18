@@ -453,17 +453,23 @@ async function loadPlaylists() {
   try {
     const data  = await apiGet('/api/spotify/playlists?limit=50');
     const items = data.playlists ?? data.items ?? [];
+    const SPECIAL_ICONS = { liked: '♥', episodes: '🎙', local: '💻' };
     const html  = items.length === 0
       ? '<span class="muted">No playlists found.</span>'
-      : items.map(pl =>
-          `<div class="lib-item" data-uri="${escAttr(pl.uri ?? '')}" data-type="playlist">
-            ${pl.art_url ? `<img class="lib-art" src="${escAttr(pl.art_url)}" alt="">` : '<div class="lib-art-placeholder"></div>'}
+      : items.map(pl => {
+          const sp      = pl.special;
+          const icon    = sp ? SPECIAL_ICONS[sp] : null;
+          const dimmed  = sp === 'local' ? ' lib-item--dimmed' : '';
+          return `<div class="lib-item${dimmed}" data-uri="${escAttr(pl.uri ?? '')}" data-type="playlist"${sp ? ` data-special="${escAttr(sp)}"` : ''}>
+            ${pl.art_url
+              ? `<img class="lib-art" src="${escAttr(pl.art_url)}" alt="">`
+              : `<div class="lib-art-placeholder lib-art-icon">${icon ?? ''}</div>`}
             <div class="lib-info">
               <span class="lib-title">${escHtml(pl.name ?? '')}</span>
               <span class="lib-sub">${escHtml(pl.tracks != null ? pl.tracks + ' tracks' : (pl.owner ?? ''))}</span>
             </div>
-          </div>`
-        ).join('');
+          </div>`;
+        }).join('');
     storeTabContent('playlists', html);
     if (_activeTab === 'playlists') list.innerHTML = html;
     wireLibItems(list);
@@ -491,8 +497,32 @@ async function doSearch(q) {
 function wireLibItems(container) {
   container?.querySelectorAll('.lib-item').forEach(el => {
     el.addEventListener('click', async () => {
-      const uri  = el.dataset.uri;
-      const type = el.dataset.type;
+      const uri     = el.dataset.uri;
+      const type    = el.dataset.type;
+      const special = el.dataset.special;
+
+      // Special library collections (not regular playlists)
+      if (special === 'liked') {
+        try {
+          await apiPost('/api/spotify/liked/play', { device_id: _spDeviceId || undefined });
+          toast('Playing Liked Songs…', 'success', 2000);
+          setTimeout(pollSpotify, 800);
+        } catch (e) { toast('Play failed: ' + e.message, 'error'); }
+        return;
+      }
+      if (special === 'episodes') {
+        try {
+          await apiPost('/api/spotify/episodes/play', { device_id: _spDeviceId || undefined });
+          toast('Playing Your Episodes…', 'success', 2000);
+          setTimeout(pollSpotify, 800);
+        } catch (e) { toast('Play failed: ' + e.message, 'error'); }
+        return;
+      }
+      if (special === 'local') {
+        toast('Local Files are stored on your device and can\'t be played via the Cockpit.', 'info', 4500);
+        return;
+      }
+
       if (!uri) return;
       try {
         if (type === 'track') {

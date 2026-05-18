@@ -205,11 +205,19 @@ class SpotifyClient:
 
     def search(self, q: str, kinds: str = "track,album,artist,playlist",
                limit: int = 20, market: str | None = None) -> dict[str, Any]:
-        kwargs: dict[str, Any] = {"q": q, "type": kinds, "limit": limit}
+        # Spotify enforces limit * num_types <= 50 on multi-type searches.
+        # With 4 types and limit=20 the API returns a 400 "Invalid limit".
+        # Cap to floor(50 / num_types) so the constraint is always satisfied.
+        type_list = [k.strip() for k in kinds.split(",") if k.strip()]
+        # Spotify Development Mode apps are capped at 10 results per search call
+        # regardless of type count. Empirically verified: limit=11 with any type
+        # count returns HTTP 400 "Invalid limit".
+        safe_limit = min(limit, 10)
+        kwargs: dict[str, Any] = {"q": q, "type": kinds, "limit": safe_limit}
         if market: kwargs["market"] = market
         result = self._call("search", **kwargs) or {}
         flattened: dict[str, list[dict[str, Any]]] = {}
-        for kind in kinds.split(","):
+        for kind in type_list:
             bucket = result.get(f"{kind}s") or {}
             items = bucket.get("items") or []
             flattened[kind] = [self._flatten_search_item(kind, it) for it in items if it]

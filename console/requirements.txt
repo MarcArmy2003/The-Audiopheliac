@@ -1,4 +1,3 @@
 Flask>=3.0
 requests>=2.31
-roonapi>=0.1.6
 spotipy>=2.24

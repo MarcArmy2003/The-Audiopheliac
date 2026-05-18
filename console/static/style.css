@@ -736,8 +736,22 @@ html, body {
   transition: border-color 100ms;
 }
 
-.lib-item:hover   { border-color: var(--hairline-2); }
-.lib-item.playing { border-color: var(--signal); background: rgba(65,217,154,0.05); }
+.lib-item:hover          { border-color: var(--hairline-2); }
+.lib-item.playing        { border-color: var(--signal); background: rgba(65,217,154,0.05); }
+.lib-item--dimmed        { opacity: 0.45; cursor: default; }
+.lib-item--dimmed:hover  { border-color: transparent; }
+
+.lib-art-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  background: var(--ink-3);
+  border-radius: 4px;
+  flex: none;
+}
 
 .lib-thumb {
   width: 40px;

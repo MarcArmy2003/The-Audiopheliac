@@ -237,8 +237,14 @@ def index():
 
 @app.route("/api/config")
 def client_config():
-    """Subset of config.json that the browser UI needs at startup."""
+    """Subset of config.json that the browser UI needs at startup.
+
+    `cockpit_version` is the explicit Cockpit-identifier field consumed by
+    launch.pyw's singleton check. Do not remove without updating the
+    singleton anchor in console/launch.pyw::is_existing_cockpit.
+    """
     return _ok({
+        "cockpit_version": __version__,
         "enabled_sources": config.get("enabled_sources", []),
         "net_radio_suggestions": config.get("net_radio_suggestions", []),
         "device_name": config.get("yamaha_name"),
@@ -473,7 +479,94 @@ def spotify_search():
 def spotify_playlists():
     sp = _require_spotify()
     limit = _clamp_int(request.args.get("limit"), default=50, lo=1, hi=200)
-    return _ok({"playlists": sp.playlists(limit=limit)})
+    playlists = sp.playlists(limit=limit)
+    # Prepend special library collections that current_user_playlists() never returns
+    special = [
+        {"id": "__liked__",    "uri": "liked",    "name": "Liked Songs",
+         "owner": "Your library", "tracks": None, "art_url": None, "special": "liked"},
+        {"id": "__episodes__", "uri": "episodes", "name": "Your Episodes",
+         "owner": "Your library", "tracks": None, "art_url": None, "special": "episodes"},
+        {"id": "__local__",    "uri": None,       "name": "Local Files",
+         "owner": "On this device · not playable via API", "tracks": None, "art_url": None, "special": "local"},
+    ]
+    return _ok({"playlists": special + playlists})
+
+
+def _resolve_device_id(sp: "SpotifyClient", device_id: str | None) -> str | None:
+    """Return device_id unchanged if provided. Otherwise find the active device,
+    falling back to the first available device. Returns None if no devices exist."""
+    if device_id:
+        return device_id
+    try:
+        devices = sp.devices()
+    except SpotifyError:
+        return None
+    active = next((d.get("id") for d in devices if d.get("is_active") and d.get("id")), None)
+    if active:
+        return active
+    return next((d.get("id") for d in devices if d.get("id")), None)
+
+
+@app.post("/api/spotify/liked/play")
+def spotify_liked_play():
+    sp = _require_spotify()
+    data = request.get_json(silent=True) or {}
+    device_id = _resolve_device_id(sp, str(data.get("device_id") or "").strip() or None)
+    if not device_id:
+        return _err("No Spotify device available. Open Spotify on any device first.", 503)
+    # Try the user-scoped collection context URI (plays full Liked Songs queue)
+    try:
+        user_id = (sp.me() or {}).get("id") or ""
+        if user_id:
+            sp.play(context_uri=f"spotify:user:{user_id}:collection", device_id=device_id)
+            return _ok()
+    except SpotifyError:
+        pass
+    # Fallback: fetch first 50 liked tracks and play as explicit URI list
+    result = sp._call("current_user_saved_tracks", limit=50) or {}
+    uris = [
+        item["track"]["uri"]
+        for item in (result.get("items") or [])
+        if item.get("track") and item["track"].get("uri")
+    ]
+    if not uris:
+        return _err("No liked songs found", 404)
+    try:
+        sp.play(uris=uris, device_id=device_id)
+        return _ok()
+    except SpotifyError as e:
+        return _err(str(e), 502)
+
+
+@app.post("/api/spotify/episodes/play")
+def spotify_episodes_play():
+    sp = _require_spotify()
+    data = request.get_json(silent=True) or {}
+    device_id = _resolve_device_id(sp, str(data.get("device_id") or "").strip() or None)
+    if not device_id:
+        return _err("No Spotify device available. Open Spotify on any device first.", 503)
+    # Try the user-scoped episodes collection context URI
+    try:
+        user_id = (sp.me() or {}).get("id") or ""
+        if user_id:
+            sp.play(context_uri=f"spotify:user:{user_id}:collection:your-episodes", device_id=device_id)
+            return _ok()
+    except SpotifyError:
+        pass
+    # Fallback: fetch saved episodes and play as explicit URI list
+    result = sp._call("current_user_saved_episodes", limit=50) or {}
+    uris = [
+        item["episode"]["uri"]
+        for item in (result.get("items") or [])
+        if item.get("episode") and item["episode"].get("uri")
+    ]
+    if not uris:
+        return _err("No saved episodes found", 404)
+    try:
+        sp.play(uris=uris, device_id=device_id)
+        return _ok()
+    except SpotifyError as e:
+        return _err(str(e), 502)
 
 
 @app.route("/api/spotify/queue")
