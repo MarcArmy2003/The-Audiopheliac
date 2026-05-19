@@ -28,6 +28,25 @@ The Audiopheliac is Gill Marchetti's lifestyle brand at the intersection of audi
 
 ---
 
+## CANONICAL PRODUCT REFERENCES
+
+**These documents define what The Audiopheliac and the Cockpit ARE. They are required reading at session-init and required citation in any Rafa prompt or task brief that touches product scope. CLAUDE.md describes operations and project hygiene; the documents below describe the product itself. Do not treat the PROJECT FOLDER STRUCTURE section as a specification — it describes the prototype layout, not the canonical design.**
+
+This section is load-bearing. A session that hasn't loaded these docs is a session that will rebuild things on guessed premises. The forensic record for what that failure looks like is the 2026-05-18 HISTORY entry titled "session-level reorientation."
+
+| Document | Path | When to read |
+|---|---|---|
+| **Cockpit System Design v2026.05** | `docs/Cockpit_System_Design_v2026_05.md` | Always at session-init. Required before any Cockpit feature, UX, or architecture work. Defines the Cockpit as a private web-based control center living at a route on theaudiopheliac.com, unifying music across four zones (Office Studio, Family Room, Lanai, Garage), integrating Hue lighting, exposing an LLM agent over MCP servers, and surfacing listening history. The `console/` Flask app is a prototype of one slice of this; the canonical product is bigger. |
+| **Cockpit Architecture Decisions v2026.05** | `docs/Cockpit_Architecture_Decisions_v2026_05.md` | Always at session-init. Required before any deployment, hosting, frontend, or integration decision. Five ADRs covering hosting model (Cloudflare Worker + Durable Object), frontend embedding (Astro Islands inside theaudiopheliac.com), auth (Cloudflare Access), MCP server topology, and state storage. All marked Proposed pending Gill's sign-off. |
+| **Brand voice guidelines v3** | `brand-voice-guidelines-v3.md` | Required before any user-facing UI copy, marketing copy, blog post, social content, or visual identity decision. Includes the dual-register voice modes (manifesto + direct), forbidden vocabulary list, and the Full Spectrum palette tie-in. |
+| **Listening Profile** | `docs/Audiopheliac_Listening_Profile_v2026_04.md` | Required before any playlist generation, recommendation, or music-curation task. Defines the genre spine (country/country-adjacent, classic rock, hard rock, blues-rock, selective hip-hop, selective pop), sonic priorities (bass-conscious, full low mids, clear lead vocals, muscular drums), and playlist design rules. |
+| **Site Architecture** | `docs/Audiopheliac_Site_Architecture.md` | Required before any work on the public-facing site at theaudiopheliac.com. The Cockpit lives at a private route on this site (per System Design §1) so site-level architecture decisions constrain Cockpit-level decisions too. |
+| **Audio System Playbook** | `media/audio_system_playbook.md` | Required before any signal-chain, gain-staging, or Office Studio routing decision. Documents the Office chain (GDMARCHE → AIR Hub → MX28 → HS7) which is independent of the Yamaha and easy to mistake for downstream-of-receiver. Some details are version-aged (mentions Scarlett Solo); cross-check against §SIGNAL CHAIN MAP below. |
+
+**Pattern for using this section:** When asked to do feature, UX, or architecture work, first read the relevant doc(s) from the table above, then state back the product framing before proposing anything. Citing the canonical doc by section in proposals is the discipline that catches scope drift before it costs commits.
+
+---
+
 ## COWORK OPERATING CONSTRAINTS
 
 - No memory across sessions. All state must be read from this file or from project files on disk.
@@ -382,7 +401,22 @@ automation/         All executable scripts. No outputs, no configs.
   spotify_local_match.py
   spotify_gap_report.py
 
-console/            Audiopheliac Cockpit v0.9.x (Spotify + YXC + MinimServer-via-DLNA local control panel)
+console/            **PROTOTYPE** Flask implementation of one slice of the Cockpit.
+                    Not the spec. Canonical product design lives in:
+                      - docs/Cockpit_System_Design_v2026_05.md
+                      - docs/Cockpit_Architecture_Decisions_v2026_05.md
+                    Read both before touching scope or architecture here.
+                    Currently covers: Spotify Web API + YXC for Yamaha + MinimServer
+                    via DLNA, single-zone (Family Room) implicitly. Missing from the
+                    canonical Cockpit: Chromecast/Cast (Office Shield, Lanai TV),
+                    SoundTouch (Garage Bose), Hue lighting, LLM agent, MCP server
+                    registry, listening history, Cloudflare Worker + Astro hosting,
+                    private route under theaudiopheliac.com, Cloudflare Access auth,
+                    multi-zone grouping via MusicCast distribution. Treat console/
+                    as a place to keep the prototype functional while the canonical
+                    architecture is built, NOT as the product. Do not add scope to
+                    this folder without first checking whether it should be in the
+                    canonical implementation instead.
   app.py            Flask routes (Spotify Web API + YXC + DLNA `/api/miniserver/*`)
   yamaha.py         YXC HTTP/JSON client (Yamaha R-N800A)
   spotify.py        Spotify Web API client (spotipy wrapper; server-side OAuth)
@@ -391,6 +425,7 @@ console/            Audiopheliac Cockpit v0.9.x (Spotify + YXC + MinimServer-via
   Create-Shortcut.ps1   Desktop shortcut generator
   config.json       yamaha_ip, host, port, enabled_sources, net_radio_suggestions, spotify {client_id, redirect_uri}
   requirements.txt  flask, requests, spotipy
+  README.md         Prototype-vs-spec framing + canonical references
   static/           style.css (Nashville Midnight), app.js (UI controller)
   templates/        index.html
   README.md         Install, run, extension auth, troubleshooting
@@ -591,6 +626,44 @@ Create the `lyrics/` and `prompts/` subdirectories under `Suno/` if they do not 
 
 ---
 
+## CROSS-PROJECT SCOPE BOUNDARIES
+
+Some platforms span multiple Gill workspaces. The Audiopheliac workspace is not the only Claude-managed environment that touches the NAS, the LAN, or the audio chain — the Lab workspace handles infrastructure, server administration, and platform health for the same hardware. To prevent duplicate work and conflicting recommendations, scope splits are codified here. When a task crosses a boundary, hand off explicitly rather than reaching across.
+
+### Plex Media Server
+
+Per the Lab workspace CLAUDE.md §1, the split between Lab and Audiopheliac is:
+
+**Lab scope (handle Plex infrastructure work in the Lab workspace):**
+- Plex Media Server qpkg health on the NAS (start/stop, version, claim status, transcoder enable)
+- Networking: LAN reachability, port 32400, removing stale router port-forward expectations, decisions about whether to re-enable any external access through Tailscale only
+- Storage: library paths on the NAS (likely under `5277_Marc/Multimedia`), watched folders, library scan intervals, file permissions on the share, scan failures
+- Container or qpkg conflicts (Plex Media Server, Multimedia Console, QuMagie, QuMagie AI Core, Video Station, Music Station, Cayin Media Viewer, CAYIN MediaSign Player, MinimServer, and QNAP DLNA Media Server all live on the same NAS and step on each other's indexing if not coordinated)
+- Plex client apps on GDMARCHE, phones, tablets
+- Plex Pass account, sign-in, server-claim status
+- Transcoder settings (the NAS now has 64 GB so RAM-cache transcoding is finally viable; this is a real win waiting to be claimed)
+
+**Audiopheliac scope (handle the audio-side decisions in this workspace):**
+- Audio quality, lossless integrity, bit-perfect playback chains
+- DLNA push from Plex (or any other UPnP server) into the Yamaha R-N800A receiver
+- MinimServer audiophile renderer config (already integrated via `console/minimserver.py`)
+- Music library curation, tagging standards, metadata for the music collection specifically, brand-voice for playlists and album art
+- Signal-chain decisions (Plex audio out → which interface → which speaker chain — Yamaha vs Office direct, etc.)
+- Anything that touches the M-Audio AIR Hub, Ableton Live, the vinyl-rip pipeline, or the Yamaha as the AVR
+
+**Hand-off pattern:** start in the Lab for any infrastructure question (qpkg, network, storage paths, library scanning, client apps, transcoder). Hand off to the Audiopheliac workspace the moment the question becomes "but does it sound right" or "how should the music be organized" or "which DAC does this hit." When in doubt, ask Gill — do not assume the boundary.
+
+**Known scanner-conflict failure mode (Lab-side, documented here for cross-reference):** multiple media apps competing on the same NAS is the single most common cause of Plex feeling unreliable. Symptoms include device-side inconsistency (clients see whichever app's metadata reached the database last) and stale indexing. The Lab workspace owns the consolidation work (the six-phase reset Gill scoped). When the Lab phase work is done and Plex is healthy, any *audio routing* questions about Plex output land back in the Audiopheliac workspace.
+
+### Future cross-project surfaces
+
+Other surfaces likely to need a boundary line (capture here when they come up):
+- YouTube integration (Cockpit feature vs Lab/platform admin)
+- Roon footprint removal (NAS-side / GDMARCHE-side Roon cleanup is Lab; Cockpit-side Roon integration cleanup is Audiopheliac — already complete)
+- Any cross-workspace MCP server (the Cockpit System Design references an MCP server registry; some servers may be Lab-administered)
+
+---
+
 ## VINYL COLLECTION MANAGEMENT
 
 - **Intake path:** `Vinyl_Collection_Update_Queue.csv`
@@ -751,6 +824,9 @@ Exit with /produce or /studio. See Suno Production Environment > Integration Not
 - **Search all sources before declaring information absent.** Premature conclusions about data unavailability are a known failure mode in this project.
 - **Flag software-profile updates proactively.** When working in or with any software application related to The Audiopheliac (Spotify, Ableton Live, Audacity, Suno, MinimServer, MusicCast Controller, Discogs CLI, NirSoft SoundVolumeView, M-Audio AIR Hub Control Panel, vendor utilities, etc.), or when changing the configuration of an existing application, Cowork must flag Gill that the corresponding profile at `docs/software/<Package>.md` should be updated. If no profile exists for the package yet, flag that one should be created from `docs/software/_TEMPLATE.md`. This applies to: setting changes, version upgrades, account or credential changes, signal-chain or pipeline integration changes, new automation that depends on the package, and any troubleshooting outcome worth durable capture. The flag is mandatory; Gill decides whether to act on it during the current session or queue it.
 - **Do not collapse Audiopheliac scope to solo/hobby framing.** The Audiopheliac is a lifestyle brand build with monetization paths active or in flight (see IDENTITY AND ROLE). When planning operations, governance, or architecture, reflect the full scope: content production, AI integrations, affiliate revenue, music releases, possible storefront, possible sponsorships. The hardware and signal chain are credibility foundation, not the project boundary.
+- **Scope contract — required on every Rafa prompt and every non-trivial Cowork task brief.** The first line of any prompt or brief that touches product scope must cite the canonical doc and section the work is scoped against. Example: "Scope: docs/Cockpit_System_Design_v2026_05.md §4a (zone routing). This work fits inside that section's data flow." If no canonical-doc citation is possible because the work doesn't fit any documented section, that itself is the signal to stop and ask whether the work is in scope at all. PROJECT FOLDER STRUCTURE descriptions are NOT specs; do not cite them as scope authority.
+- **Ambient assumption check before architectural or UX decisions.** Before drafting a design change, state the premises back explicitly. "I'm assuming X about the product, Y about the user, Z about the implementation." If those premises haven't been verified against the canonical references, do that first. The failure mode this catches: building successively correct fixes against a wrong mental model. See the 2026-05-18 HISTORY entry "session-level reorientation" for what skipping this looks like.
+- **`console/` is a prototype, not the product.** Never treat its current shape as the specification for further work. When asked to add scope to `console/`, ask first whether the scope belongs in the canonical Cloudflare Worker + Astro architecture instead. Patching the prototype while the canonical implementation is unbuilt is debt against the eventual real thing; do it only when the prototype-patching is consciously chosen and named as such.
 
 ---
 
@@ -785,15 +861,17 @@ Cowork does the work. Rafa is invoked only when the task requires Windows-native
 **Required at start of every session. Execute before any other action.**
 
 1. Read this CLAUDE.md (sole persistent instruction source per COWORK OPERATING CONSTRAINTS)
-2. Read Slack channel #theaudiopheliac (channel ID `C0AUH2RLZ41`): most recent messages for last action, blockers, in-flight work. The Session Development Log canvas (F0AU7FEMA7M) may also be consulted as legacy reference; daily_log.md is primary for prior session detail.
-3. Read `docs/daily_log.md` last entries for the durable archive view of recent sessions (per the hybrid logging charter, this is the archive of record)
-4. Read on-disk state files relevant to active work (e.g., `data/library_index/library_index.json`, `data/manifests/spotify_local_matches.json`, `Suno/suno_my_taste_draft.md`) as scoped by the task
-5. Output status block (see format below)
-6. Proceed with session work
+2. **Read the CANONICAL PRODUCT REFERENCES.** Specifically: `docs/Cockpit_System_Design_v2026_05.md` and `docs/Cockpit_Architecture_Decisions_v2026_05.md` are required reading on every session, not just when Cockpit work is on the table. They define what the product IS. The other entries in the §CANONICAL PRODUCT REFERENCES table are read as scoped to the task (brand voice for any UI/copy work, listening profile for any music-curation work, etc.). A session that skips this step will rebuild on guessed premises — see the 2026-05-18 HISTORY entry "session-level reorientation" for the forensic record of what that looks like.
+3. Read Slack channel #theaudiopheliac (channel ID `C0AUH2RLZ41`): most recent messages for last action, blockers, in-flight work. The Session Development Log canvas (F0AU7FEMA7M) may also be consulted as legacy reference; daily_log.md is primary for prior session detail.
+4. Read `docs/daily_log.md` last entries for the durable archive view of recent sessions (per the hybrid logging charter, this is the archive of record)
+5. Read on-disk state files relevant to active work (e.g., `data/library_index/library_index.json`, `data/manifests/spotify_local_matches.json`, `Suno/suno_my_taste_draft.md`) as scoped by the task
+6. Output status block (see format below) — the `Product framing` line is a forced restatement of what The Audiopheliac is, what the Cockpit is, what's prototype vs canonical, and where the implementation gap sits today. If you cannot write that line from the canonical references you just read, you didn't read them well enough; go back to step 2 before proceeding.
+7. Proceed with session work
 
 **Status block format:**
 ```
 AUDIOPHELIAC SESSION-INIT, [YYYY-MM-DD]
+Product framing: The Audiopheliac is [one-sentence brand summary]. The Cockpit is [one-sentence purpose per System Design §1]. Current implementation: [console/ Flask prototype vs canonical Cloudflare Worker + Astro + MCP-registry architecture — where the gap is today].
 Last action: [one-line from #theaudiopheliac or daily_log.md, or "first session of day"]
 Active: [top in-flight item or "none"]
 Blockers: [list or "none"]
@@ -895,6 +973,8 @@ See HISTORY entry dated 2026-05-18 for the full deprecation rationale.
 ---
 
 ## HISTORY
+
+**2026-05-18 (session-level reorientation: structural fixes after a session that built on the wrong product frame):** Gill called a hard stop on Cockpit dev after a long session in which I shipped three commits (`4ae6e7d`, `4d9ba2e`, `12d55bb`) and drafted further changes against a guessed product model — "the Cockpit is a Spotify+Yamaha+MinimServer remote, the Yamaha is the canonical destination." The canonical product, documented at `docs/Cockpit_System_Design_v2026_05.md`, is much larger: a private web-based control center at a route on theaudiopheliac.com, four zones (Office Studio / Family Room / Lanai / Garage), per-zone playback protocols (YXC + Cast + SoundTouch + UPnP), MusicCast multi-zone grouping, Hue lighting with album-art-driven theming, an LLM agent over an MCP server registry, listening history viz, and action targets (send-to-Ableton, fire Live scene, trigger Hue scene). The companion ADR doc at `docs/Cockpit_Architecture_Decisions_v2026_05.md` codifies the architecture: Cloudflare Worker + Durable Object backend, Astro frontend embedded in theaudiopheliac.com, Cloudflare Access auth, MCP servers on LAN via Cloudflare Tunnel. Neither doc was opened during the session. The forensic root cause: I treated the CLAUDE.md PROJECT FOLDER STRUCTURE entry for `console/` ("Audiopheliac Cockpit v0.9.x — Spotify + YXC + MinimServer-via-DLNA local control panel") as the spec, when it was just describing one prototype implementation. Every subsequent fix anchored to that wrong frame. UX problems Gill raised got patched at the surface (MUTE tile overflow, Spotify Devices ambiguity, Yamaha source row filtering, atomic Library-tab dispatch) inside the wrong model. The "Yamaha is the canonical destination" assumption cascaded — Office listening was systematically routed wrong, source switching looked broken because the destination model itself was wrong, and I built up to proposing more code (Office MinimServer renderer options A/B/C) on premises I should have verified by reading the spec on turn one. Structural fixes landed in this commit pass to prevent recurrence: (1) new top-level §CANONICAL PRODUCT REFERENCES section near the top of CLAUDE.md naming the System Design, ADR, brand voice, listening profile, site architecture, and audio system playbook as required reading with summaries and when-to-read guidance; (2) §SESSION-INIT PROTOCOL updated to require reading the System Design + ADR docs every session (not just when Cockpit work is on the table) and to require a "Product framing" line in the status block that restates what the product is, what's prototype vs canonical, and where the implementation gap sits; (3) PROJECT FOLDER STRUCTURE entry for `console/` rewritten to explicitly mark it as a prototype, list what's missing from the canonical Cockpit, and direct any scope work to ask first whether the right home is the canonical Cloudflare Worker + Astro implementation; (4) three new §BEHAVIORAL RULES — a Scope-contract rule requiring every Rafa prompt and non-trivial Cowork task brief to cite the canonical doc + section the work is scoped against, an Ambient assumption check rule requiring premise statements before architectural or UX decisions, and an explicit "console/ is a prototype, not the product" rule; (5) new §CROSS-PROJECT SCOPE BOUNDARIES section with the Lab/Audiopheliac split for Plex per Gill's Lab CLAUDE.md §1 (Lab handles Plex qpkg health + networking + storage + container conflicts + clients + Plex Pass + transcoder; Audiopheliac handles audio quality + DLNA into Yamaha + MinimServer + music library curation + signal-chain decisions + Scarlett/Ableton/vinyl-rip/AVR), with hand-off pattern documented; (6) `console/README.md` rewritten to lead with the prototype framing, list canonical references, enumerate what's missing from the canonical Cockpit, and codify the discipline for working in the folder; (7) `console/app.py` module docstring updated to name the prototype status and point at the canonical docs; (8) two new auto-memory entries — `project_cockpit_scope.md` (the four-zone framing + canonical-doc pointers) and `feedback_canonical_doc_first_for_cockpit.md` (the verification-first discipline applied to Cockpit work specifically). No code commits in this pass — the entire delivery is project-hygiene documentation. Gill explicitly stopped dev to reorient. Next session starts fresh against the canonical references.
 
 **2026-05-18 (Phase E ship: direct DLNA MinimServer integration in the Cockpit):** Direct UPnP/DLNA control-point integration shipped in `console/`, replacing the previously broken YXC-proxy stubs in the frontend (which were calling `/api/miniserver/*` routes that didn't exist). New hand-rolled module `console/minimserver.py` (~500 lines, stdlib + requests, no new dependencies): SSDP M-SEARCH multicast discovery of MediaServer + MediaRenderer, device description XML parsing, SOAP envelope construction for ContentDirectory:Browse + :Search, AVTransport:SetAVTransportURI + Play handoff, DIDL-Lite XML parsing. New routes in `console/app.py`: `/api/miniserver/{discover,status,browse,search,search-capabilities,play,stop,pause}` with CSRF + Host allowlist preserved. Frontend in `console/static/app.js`: `checkMinimServer` updated to new status shape, `browseMinimServer` rewritten for DLNA item shapes with breadcrumb navigation, new `searchMinimServer`, `doSearch` dispatches by `_activeLibSource`. Rafa Prompt 3 verified end-to-end (2026-05-18): SSDP discovery returns state="ready" with both MinimServer and Yamaha; Browse root returns the real MinimServer tree (520 albums, 6719 items, 148 playlists, plus Artist/Genre/Date/Composer indexes — not the QNAP generic Music/Videos/Photos); search returns coherent results; play handoff loaded Oasis "Hello" from MinimServer and played it through the Yamaha (woke the receiver from standby on the SetAVTransportURI+Play call); stop works. Four defects caught by Rafa during verification: (1) duplicate route block in `app.py` from a stale legacy MinimServer-via-YXC-proxy paradigm that collided with the new endpoint name — Rafa removed the legacy block; (2) `status_snapshot()` was last-wins on SSDP order, displaying Bose Lifestyle as the renderer when Yamaha was the actual play target — Cowork fixed to use `media_server()` and `media_renderer(friendly_name_hint="Yamaha")`; (3) `media_server()` returned the first MediaServer in SSDP order which was the QNAP generic DLNA server, defeating the whole integration — Rafa fixed to prefer MinimServer by manufacturer/model/friendly-name substring; (4) double-unescape silently zeroed pages when titles contained legitimate `&amp;` (e.g. Crosby, Stills, Nash & Young) — Rafa fixed by parsing result_xml directly without the extra `html.unescape()`, plus added per-element try/except in `_parse_didl_lite` so one malformed item can't discard a whole page. One functional limitation fixed by Cowork in the same pass: search was title-only (`dc:title contains "X"`), so artist-name queries returned 0 results even when the artist was in the library; rewrote `_build_search_criteria` to compound across `dc:title`, `upnp:artist`, `upnp:album`, `dc:creator` for `kind=all` and `kind=track`. Phase D + F (source-aware UX redesign and per-session queue management) is the next major work block; the DLNA foundation is now verified ready to support it.
 

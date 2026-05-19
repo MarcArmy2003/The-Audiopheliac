@@ -1,4 +1,12 @@
-"""Audiopheliac Cockpit v0.9 - Spotify + YXC only (Roon removed).
+"""Audiopheliac Cockpit v0.9 — Spotify + YXC + MinimServer-via-DLNA.
+
+PROTOTYPE. Not the product specification. The canonical Cockpit lives in
+`docs/Cockpit_System_Design_v2026_05.md` and `docs/Cockpit_Architecture_Decisions_v2026_05.md`
+— a Cloudflare Worker + Astro implementation at a private route on
+theaudiopheliac.com, with four zones, Hue lighting, an LLM agent over an
+MCP server registry, and listening history. This file is a single-zone
+Flask slice exercising part of that design. Read the canonical docs
+(and `console/README.md`) before adding scope or changing architecture.
 
 Run with:  python app.py            (foreground, dev)
        or  pythonw launch.pyw       (silent, Chrome --app, production)

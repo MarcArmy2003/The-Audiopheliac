@@ -1,25 +1,49 @@
-# Audiopheliac Cockpit (v0)
+# `console/` — Audiopheliac Cockpit PROTOTYPE
 
-Local desktop console for the Yamaha R-N800A receiver. Runs on GDMARCHE,
-controls the receiver via the YXC HTTP/JSON API on the LAN.
+**This folder is a prototype. It is not the product specification.**
 
-This is the v0 descope of the full Cockpit specced in
-`../docs/Cockpit_System_Design_v2026_05.md`. No Cloudflare. No Worker.
-No auth. Single device. Loopback only.
+The canonical Cockpit design lives in:
+- [`../docs/Cockpit_System_Design_v2026_05.md`](../docs/Cockpit_System_Design_v2026_05.md) — what the Cockpit IS (private web-based control center at a route on theaudiopheliac.com, four zones, Hue integration, LLM agent over MCP servers, listening history, album-art-driven theming)
+- [`../docs/Cockpit_Architecture_Decisions_v2026_05.md`](../docs/Cockpit_Architecture_Decisions_v2026_05.md) — five ADRs covering hosting (Cloudflare Worker + Durable Object), frontend (Astro Islands embedded in theaudiopheliac.com), auth (Cloudflare Access), MCP server topology, state storage
 
-## What it does
+Read both before adding scope, changing architecture, or making UX decisions here. The shape of this folder is an early, single-zone, locally-hosted Flask slice. It is not what the product is supposed to become.
+
+This is the v0 descope of that full spec. No Cloudflare. No Worker. No auth. Single device. Loopback only.
+
+## What this prototype currently does
 
 - Power on, standby
-- Volume slider with up/down and mute toggle
-- Input source select (driven by the receiver's reported `input_list`)
+- Volume slider with up/down and mute toggle (UNMUTED / Muted state on a `.power` button)
+- Input source select (driven by the receiver's reported `input_list`, filtered through `enabled_sources` and the `LIBRARY_DRIVEN_SOURCES` exclusion list)
 - Now Playing card with album art (Spotify Connect, Net Radio, Server/DLNA)
 - Transport controls (play, pause, next, previous) where the source supports them
 - Net Radio preset recall (recalls existing presets; does not create new ones)
+- Spotify Web API: browse, search, transport, queue, Spotify Connect device transfer (auth via spotipy OAuth)
+- MinimServer via hand-rolled UPnP/DLNA control point (SSDP discovery, ContentDirectory browse + search, AVTransport push to the Yamaha as MediaRenderer)
+- CSRF + Host allowlist hardening on the Flask surface
+- Single-trigger desktop launch via `launch.pyw` (Chrome `--app`, singleton check anchored on `cockpit_version`)
 
-## What it does not do (yet)
+## What this prototype is MISSING from the canonical Cockpit
 
-Multi-zone control, Hue, LLM agent, Spotify Web API search, listening
-history, anything off-LAN. Those are in the full Cockpit spec.
+- Multi-zone routing (Office Studio, Family Room, Lanai, Garage) per System Design §1. Current implementation is implicitly single-zone (Family Room via Yamaha).
+- Cast endpoints for Chromecast 4K and Shield Pro per System Design §1.
+- SoundTouch HTTP API for the Garage Bose per System Design §1.
+- Hue lighting integration with album-art-driven color extraction per System Design §1.5–§1.6.
+- Natural-language LLM agent over an MCP server registry per System Design §1.7.
+- Listening history viz per System Design §1.9.
+- Action targets (send-to-Ableton, fire Live scene, trigger Hue scene) per System Design §1.8.
+- Cloudflare Worker + Durable Object backend per ADR-001.
+- Astro frontend embedded in theaudiopheliac.com at a private route per ADR-002.
+- Cloudflare Access auth boundary.
+- Multi-zone grouping via MusicCast distribution (R-N800A as server).
+
+## Discipline for working here
+
+- Cite the canonical doc and section in every prompt and task brief that touches this folder. `CLAUDE.md` PROJECT FOLDER STRUCTURE entries are descriptions, not specs.
+- Do not treat the prototype's current UX as the design. If a UX problem surfaces, ask first whether the fix belongs in the canonical Cloudflare Worker + Astro implementation rather than in `console/`.
+- Patches to `console/` are debt against the eventual canonical implementation. Land them only when consciously chosen as bridge work, named as such in the commit message.
+
+See `../CLAUDE.md` §CANONICAL PRODUCT REFERENCES and §BEHAVIORAL RULES (scope contract + ambient assumption check) for the discipline that prevents the failure mode documented in the 2026-05-18 HISTORY entry "session-level reorientation."
 
 ## Install
 
